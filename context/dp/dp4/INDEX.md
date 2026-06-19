@@ -28,8 +28,12 @@ dp4/
 | A4(4안) | Pipes-and-Filters Stateless Stage | Pipes and Filters, Stateless, Std schema | R-02 | 발굴·평가완료 |
 | A5(5안) | Serverless/Ephemeral Compute-per-Node | FaaS, Ephemeral, Scale-to-zero, Bulkhead | R-02 | 발굴·평가완료 |
 | A6(6안) | Durable Orchestration (Workflow Engine) | Durable Execution, Event Sourcing, Saga | R-03 | 발굴·평가완료 |
+| A7(7안) | Microkernel Plug-in Node Backends | Microkernel/Plug-in, Plugin registry | R-04 | 발굴·평가완료 |
+
+> **신규 5개(A3~A7) 발굴 완료.** 통합 비교·조합 권고는 `evaluation.md` 참조.
 
 ## Iteration 로그
 - **Iter1 (2026-06-20)**: Event-driven/message-queue 패턴군 리서치(R-01) → A3 Event-Driven Work Queue 발굴·평가. 근거: Azure Competing Consumers/Claim-Check.
 - **Iter2 (2026-06-20)**: 구조 스타일(Pipes-and-Filters) + 실행 기반(Serverless/Ephemeral) 리서치(R-02) → A4·A5 발굴·평가. 결정 축이 "어디서 실행(A5)"과 "어떻게 분해(A4)" 둘로 분리됨을 식별. 근거: Azure Pipes-and-Filters, Knative/FaaS.
 - **Iter3 (2026-06-20)**: Durable Execution/Event Sourcing/Saga 리서치(R-03) → A6 발굴·평가. "실행 상태의 내구성·복구"를 1급으로 두는 직교 축, FR-0001(재시도·복구) 정조준. 근거: Temporal/Argo, Saga Orchestration vs Choreography.
+- **Iter4 (2026-06-20)**: Microkernel/Plug-in 리서치(R-04) → A7 발굴·평가. 단계 구현 변종(variety) 수용 축. 근거: Microkernel architecture(SSD/csse6400). → **신규 5개 충족, evaluation.md로 통합 종합.**
