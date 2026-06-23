@@ -3,7 +3,7 @@
 > `context/qa/`의 QA·KPI를 **반복 심의(라운드)**하며 완성도를 끌어올리는 작업의 색인.
 > 한 라운드 = red team 비평(review) + blue team 권고(counsel)의 한 묶음.
 > 공통 프로토콜·다른 영역(DP 등)은 상위 [`../README.md`](../README.md). 트리거: "QA 디스커션 돌리자".
-> updated: 2026-06-23
+> updated: 2026-06-24
 
 ## 관리 체계
 
@@ -23,29 +23,29 @@
 
 | 라운드 | 날짜 | 대상 | High | Med | Low | 한 줄 요약 |
 |---|---|---|:---:|:---:|:---:|---|
-| [round-01](round-01/review/report.md) | 2026-06-23 | QA-01~10 | 4 | 5 | 1 | red team 최초 리뷰. KPI 측정불가(placeholder·“최대화”)·정의↔KPI 불일치 다수, agentic 고유 리스크 과소대표. (blue team counsel 예정) |
+| round-01 [review](round-01/review/report.md) · [counsel](round-01/counsel/counsel.md) | review 2026-06-23 · counsel 2026-06-24 | QA-01~10 | 4 | 5 | 1 | red team 최초 리뷰(KPI ✕ 3·정의↔KPI 불일치·agentic 리스크 과소대표) → **blue team counsel 완료**: KPI ✕ 3건 전부 측정가능화, C1~C5 응답, 17개 PoC, NQA-A/B/C 채택 권고. |
 
 ## QA별 verdict 추세
 
-표기: ◎ 우수 · ○ 타당 · △ 부분결함 · ✕ 재설계 (형식: `Sound / KPI`)
+표기: ◎ 우수 · ○ 타당 · △ 부분결함 · ✕ 재설계 (형식: `Sound / KPI`). counsel = blue team 권고 stance.
 
-| QA | 속성 | round-01 |
-|---|---|---|
-| QA-01 | Scalability | △ / ✕ |
-| QA-02 | Availability | ○ / △ |
-| QA-03 | Controllability | ◎ / △ |
-| QA-04 | Observability | ○ / △ |
-| QA-05 | Efficiency | ○ / △ |
-| QA-06 | Reliability (WF 격리) | ○ / ○ |
-| QA-07 | Performance (Agent 시간) | △ / ✕ |
-| QA-08 | Performance (E2E) | △ / ✕ |
-| QA-09 | Reliability (일관성) | △ / △ |
-| QA-10 | Maintainability | ○ / ○ |
+| QA | 속성 | round-01 review | round-01 counsel |
+|---|---|---|---|
+| QA-01 | Scalability | △ / ✕ | 채택 권장 (scaling efficiency + rate-limit 헤드룸) |
+| QA-02 | Availability | ○ / △ | 채택 권장 (MTTR 분해·무손실 + 외부 LLM 장애) |
+| QA-03 | Controllability | ◎ / △ | 채택 권장 (위반 0건 편입 + runaway cap) |
+| QA-04 | Observability | ○ / △ | 채택 권장 (trace 완전성 + event-history) |
+| QA-05 | Efficiency | ○ / △ | 채택 권장 (캐시 분리집계, top-line→NQA-C) |
+| QA-06 | Reliability (WF 격리) | ○ / ○ | 채택 권장 (쿼터 격리 KPI 추가) |
+| QA-07 | Performance (Agent 시간) | △ / ✕ | 채택 권장 (speedup + 품질 게이트) |
+| QA-08 | Performance (E2E) | △ / ✕ | 채택 권장 (E2E latency·throughput 추가) |
+| QA-09 | Reliability (일관성) | △ / △ | 채택 권장 (캐시우회 pass^k + 유효-결정률) |
+| QA-10 | Maintainability | ○ / ○ | 채택 권장 (CIS p95 + model 교체축) |
 
 ## 신규 QA 권고 추세
 
-| 후보 | 제안 라운드 | 상태 |
-|---|---|---|
-| NQA-A Security/Safety | round-01 | 권고 (미채택) |
-| NQA-B Correctness/Accuracy | round-01 | 권고 (미채택) |
-| NQA-C Cost-economy | round-01 | 권고 (미채택) |
+| 후보 | 제안 라운드 | counsel stance | 상태 |
+|---|---|---|---|
+| NQA-A Security/Safety | round-01 | 신설·**강력권장** (우선순위 상위) | 권고 (미채택, Stage 2 대기) |
+| NQA-B Correctness/Accuracy | round-01 | 신설·**권장** (QA-07/09 게이트 전제) | 권고 (미채택, Stage 2 대기) |
+| NQA-C Cost-economy | round-01 | 신설·권장 (Med, QA-05/01 KPI 흡수) | 권고 (미채택, Stage 2 대기) |
