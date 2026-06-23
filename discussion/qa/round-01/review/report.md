@@ -1,6 +1,6 @@
 # QA 리뷰 round-01 — 결론 리포트
 
-> **이 문서 하나로 round-01의 전모를 파악할 수 있다.** 개별 근거는 `QA-0X-*.md`, 방법론은 [`../Reviewer.md`](../Reviewer.md).
+> **이 문서 하나로 round-01의 전모를 파악할 수 있다.** 개별 근거는 `QA-0X-*.md`, 방법론은 [`../../Reviewer.md`](../../Reviewer.md).
 > date: 2026-06-23 · scope: `context/qa/` QA 10 + QAS 10
 > lenses: (1) Agentic Workflow 전문가 · (2) 20년차 수석 아키텍트 · (3) 대규모 Workflow Runner 인프라 아키텍트
 > 직전 라운드: 없음(최초)

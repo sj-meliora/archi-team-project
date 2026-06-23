@@ -54,7 +54,7 @@ QA/QAS 방법론의 형식적 완성도를 본다. 점검 축:
 - `context/overview.md` (시스템 정의·Pain Point — KPI 현실성 판단의 기준선)
 - `context/glossary.md` (약어·QA 번호 매핑)
 - `context/INDEX.md` (ID 체계·DP 목록)
-- 직전 라운드 `report.md` (있으면 — 추세 비교용)
+- 직전 라운드 `round-NN/review/report.md` (있으면 — 추세 비교용)
 
 ## 2. 판정 rubric
 
@@ -102,20 +102,22 @@ QA/QAS 방법론의 형식적 완성도를 본다. 점검 축:
 
 ---
 
-## 6. 라운드 산출물 (한 라운드 폴더 `round-NN-YYYY-MMDD/`)
+## 6. 라운드 산출물 (red team 몫은 `round-NN/review/`)
 
-| 파일 | 역할 |
+라운드 폴더는 `round-NN/` (날짜 없음 — 메타는 보고서에 기록). red team 산출물은 그 아래 `review/`에 둔다(`counsel/`은 blue team [`Council.md`](Council.md) 몫).
+
+| `round-NN/review/` 파일 | 역할 |
 |---|---|
-| `report.md` | **이것만 읽으면 라운드 전체를 아는 결론 요약** — 판정표·교차발견·우선순위·신규QA·직전 라운드 대비 변화 |
+| `report.md` | **이것만 읽으면 라운드 전체를 아는 결론 요약** — 판정표·교차발견·우선순위·신규QA·직전 라운드 대비 변화. **날짜 등 메타를 여기 기록.** |
 | `README.md` | 폴더 내비게이션(파일 목록·읽기순서·링크). 분석 내용은 두지 않음 |
 | `QA-0X-*.md` | QA별 3렌즈 상세 (위 §4 포맷) |
 | `_new-qa-candidates.md` | 신규 QA 권고(NQA-*) |
 
-상위 `review/qa/README.md`(마스터 인덱스)에 라운드 1줄 + verdict 추세표를 갱신한다.
+상위 `discussion/qa/README.md`(마스터 인덱스)에 라운드 1줄 + verdict 추세표를 갱신한다.
 
 ---
 
-## 7. 관리 규칙 (review/qa/)
+## 7. 관리 규칙 (discussion/qa/)
 
 - **append-only**: 지난 라운드는 수정 금지(오타·링크만 예외). 개선은 새 라운드로.
 - **순환**: 리뷰(라운드 N) → Stage 2에서 `context/qa/` 개선 → 라운드 N+1로 검증.

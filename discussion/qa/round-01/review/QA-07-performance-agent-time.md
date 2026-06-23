@@ -48,5 +48,5 @@
   - 기존 `{사람−에이전트} 최대화` → **`노드타입별 speedup ≥ ◯배`** 또는 **`Agent 노드시간 ≤ 수동 baseline의 30%`**
   - **품질 게이트 동반**: 위 시간지표는 **first-pass 성공한 작업에 한해** 집계(재작업분 제외) → “빠르게 틀리기” 차단
   - 커버리지 명시: 측정 대상 노드 집합을 고정(easy-node cherry-picking 방지)
-- **QA-08과 통합 검토**: Performance QA를 하나로 묶고 07=per-node, 08=E2E throughput의 sub-metric으로. README C3 참조.
+- **QA-08과 통합 검토**: Performance QA를 하나로 묶고 07=per-node, 08=E2E throughput의 sub-metric으로. report.md C3 참조.
 - DP 연결 점검: DP-0001(즉시 실행)이 latency만 보는지, 품질 게이트와 연결되는지 역검토.

@@ -1,7 +1,7 @@
 # QA 리뷰 round-01 (2026-06-23) — 내비게이션
 
 > 이 폴더는 `context/qa/` QA 10 + QAS 10에 대한 round-01 리뷰다.
-> **결론 요약은 [`report.md`](report.md) 하나만 읽으면 된다.** 리뷰 방법론은 [`../Reviewer.md`](../Reviewer.md).
+> **결론 요약은 [`report.md`](report.md) 하나만 읽으면 된다.** 리뷰 방법론은 [`../../Reviewer.md`](../../Reviewer.md).
 
 ## 읽는 순서
 
