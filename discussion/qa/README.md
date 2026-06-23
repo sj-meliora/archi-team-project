@@ -2,6 +2,7 @@
 
 > `context/qa/`의 QA·KPI를 **반복 심의(라운드)**하며 완성도를 끌어올리는 작업의 색인.
 > 한 라운드 = red team 비평(review) + blue team 권고(counsel)의 한 묶음.
+> 공통 프로토콜·다른 영역(DP 등)은 상위 [`../README.md`](../README.md). 트리거: "QA 디스커션 돌리자".
 > updated: 2026-06-23
 
 ## 관리 체계
