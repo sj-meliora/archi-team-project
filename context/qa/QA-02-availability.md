@@ -1,4 +1,4 @@
-# QA-0003 Availability — 운영 안정성
+# QA-02 Availability — 운영 안정성
 
 > category: QA | importance: H | difficulty: H | source: pptx p.13 | updated: 2026-06-19
 > related-dp: DP-0001, DP-0002, DP-0003

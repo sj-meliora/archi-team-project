@@ -1,7 +1,7 @@
 # C-0002 배포 이식성
 
 > category: Constraint | source: pptx p.14 | updated: 2026-06-19
-> related: QA-0003, QA-0004
+> related: QA-02, QA-03
 
 ## 제약
 - 클라우드 외 내부 개발 서버에도 직접 구축 가능해야 함.

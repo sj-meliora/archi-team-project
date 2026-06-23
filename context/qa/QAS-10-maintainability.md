@@ -1,6 +1,6 @@
-# QAS-0010 모듈 교체 용이성 시나리오
+# QAS-10 모듈 교체 용이성 시나리오
 
-> category: QAS | refines: QA-0010 (Maintainability) | updated: 2026-06-20
+> category: QAS | refines: QA-10 (Maintainability) | updated: 2026-06-20
 
 | 요소 | 내용 |
 |---|---|

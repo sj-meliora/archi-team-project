@@ -19,13 +19,13 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 | 기능 요구사항 | requirements/ | FR | |
 | 비기능 요구사항 | requirements/ | NFR | (현재 없음, 예약) |
 | 제약 | requirements/ | C | |
-| 품질 속성 | qa/ | QA | canonical = 슬라이드 13 기준 |
-| 품질 속성 시나리오 | qa/ | QAS | 6-part 정형화 |
+| 품질 속성 | qa/ | QA | **2자리**, 번호 = 발표 우선순위(재정렬 가능) |
+| 품질 속성 시나리오 | qa/ | QAS | 6-part 정형화, **2자리** |
 | 설계 결정 | dp/ | DP | ATAM 분석을 문서 내부에 포함 |
 | 산출물(뷰/도표) | artifacts/ | (자유) | context/domain diagram 등 |
 
-- ID 포맷: `<CAT>-<NNNN>` (4자리 zero-pad). 파일명 = `<ID>-<kebab-slug>.md`.
-- ID는 영구 고정 — 슬러그/내용만 변경. cross-link은 본문에 ID 텍스트로(`DP-0002`, `QA-0004`) 적어 grep 역참조 가능하게.
+- ID 포맷: `<CAT>-<NNNN>` (4자리 zero-pad). **단 QA·QAS는 2자리(`QA-01`)** — 번호가 곧 발표 우선순위. (FR/C/DP도 2자리 통일 예정.) 파일명 = `<ID>-<kebab-slug>.md`.
+- FR/C/DP ID는 영구 고정(슬러그/내용만 변경). **QA·QAS 번호는 우선순위가 바뀌면 재번호.** cross-link은 본문에 ID 텍스트로(`DP-0002`, `QA-03`) 적어 grep 역참조 가능하게.
 
 ## 전체 ID 목록
 
@@ -39,10 +39,10 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 - C-0002 배포 이식성
 
 ### qa/
-- QA-0001 Efficiency / QA-0002 Scalability / QA-0003 Availability / QA-0004 Controllability
-- QA-0005 Observability / QA-0006 Reliability(Workflow) / QA-0007 Performance(Agent수행시간)
-- QA-0008 Performance(E2E) / QA-0009 Reliability(Agent일관성) / QA-0010 Maintainability
-- QAS-0001.. (QA별 6-part 시나리오)
+- QA-01 Scalability / QA-02 Availability / QA-03 Controllability / QA-04 Observability
+- QA-05 Efficiency / QA-06 Reliability(Workflow) / QA-07 Performance(Agent수행시간)
+- QA-08 Performance(E2E) / QA-09 Reliability(Agent일관성) / QA-10 Maintainability
+- QAS-01.. (QA별 6-part 시나리오)
 
 ### dp/
 - DP-0001 Workflow–Agent 매핑

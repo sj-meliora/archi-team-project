@@ -1,6 +1,6 @@
-# QAS-0005 관측성 시나리오
+# QAS-04 관측성 시나리오
 
-> category: QAS | refines: QA-0005 (Observability) | updated: 2026-06-20
+> category: QAS | refines: QA-04 (Observability) | updated: 2026-06-20
 
 | 요소 | 내용 |
 |---|---|

@@ -1,7 +1,7 @@
 # DP-0004 Workflow 실행 구조
 
 > category: DP | status: 결정대기(A5 vs A8로 수렴) | source: pptx p.32 | updated: 2026-06-22
-> drives: QA-0002(Scalability), QA-0006(Reliability-Workflow), QA-0008(Performance-E2E), QA-0010(Maintainability)
+> drives: QA-01(Scalability), QA-06(Reliability-Workflow), QA-08(Performance-E2E), QA-10(Maintainability)
 > realizes: FR-0001, FR-0002 | constrained-by: C-0001(Docker)
 > 보강작업: `dp4/`(INDEX·decision-axes·approaches A3~A8·evaluation·review)
 > note: ⚠️ 원본 헤더가 DP-0002 라벨(Hierarchical/Decentralized) 복붙 오류 — 내용 기준 라벨로 교정 (OI-3)
@@ -49,9 +49,9 @@
 ## ATAM 분석 (A5 vs A8 초점)
 
 ### 민감점 (Sensitivity Points)
-- **SP-1 (전달 배치 → Performance)**: 중간 Artifact 전달 방식(claim-check 원격 vs 로컬 스트리밍)이 QA-0008(전달 오버헤드 ≤5%)에 강하게 민감. **A5 vs A8을 가르는 핵심 손잡이**.
-- **SP-2 (산출물 내구성 → Reliability)**: 산출물 저장 위치(오브젝트 스토리지 vs 노드 로컬 디스크)가 QA-0006(노드 사망 시 재실행 범위)에 민감.
-- **SP-3 (cold-start)**: 일회용 공통 약점. 이미지 크기·pre-warm/min-instance 정책이 QA-0008·QA-0007에 민감(A5·A8 공통이나 A5가 더 노출).
+- **SP-1 (전달 배치 → Performance)**: 중간 Artifact 전달 방식(claim-check 원격 vs 로컬 스트리밍)이 QA-08(전달 오버헤드 ≤5%)에 강하게 민감. **A5 vs A8을 가르는 핵심 손잡이**.
+- **SP-2 (산출물 내구성 → Reliability)**: 산출물 저장 위치(오브젝트 스토리지 vs 노드 로컬 디스크)가 QA-06(노드 사망 시 재실행 범위)에 민감.
+- **SP-3 (cold-start)**: 일회용 공통 약점. 이미지 크기·pre-warm/min-instance 정책이 QA-08·QA-07에 민감(A5·A8 공통이나 A5가 더 노출).
 - **SP-4 (노드 footprint, A8 고유)**: 모델당 파이프라인이 단일 노드 용량에 들어가는지가 A8의 로컬리티 유지 vs spill에 민감.
 
 ### 교환점 (Tradeoff Points)
@@ -59,7 +59,7 @@
 - **TP-2 (단순성 ↔ 로컬리티 제어)**: A5는 배치 자유로 스케줄러 단순, A8은 data-affinity·로컬 볼륨 수명관리로 Maintainability 비용 추가.
 
 ### 위험 (Risks)
-- **R-1 (A5)**: 대형 컴파일러 이미지 cold-start + 20GB claim-check 왕복으로 E2E ≤5% 전달 budget(QA-0008) 미달 위험 → pre-warm pool·이미지 슬림화로 완화.
+- **R-1 (A5)**: 대형 컴파일러 이미지 cold-start + 20GB claim-check 왕복으로 E2E ≤5% 전달 budget(QA-08) 미달 위험 → pre-warm pool·이미지 슬림화로 완화.
 - **R-2 (A8)**: 모델 폭증으로 노드 용량 초과 → **로컬리티 붕괴, 원격 전달 degrade(A8 강점 소멸 → A5에 수렴)**. 로컬 디스크 유실 시 재실행 비용↑ → 복제/체크포인트 정책 필요.
 - **R-3 (공통)**: 일회용 scale-to-zero 후 동시 폭증 시 throttling → min-instance 하한 필요.
 
@@ -67,7 +67,7 @@
 - **NR-1**: A5·A8 모두 C-0001(Docker)·C-0002(이식성) 충족 — K8s Job / Knative(+pod affinity·local volume) 컨테이너 기반 구동.
 
 ## 결정을 가르는 단일 질문
-> **`(4단계 × 20GB 왕복) ÷ 스토리지 대역폭`이 E2E의 5% budget(QA-0008) 안에 드는가?**
+> **`(4단계 × 20GB 왕복) ÷ 스토리지 대역폭`이 E2E의 5% budget(QA-08) 안에 드는가?**
 - **든다 → A5** (전달세금 감내 가능 → 단순·복구 유리 채택).
 - **넘는다 → A8** (전달세금 회피 필요 → 로컬 전달, locality-first 채택).
 - 이 산식은 **실측·노드 사양 의존 → 팀 검증 대상**. 본 결정은 *구조*를 고정하고 수치는 측정으로 채운다.

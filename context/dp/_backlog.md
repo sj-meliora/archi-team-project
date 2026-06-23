@@ -5,12 +5,12 @@
 > driving QA의 tactic/pattern 카탈로그에서 발굴 → 검증되면 해당 DP 파일의 대안으로 승격.
 
 ## BL-1 → DP-0002: Hierarchical + Standby Orchestrator
-- **driving QA**: QA-0003(Availability) — 1안의 Orchestrator SPOF(R-1) 완화 목적.
+- **driving QA**: QA-02(Availability) — 1안의 Orchestrator SPOF(R-1) 완화 목적.
 - **근거 tactic**: Redundancy(Active-Passive), Heartbeat, State resync.
-- **상태**: DP-0002에 3안으로 임시 반영. 페일오버 시간·일관성(QA-0009) 검증 필요.
+- **상태**: DP-0002에 3안으로 임시 반영. 페일오버 시간·일관성(QA-09) 검증 필요.
 
 ## BL-2 → DP-0002: Hierarchical Federation (도메인별 Sub-Orchestrator)
-- **driving QA**: QA-0002(Scalability), QA-0008(Performance) — 단일 Orchestrator 병목(TP-2) 완화.
+- **driving QA**: QA-01(Scalability), QA-08(Performance) — 단일 Orchestrator 병목(TP-2) 완화.
 - **근거 pattern**: Hierarchical control + 파이프라인 단계(Converter/Optimizer/Compiler)별 Sub-Orchestrator.
 - **상태**: 미검토. 제어 일관성 유지하며 수평 확장 가능한지 평가 필요.
 

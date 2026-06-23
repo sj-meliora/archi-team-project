@@ -1,6 +1,6 @@
-# QAS-0007 Agent 수행 시간 시나리오
+# QAS-07 Agent 수행 시간 시나리오
 
-> category: QAS | refines: QA-0007 (Performance-Agent) | updated: 2026-06-20
+> category: QAS | refines: QA-07 (Performance-Agent) | updated: 2026-06-20
 
 | 요소 | 내용 |
 |---|---|

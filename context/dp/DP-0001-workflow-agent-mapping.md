@@ -1,7 +1,7 @@
 # DP-0001 Workflow – Agent 매핑
 
 > category: DP | status: 결정대기 | source: pptx p.29 | updated: 2026-06-20
-> drives: QA-0007(Performance-Agent), QA-0003(Availability), QA-0002(Scalability), QA-0001(Efficiency)
+> drives: QA-07(Performance-Agent), QA-02(Availability), QA-01(Scalability), QA-05(Efficiency)
 > realizes: FR-0001
 
 ## 결정 포인트
@@ -29,15 +29,15 @@ Workflow 노드에 Agent를 어떻게 배치할 것인가 — **고정 배치(�
 
 ## ATAM 분석
 ### 민감점 (Sensitivity Points)
-- **SP-1**: Agent Router의 routing 지연이 Performance(QA-0007)에 민감 (2안).
-- **SP-2**: Agent 배치 정적/동적 여부가 Scalability(QA-0002, 자원활용률≥70%)에 민감.
+- **SP-1**: Agent Router의 routing 지연이 Performance(QA-07)에 민감 (2안).
+- **SP-2**: Agent 배치 정적/동적 여부가 Scalability(QA-01, 자원활용률≥70%)에 민감.
 
 ### 교환점 (Tradeoff Points)
 - **TP-1 (Performance ↔ Scalability/Efficiency)**: 고정 배치는 즉시성↑·확장성↓, 동적 풀은 그 반대. 본 DP의 핵심 교환점.
 
 ### 위험 (Risks)
 - **R-1**: 1안은 모델·노드 폭증(배경 워크로드 축) 시 자원활용률 70% 미달 위험.
-- **R-2**: 2안의 routing 지연이 QA-0007(수행시간 단축) 효과를 잠식할 위험.
+- **R-2**: 2안의 routing 지연이 QA-07(수행시간 단축) 효과를 잠식할 위험.
 
 ### 비위험 (Non-Risks)
 - **NR-1**: 두 안 모두 노드 단위 재시도/복구(FR-0001)는 지원 가능.

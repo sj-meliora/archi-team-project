@@ -1,6 +1,6 @@
-# QAS-0008 E2E 개발 시간 시나리오
+# QAS-08 E2E 개발 시간 시나리오
 
-> category: QAS | refines: QA-0008 (Performance-E2E) | updated: 2026-06-20
+> category: QAS | refines: QA-08 (Performance-E2E) | updated: 2026-06-20
 
 | 요소 | 내용 |
 |---|---|

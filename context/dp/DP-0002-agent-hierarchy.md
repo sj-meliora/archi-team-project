@@ -1,7 +1,7 @@
 # DP-0002 Agent Hierarchy
 
 > category: DP | status: 결정대기 | source: pptx p.30 | updated: 2026-06-20
-> drives: QA-0004(Controllability)↑, QA-0003(Availability), QA-0008(Performance-E2E), QA-0002(Scalability)
+> drives: QA-03(Controllability)↑, QA-02(Availability), QA-08(Performance-E2E), QA-01(Scalability)
 > realizes: FR-0004
 
 ## 결정 포인트
@@ -25,7 +25,7 @@ Agent들을 어떤 위상(topology)으로 구성할 것인가 — **중앙 제�
 - **구조**: 1안 + Orchestrator를 Active-Passive 이중화, 상태 외부화.
 - **근거 tactic**: [Availability] Redundancy(Active-Passive) + Heartbeat + State resync.
 - **의도**: 1안의 Controllability ★★★를 유지하면서 SPOF를 완화.
-- **미검증 trade-off**: 페일오버 중 일관성(QA-0009), 대기 인스턴스 자원, 페일오버 시간 vs MTTR<1분(QA-0003).
+- **미검증 trade-off**: 페일오버 중 일관성(QA-09), 대기 인스턴스 자원, 페일오버 시간 vs MTTR<1분(QA-02).
 - → 상세 논의: `_backlog.md` BL-1.
 
 ## Trade-off 매트릭스
@@ -39,20 +39,20 @@ Agent들을 어떤 위상(topology)으로 구성할 것인가 — **중앙 제�
 > 이 결정에 대한 민감점·교환점·위험을 문서 내부에서 분석한다.
 
 ### 민감점 (Sensitivity Points)
-- **SP-1**: Orchestrator의 가용성이 시스템 전체 Availability(QA-0003, MTTR<1분)를 좌우 → 1안에서 특히 민감.
-- **SP-2**: 정책 적용 지점의 집중도가 Controllability(QA-0004, 중단 ≤5초)를 좌우.
+- **SP-1**: Orchestrator의 가용성이 시스템 전체 Availability(QA-02, MTTR<1분)를 좌우 → 1안에서 특히 민감.
+- **SP-2**: 정책 적용 지점의 집중도가 Controllability(QA-03, 중단 ≤5초)를 좌우.
 
 ### 교환점 (Tradeoff Points)
 - **TP-1 (Controllability ↔ Availability)**: 제어를 한 점에 모을수록(1안) Controllability↑·Availability↓. 분산할수록(2안) 반대. → 본 DP의 핵심 교환점.
 - **TP-2 (Performance ↔ Controllability)**: Orchestrator 경유는 HITL·정책 적용을 쉽게 하지만 E2E 병목.
 
 ### 위험 (Risks)
-- **R-1**: 1안 채택 시 Orchestrator SPOF가 QA-0003(MTTR<1분) 미달 위험.
-- **R-2**: 2안 채택 시 분산 정책으로 QA-0004(중단 ≤5초) 미달 + 토큰 비용 증가(QA-0001) 위험.
+- **R-1**: 1안 채택 시 Orchestrator SPOF가 QA-02(MTTR<1분) 미달 위험.
+- **R-2**: 2안 채택 시 분산 정책으로 QA-03(중단 ≤5초) 미달 + 토큰 비용 증가(QA-05) 위험.
 
 ### 비위험 (Non-Risks)
 - **NR-1**: Workflow별 인스턴스 생성으로 Scalability는 1·2안 모두 수용 가능(★★☆ 동급).
 
 ## 결정 / 근거
 - (미정 — open-issues 아님. FR-0004의 제어·관측 우선순위가 높으면 1안/3안, 가용성 최우선이면 2안.)
-- 권고: Controllability가 H 중요도(QA-0004)이고 C-0002(기존 시스템 무영향)가 강하므로 **1안 기반**, R-1은 **3안(Standby)**으로 완화 검토.
+- 권고: Controllability가 H 중요도(QA-03)이고 C-0002(기존 시스템 무영향)가 강하므로 **1안 기반**, R-1은 **3안(Standby)**으로 완화 검토.

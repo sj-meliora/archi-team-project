@@ -5,8 +5,9 @@
 
 ## [ ] OI-1 QA 번호 불일치
 - 슬라이드 11/13/25~28이 같은 QA01~04에 서로 다른 속성을 부여.
-- **결정**: canonical = 슬라이드 13 기준 (glossary.md에 매핑 보존).
-- **남은 작업**: 발표 슬라이드 전체에서 canonical 번호로 통일.
+- **결정**: canonical = 팀 합의 우선순위 기준 (2026-06-23 재정렬, QA·QAS 2자리). glossary.md에 원본 매핑 보존.
+- **2026-06-23 재정렬**: QA-01 Scalability / 02 Availability / 03 Controllability / 04 Observability / 05 Efficiency (이전 1위 Efficiency→5위). 06~10 불변.
+- **남은 작업**: 발표 슬라이드 전체에서 canonical(2자리) 번호로 통일. FR/C/DP도 2자리 전환 예정.
 
 ## [ ] OI-2 DP-0001 1안 '단점' 칸 표기 오류
 - Per-Node Agent(1안) 단점에 2안의 장점이 복붙됨.

@@ -2,7 +2,7 @@
 
 > category: DP-eval | for: DP-0004 | updated: 2026-06-20
 > 기존 1·2안 + 신규 A3~A7(패턴 기반 발굴)을 driving QA 기준으로 통합 비교한다.
-> driving QA: QA-0002(Scalability), QA-0006(Reliability-Workflow), QA-0008(Performance-E2E), QA-0010(Maintainability).
+> driving QA: QA-01(Scalability), QA-06(Reliability-Workflow), QA-08(Performance-E2E), QA-10(Maintainability).
 
 ## 핵심 통찰 — DP-0004는 "단일 택1"이 아니라 4개의 직교 결정 축
 신규 대안을 발굴하며, 원래 1안 vs 2안으로 보였던 결정이 사실 **서로 직교하는 4개 축**임을 식별했다. 중간 피드백("architecture pattern 보강")의 핵심 가치도 여기에 있다 — 단일 비교가 아니라 **축별로 패턴을 조합**하는 설계.
@@ -31,17 +31,17 @@
 > A8 별점 근거: 로컬 전달로 Performance ★★★(2안 강점 계승) + 단계 입도 확장으로 Scalability ★★★. 단 로컬 디스크 내구성 약점으로 Reliability ★★☆, 배치 제어 복잡성으로 Maintainability ★★☆. (상세 `approaches/A8-*`)
 
 ## QA별 최강 대안
-- **Scalability(QA-0002)**: A5·A8(둘 다 일회용 탄력) — A5는 클러스터 폭증, A8은 노드 내 단계 입도. A7(변종)은 별도 축(variety, 수량 아님).
-- **Reliability-WF(QA-0006)**: A6(내구 복구) ≥ A5(invocation 격리·스토리지 보존) ≥ 2안(노드 격리) > A8(단계 격리이나 로컬 디스크 유실 위험).
-- **Performance-E2E(QA-0008)**: 2안·**A8(로컬 전달)** 이 우위(★★★), 원격 계열(A3/A5/A6)은 claim-check 전달세금으로 ★★☆ — pre-warm·co-location로 보완 필요.
-- **Maintainability(QA-0010)**: A4(분해) · A7(변종 교체) · A6(흐름 명시) 동급 우위. 1안이 최약.
+- **Scalability(QA-01)**: A5·A8(둘 다 일회용 탄력) — A5는 클러스터 폭증, A8은 노드 내 단계 입도. A7(변종)은 별도 축(variety, 수량 아님).
+- **Reliability-WF(QA-06)**: A6(내구 복구) ≥ A5(invocation 격리·스토리지 보존) ≥ 2안(노드 격리) > A8(단계 격리이나 로컬 디스크 유실 위험).
+- **Performance-E2E(QA-08)**: 2안·**A8(로컬 전달)** 이 우위(★★★), 원격 계열(A3/A5/A6)은 claim-check 전달세금으로 ★★☆ — pre-warm·co-location로 보완 필요.
+- **Maintainability(QA-10)**: A4(분해) · A7(변종 교체) · A6(흐름 명시) 동급 우위. 1안이 최약.
 
 ## 수렴 결론 (리뷰 F-10 반영 — "다 쌓기"에서 택일로)
 > ⚠️ 종전 "권고 스택(A4+A3+A5+A7+A6 다 쌓기)"은 리뷰(F-02/F-03/F-10)에서 **과설계·이중 제어평면·복합 trade-off 미검증**으로 결론 부적합 판정. 아래 수렴안으로 대체한다. ATAM의 본령은 **버릴 것을 정하는 것**.
 
 ### 1) 핵심 결정 — 축 A에서 A5 vs A8로 수렴
 - `decision-axes.md`의 2x2로 축 A를 재정렬하면 **1안→A5, 2안→A8** 로 각 계열이 진화형에 지배된다 → **1안·2안은 기준선(null)으로 격하**, 후보는 **A5(일회용·원격) vs A8(일회용·로컬)** 둘로 압축.
-- **가르는 단일 질문**: `(4단계 × 20GB 왕복) ÷ 스토리지 대역폭`이 E2E의 5% budget(QA-0008) 안에 드는가.
+- **가르는 단일 질문**: `(4단계 × 20GB 왕복) ÷ 스토리지 대역폭`이 E2E의 5% budget(QA-08) 안에 드는가.
   - 든다 → **A5**(단순·복구 유리, 전달세금 감내).
   - 넘는다 → **A8**(로컬 전달로 세금 회피, locality-first).
 - 지배 드라이버 **Scalability(H)+Reliability(M)** 기준 둘 다 강하나, **Performance(전달) ↔ Reliability(복구)** 교환에서 갈림(A8=전달 우위/복구 약, A5=복구 우위/전달 약).
@@ -62,11 +62,11 @@
 - **배제 기준**: cold-start를 X ms 이하로 못 누르면 A5 보류 / 노드가 모델 파이프라인을 못 담으면 A8 보류 / 변종 < N이면 A7 미도입.
 
 ## 미해결/검증 필요 (open-issues 연계)
-- **🔑 5% 산식이 A5 vs A8을 가름(QA-0008)**: `(4단계 × 20GB 왕복) ÷ 스토리지 대역폭` 실측·노드 사양 의존 → **팀 검증 대상**(이 수치가 최종 택일을 결정).
-- **A8 로컬 디스크 내구성(QA-0006)**: 노드 사망 시 산출물 유실 → 복제/체크포인트 정책 필요 여부 판정.
+- **🔑 5% 산식이 A5 vs A8을 가름(QA-08)**: `(4단계 × 20GB 왕복) ÷ 스토리지 대역폭` 실측·노드 사양 의존 → **팀 검증 대상**(이 수치가 최종 택일을 결정).
+- **A8 로컬 디스크 내구성(QA-06)**: 노드 사망 시 산출물 유실 → 복제/체크포인트 정책 필요 여부 판정.
 - **A8 노드 footprint**: 모델당 파이프라인이 노드에 들어가는지(안 들어가면 spill → A5 수렴) 검증.
-- **잔여 P0(리뷰)**: 가중 매트릭스(H/M/M/L)·간이 FMEA·멱등성↔QA-0009 모순 해소는 **미반영** — 다음 수렴 iteration 과제.
-- **전달 오버헤드 ≤5%(QA-0008)**: A3/A5/A6 모두 hop·cold-start 추가 → claim-check + pre-warm 효과 정량 검증 필요.
+- **잔여 P0(리뷰)**: 가중 매트릭스(H/M/M/L)·간이 FMEA·멱등성↔QA-09 모순 해소는 **미반영** — 다음 수렴 iteration 과제.
+- **전달 오버헤드 ≤5%(QA-08)**: A3/A5/A6 모두 hop·cold-start 추가 → claim-check + pre-warm 효과 정량 검증 필요.
 - **공유 의존점 SPOF**: A3 브로커 / A6 오케스트레이터 → 다중화·샤딩 전제. DP-0002와 정합.
 - **plugin API 안정성(A7)**: 초기 계약 설계가 critical(breaking change 리스크).
 - **DP-0001·DP-0005 정합**: A5↔DP-0001(Dynamic Pool), A3/A6↔DP-0005(공유 캐시·memoization) 일관 결정 필요.

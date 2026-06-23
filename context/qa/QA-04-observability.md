@@ -1,4 +1,4 @@
-# QA-0005 Observability — Agent 작업 추적 용이성
+# QA-04 Observability — Agent 작업 추적 용이성
 
 > category: QA | importance: M | difficulty: M | source: pptx p.13 | updated: 2026-06-19
 > related-dp: DP-0003

@@ -1,6 +1,6 @@
-# QAS-0002 확장성 시나리오
+# QAS-01 확장성 시나리오
 
-> category: QAS | refines: QA-0002 (Scalability) | updated: 2026-06-20
+> category: QAS | refines: QA-01 (Scalability) | updated: 2026-06-20
 
 | 요소 | 내용 |
 |---|---|

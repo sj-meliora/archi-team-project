@@ -2,7 +2,7 @@
 
 > category: DP-review | reviewer: 수석 아키텍트 관점(20년차 가정) | for: dp4(A3~A7 + evaluation) | updated: 2026-06-20
 > 대상: `context/dp/dp4/` 전체 — research(R-01~04), approaches(A3~A7), evaluation.md, INDEX.md
-> 교차검증 근거: DP-0004 본문, DP-0001/0002/0005, QA-0002/0006/0008/0010(+0007/0009), FR-0001/0002, overview, open-issues
+> 교차검증 근거: DP-0004 본문, DP-0001/0002/0005, QA-01/06/08/10(+07/09), FR-0001/0002, overview, open-issues
 
 ## 한 줄 총평
 **대안 발굴(divergence)은 인증과정 수준을 넘어선다. 그러나 ATAM의 본령인 의사결정 수렴(convergence)과 "조합의 복합 trade-off" 검증이 비어 있어, 현 상태로 발표하면 '좋은 패턴을 다 모았다'는 과설계(over-engineering) 비판에 노출된다.**
@@ -24,11 +24,11 @@
 | F-01 | **CRITICAL** | Performance(E2E) 별점이 신규 5안 모두 ★★☆로 동일 → 변별력 0, 조합 시 latency 합산 미분석 |
 | F-02 | **CRITICAL** | 권고 스택의 **복합 QA 프로파일 미산출** — 창발적 복잡도 무시, Maintainability는 조합 시 오히려 악화 |
 | F-03 | **CRITICAL** | A3(Choreography) + A6(Orchestration) 동시 채택 = **이중 제어평면** 상충 (R-03이 대비 관계로 명시) |
-| F-04 | **CRITICAL** | claim-check가 곧 QA-0008의 '전달 오버헤드'인데 모든 안이 **순이익으로 오인** — 2안의 핵심 강점을 버리는 비용 미정량 |
-| F-05 | **CRITICAL** | 멱등 가정이 A3/A4/A5/A6의 load-bearing인데 시스템 자체 **QA-0009 재현율≥80%(비결정성)와 모순** |
-| F-06 | HIGH | QA-0002 throughput KPI(시간당 모델수) 미커버, Change Impact ≤2 **주장만 하고 미실증** |
+| F-04 | **CRITICAL** | claim-check가 곧 QA-08의 '전달 오버헤드'인데 모든 안이 **순이익으로 오인** — 2안의 핵심 강점을 버리는 비용 미정량 |
+| F-05 | **CRITICAL** | 멱등 가정이 A3/A4/A5/A6의 load-bearing인데 시스템 자체 **QA-09 재현율≥80%(비결정성)와 모순** |
+| F-06 | HIGH | QA-01 throughput KPI(시간당 모델수) 미커버, Change Impact ≤2 **주장만 하고 미실증** |
 | F-07 | HIGH | QA 중요도(H/M/M/L) **가중 미적용** — 다수 안이 최저중요도 Maintainability(L)에 과최적화 |
-| F-08 | HIGH | A7의 'variety'를 Scalability(QA-0002)로 표기 = **범주 오류·이중계상** (별점 인플레) |
+| F-08 | HIGH | A7의 'variety'를 Scalability(QA-01)로 표기 = **범주 오류·이중계상** (별점 인플레) |
 | F-09 | HIGH | 공유 실패도메인(broker/orchestrator/cache) **누적** vs 중단≤1% — blast-radius 분석 부재 |
 | F-10 | HIGH | **의사결정 수렴 부재** — phasing/MVA/배제기준 없이 '다 좋다' 스택 (발표 리스크) |
 | F-11 | MEDIUM | 비용·운영복잡도·팀 역량 축 부재 — 4~5개 신규 인프라 도입 리스크 미반영 |

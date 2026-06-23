@@ -1,4 +1,4 @@
-# QA-0007 Performance — Agent 수행 시간
+# QA-07 Performance — Agent 수행 시간
 
 > category: QA | importance: H | difficulty: H | source: pptx p.13 | updated: 2026-06-19
 > related-dp: DP-0001

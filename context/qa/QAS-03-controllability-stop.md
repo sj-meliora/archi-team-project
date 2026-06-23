@@ -1,6 +1,6 @@
-# QAS-0004 Agent 제어 시나리오
+# QAS-03 Agent 제어 시나리오
 
-> category: QAS | refines: QA-0004 (Controllability) | source: pptx p.28 | updated: 2026-06-20
+> category: QAS | refines: QA-03 (Controllability) | source: pptx p.28 | updated: 2026-06-20
 
 ## 6-Part Quality Attribute Scenario
 | 요소 | 내용 |

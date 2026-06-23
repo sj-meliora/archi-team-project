@@ -1,6 +1,6 @@
-# QAS-0009 Agent 결과 일관성 시나리오
+# QAS-09 Agent 결과 일관성 시나리오
 
-> category: QAS | refines: QA-0009 (Reliability-Agent) | updated: 2026-06-20
+> category: QAS | refines: QA-09 (Reliability-Agent) | updated: 2026-06-20
 
 | 요소 | 내용 |
 |---|---|

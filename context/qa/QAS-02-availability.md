@@ -1,6 +1,6 @@
-# QAS-0003 운영 안정성 시나리오
+# QAS-02 운영 안정성 시나리오
 
-> category: QAS | refines: QA-0003 (Availability) | updated: 2026-06-20
+> category: QAS | refines: QA-02 (Availability) | updated: 2026-06-20
 
 | 요소 | 내용 |
 |---|---|

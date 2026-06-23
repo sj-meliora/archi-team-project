@@ -1,4 +1,4 @@
-# QA-0008 Performance — E2E 개발 시간
+# QA-08 Performance — E2E 개발 시간
 
 > category: QA | importance: M | difficulty: M | source: pptx p.13 | updated: 2026-06-19
 > related-dp: DP-0004, DP-0005 | related-fr: FR-0002

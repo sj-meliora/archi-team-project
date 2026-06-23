@@ -6,7 +6,7 @@
 
 ## DP-0004 재확인 (대상 결정)
 - **결정 포인트**: 파이프라인 노드 작업(IR Converter → Graph Optimizer → Quantizer → Compiler)을 **어떤 실행 구조**로 처리할 것인가.
-- **driving QA**: QA-0002(Scalability), QA-0006(Reliability-Workflow), QA-0008(Performance-E2E), QA-0010(Maintainability).
+- **driving QA**: QA-01(Scalability), QA-06(Reliability-Workflow), QA-08(Performance-E2E), QA-10(Maintainability).
 - **기존 대안**: 1안 타입별 공유 서버 풀 / 2안 노드당 Workflow 인스턴스. → 본 작업은 여기에 **패턴 기반 신규 대안**을 추가한다.
 - **인접 정합 제약**: DP-0001(Agent 배치), DP-0005(캐시 전략)와 격리·확장 정책이 충돌하지 않아야 함.
 

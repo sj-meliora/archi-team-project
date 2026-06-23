@@ -1,4 +1,4 @@
-# QA-0010 Maintainability — 모듈 교체 용이성
+# QA-10 Maintainability — 모듈 교체 용이성
 
 > category: QA | importance: L | difficulty: M | source: pptx p.13 | updated: 2026-06-19
 > related-dp: DP-0004, DP-0005 | related-fr: FR-0003

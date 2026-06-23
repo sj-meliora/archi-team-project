@@ -1,4 +1,4 @@
-# QA-0009 Reliability — Agent 결과 일관성
+# QA-09 Reliability — Agent 결과 일관성
 
 > category: QA | importance: L | difficulty: H | source: pptx p.13 | updated: 2026-06-19
 > related-dp: DP-0005

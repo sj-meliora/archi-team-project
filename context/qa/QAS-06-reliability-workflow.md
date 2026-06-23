@@ -1,6 +1,6 @@
-# QAS-0006 Workflow 독립성 시나리오
+# QAS-06 Workflow 독립성 시나리오
 
-> category: QAS | refines: QA-0006 (Reliability-Workflow) | updated: 2026-06-20
+> category: QAS | refines: QA-06 (Reliability-Workflow) | updated: 2026-06-20
 
 | 요소 | 내용 |
 |---|---|
