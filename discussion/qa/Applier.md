@@ -17,6 +17,7 @@
 ## 읽을 입력 (반드시 다 읽는다)
 1. `discussion/<concept>/<round>/review/<ID>.md` — red team 지적 (무엇이 틀렸나)
 2. `discussion/<concept>/<round>/counsel/<ID>.md` — blue team 권고 (어떻게·왜 바꾸나 + 레퍼런스)
+2b. **(ASR 대상이면) `discussion/<concept>/<round>/contention/counter.md`(+있으면 `referee.md`)** — red↔blue 반박 후 **최종 권고 델타**. **counter의 `수용`/`부분수용` 델타가 원 counsel보다 우선**(referee 지시가 있으면 그게 최종). contention 폴더가 없으면(=ASR 아님) 생략. → 방법론 [`Contention.md`](Contention.md).
 3. `discussion/<concept>/<round>/counsel/_feasibility-filter.md` — **현실성 등급**([반영]/[발표 서사]/[생략]). 이게 *무엇을 원본에 쓸지*를 결정한다.
 4. 원본 `context/qa/<ID>.md` + 짝 `context/qa/QAS-<NN>.md`
 5. `related-dp`에 적힌 DP들 `context/dp/DP-XXXX.md` — **검증 전략** 섹션을 쓰려면 그 설계가 뭘 주장하는지 알아야 한다.

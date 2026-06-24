@@ -25,6 +25,7 @@ discussion/
     └── round-NN/             한 라운드 (날짜 없음 — 메타는 보고서에 기록)
         ├── review/           red team 산출물: report.md(결론)·README.md·항목별 상세·신규후보
         ├── counsel/          blue team 산출물: counsel.md(권고)·항목별 개선안·_poc-plan.md
+        ├── contention/       (ASR 대상만) red↔blue 바운드 1왕복: rebuttal.md·counter.md·(선택)referee.md
         └── applier/          applier 산출물: report.md — 반영 보고서(지적별 disposition, 다음 Reviewer 입력)
 ```
 
@@ -35,6 +36,7 @@ discussion/
 - **append-only**: 지난 라운드는 수정하지 않고 보존(추세 비교용). 오타·링크만 예외.
 - **순환**: 심의(라운드 N) → **원본(`context/<concept>/`) 반영** → 라운드 N+1로 검증 → 반복. 반영은 **Applier**(red→blue→applier의 3번째 역할)가 수행 — review·counsel·filter를 읽어 등급 [반영]만 원본에 쓴다. 방법론은 `discussion/<concept>/Applier.md`, 워커는 [`.claude/agents/discussion-applier.md`](../.claude/agents/discussion-applier.md).
 - **보고-루프(red↔applier 닫기)**: 반영을 마치면 Applier가 **반영 보고서**(`round-NN/applier/report.md`)를 남겨, 모든 지적의 처리([반영]/[발표 서사]/[생략]/[거부]+사유/[이월])를 명시한다. **다음 라운드 Reviewer는 이 보고서를 입력으로 받아**(Reviewer §8 절차 0), [반영]은 verdict 변화로 재평가하고 [발표 서사]/[이월]/[거부]는 다시 판정한다 — 지적이 처리됐는지 추적 가능해진다.
+- **contention(선택·ASR 대상만)**: counsel 직후 applier 전에, red↔blue가 **바운드된 1 왕복**(rebuttal→counter, +선택 referee)으로 약한 반박·회피된 지적·헤드라인 KPI 모순을 *반영 전에* 잡는다. **자유 토론 아님**(수렴/아첨 방지 — 1왕복 상한 + 안티-수렴 가드). 비싸서 **ASR 선정 QA에만**. 방법론: [`<concept>/Contention.md`](qa/Contention.md), 워커: [`.claude/agents/discussion-contention.md`](../.claude/agents/discussion-contention.md).
 - **추적성**: 권고가 원본에 반영되면 `changelog.md` 델타 + 다음 라운드 종합 보고서에 verdict 변화 기록.
 
 ## 새 개념 영역 추가하는 법 (예: DP)

@@ -15,6 +15,7 @@
 - **라운드 폴더**: `round-NN/` — **폴더명에 날짜를 넣지 않는다.** 날짜 등 메타는 그 라운드의 종합 보고서에 기록(공의회가 최종 결론을 문서화하듯).
   - `review/` — red team 산출물: `report.md`(결론)·`README.md`(내비)·`QA-0X-*.md`(3렌즈 상세)·`_new-qa-candidates.md`
   - `counsel/` — blue team 산출물: `counsel.md`(권고 결론)·`QA-0X-*.md`(개선안)·PoC 계획 등
+  - `contention/` — (ASR 대상만) red↔blue 바운드 1왕복: `rebuttal.md`·`counter.md`·(선택)`referee.md`. 방법론 [`Contention.md`](Contention.md)
   - `applier/` — 반영 산출물: `report.md`(지적별 disposition 보고서 — 다음 라운드 Reviewer 입력, 루프 닫기)
 - **append-only**: 지난 라운드는 수정하지 않고 보존한다(추세 비교용). 오타·링크 깨짐만 예외.
 - **순환**: 심의(라운드 N) → Stage 2에서 `context/qa/` 개선 → 다음 라운드(N+1)를 새로 떠서 개선 검증 → 반복. 반영 후 Applier가 `round-NN/applier/report.md`로 **지적별 처리를 보고** → 다음 Reviewer가 받아 재검증(red↔applier 루프 닫기).

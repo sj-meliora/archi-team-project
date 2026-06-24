@@ -42,7 +42,8 @@
 
 이번 라운드 N+1의 **우선 점검 목록**이다.
 
-1. **[발표 서사]로 미룬 검증이 여전히 유효한 설계인가** — QA-03 적대적 eval(위반0), QA-09 캐시우회 pass^k, NQA-A red-team, NQA-B golden, NQA-C 수작업 baseline. "실측 없이 설계 서사만"이 발표 방어선으로 충분한지 재판정.
+1. **[발표 서사]로 미룬 검증이 여전히 유효한 설계인가** — QA-03 적대적 eval(위반0), ~~QA-09 캐시우회 pass^k~~, NQA-A red-team, NQA-B golden, NQA-C 수작업 baseline. "실측 없이 설계 서사만"이 발표 방어선으로 충분한지 재판정.
+   - **갱신 2026-06-24**: **QA-09는 contention으로 해소** — 헤드라인을 시연 불가한 `pass^k 절대값`에서 시연 가능한 `캐시 On/Off 갭 Δ 대조`로 교체, ②를 ②-1 대리 게이트(반영)/②-2(open-issue)로 분리. 상세 [contention/counter.md](../contention/counter.md). 나머지(QA-03·NQA-*)는 미해결.
 2. **교차 의존이 닫혔는가** — QA-07 first-pass 게이트·QA-09 유효-결정률이 **NQA-B에 의존**. NQA-B가 [이월](미채택)이면 두 QA의 KPI는 아직 안 닫힘 → 동반 채택 필요성 재확인.
 3. **DP 역검토(OI-7)** — round-01 반영이 드러낸 DP 미명시 차원(rate-limit·외부 LLM degradation·runaway cap·안전정지·span trace·품질게이트·workflow 버저닝·보안 tactic·eval 서브시스템 신규 DP). **다음은 DP 디스커션 차례**임을 시사.
 4. **신규 QA 정식화(OI-8)** — NQA-A/B/C 채택 가부 + 우선순위 번호 재정렬(Security·Correctness 상위 진입) → 확정 시 기존 QA cross-ref·INDEX·glossary 동기화.

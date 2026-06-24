@@ -38,8 +38,18 @@ description: >-
 3. 확인되면 `scope: full`로 나머지 + `counsel.md`(종합·메타) + `_poc-plan.md` 완성.
 4. 마스터 인덱스의 권고 추세·verdict 변화 갱신.
 
+## 4.5 Contention 단계 (선택 · ASR 대상만)
+> 전제: 해당 라운드 `counsel/` 완성. **대상이 ASR(architecturally significant)로 선정된 QA일 때만** 돈다 — 현재 선정 **QA-01~QA-05**. 방법론 [`discussion/<concept>/Contention.md`](../../discussion/qa/Contention.md). ASR 아닌 QA는 이 단계를 건너뛰고 바로 Applier로 간다.
+1. ASR 대상 QA마다 **Agent**로 `subagent_type: discussion-contention` 호출 — `role=rebuttal`(red 되치기) 먼저.
+2. rebuttal 완료 후 같은 QA에 `role=counter`(blue 응답, rebuttal.md를 읽음) 호출. **바운드 1 왕복** — 그 이상 핑퐁 금지.
+3. counter 후에도 충돌이 남으면(`referee 회부` 표기) `role=referee` 1회.
+4. 샘플 체크포인트: **첫 ASR QA의 rebuttal+counter를 보여주고** 가치·포맷 확인 후 나머지 ASR QA 진행.
+5. counter의 `수용`/`부분수용` **최종 델타가 Applier 입력**(원 counsel보다 우선).
+
+> 핵심: **자유 토론 아님.** 1왕복 상한 + 안티-수렴 가드(각 단계 최소 1개 진짜 이견 또는 "이견 없음+사유" 명시). 비싸므로 ASR에만.
+
 ## 5. 마무리
-- 라운드 산출물 트리와 핵심 결론(판정 집계·주요 권고)을 요약한다.
+- 라운드 산출물 트리와 핵심 결론(판정 집계·주요 권고·contention 델타)을 요약한다.
 - **커밋 여부를 묻는다**(자동 커밋하지 않음). 메시지는 Conventional Commits(`feat(discussion): …`).
 
 ## 원칙
