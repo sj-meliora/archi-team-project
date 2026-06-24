@@ -33,5 +33,12 @@
 - QA 디스커션 round-01 반영 중, 여러 DP가 새 KPI가 요구하는 차원을 명시하지 않음이 드러남(원본 DP는 고치지 않고 트래킹만).
 - **DP-0001(동적 풀)·DP-0004(타입별 scale-out)**: rate-limit·admission control 차원 미명시 (QA-01 반영 시 발견).
 - **DP-0002(Standby)·DP-0003(격리/모니터링)**: "외부 LLM degradation"(outage/429) 시나리오 미명시 — backoff·폴백 tactic 보강 필요 (QA-02 반영 시 발견).
+- **DP-0002(제어지점)·DP-0003(권한 게이트)**: **runaway cap**(max iter·token·wall-clock)과 **graceful 정지+롤백**(협조적 취소 vs hard-kill) tactic 미명시 (QA-03 반영 시 발견). DP-0002 1안 HITL·DP-0003 1안 allowlist는 있으나 cap·정지 의미 분리는 후보 대안/ATAM에 없음.
 - **DP-0001 ↔ QA-02 링크 불일치**: QA-02 반영 시 related-dp에서 DP-0001 제거(가용성 기여가 '장애 격리'라 QA-06 소관)했으나, **DP-0001 파일은 여전히 `drives: QA-02`로 선언** → 단방향 불일치. DP-0001의 `drives`를 **QA-02→QA-06으로 교정**할지 DP 디스커션에서 결정.
-- **남은 작업**: 각 DP에 해당 tactic(rate-limit headroom·admission control·외부 의존성 backoff·폴백)을 후보 대안/ATAM에 명시할지 + DP-0001 drives 교정을 역검토.
+- **DP-0003(실시간 모니터링)**: span 수준 trace(prompt+context+tool I/O+model+token+ts) 보장 여부 미명시 — "규칙 기반 한정 적용" 시 어디까지 span을 남기는지 명시 필요 (QA-04 반영 시 발견).
+- **DP-0001(2안 동적 풀)**: 작업별 최적 agent 선택이 **토큰 기준인지 비용 기준인지** 미명시 — 비용 기준 정렬 권고 (QA-05 반영 시 발견).
+- **DP-0001(1안 즉시 실행)**: latency만 보고 **품질 게이트(first-pass 성공)와 무연결** — "빠르게 틀리기" 차단 tactic 미명시 (QA-07 반영 시 발견).
+- **DP-0004/0005**: E2E latency 책임 및 **결정 산식(4단계×20GB÷대역폭 5% budget → A5 vs A8)의 실측 의존**, prompt/모델 교체 내성(workflow 버저닝·계약 분리) 미명시 (QA-08·QA-10 반영 시 발견).
+- **신규 QA 교차 의존(NQA-B 전제)**: QA-07 first-pass 품질 게이트·QA-09 유효-결정률이 **NQA-B(Correctness) golden 게이트에 의존** — NQA-B 신설과 함께 가야 두 QA의 KPI가 닫힘.
+- **`related-dp` 추가**: QA-05에 DP-0005, QA-07에 DP-0004 추가함(반영 완료). 역방향(DP의 `drives`)과 정합 확인 필요.
+- **남은 작업**: 각 DP에 해당 tactic(rate-limit headroom·admission control·외부 의존성 backoff·폴백·runaway cap·graceful 정지·span trace·품질 게이트·workflow 버저닝)을 후보 대안/ATAM에 명시할지 + DP-0001 drives 교정 + NQA-B 교차 의존을 DP 디스커션에서 역검토.
