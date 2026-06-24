@@ -3,7 +3,7 @@
 > `context/qa/`의 QA·KPI를 **반복 심의(라운드)**하며 완성도를 끌어올리는 작업의 색인.
 > 한 라운드 = red team 비평(review) + blue team 권고(counsel)의 한 묶음.
 > 공통 프로토콜·다른 영역(DP 등)은 상위 [`../README.md`](../README.md). 트리거: "QA 디스커션 돌리자".
-> updated: 2026-06-24
+> updated: 2026-06-24 (round-02 review + counsel 완료)
 
 ## 관리 체계
 
@@ -26,30 +26,32 @@
 | 라운드 | 날짜 | 대상 | High | Med | Low | 한 줄 요약 |
 |---|---|---|:---:|:---:|:---:|---|
 | round-01 [review](round-01/review/report.md) · [counsel](round-01/counsel/counsel.md) · [applier](round-01/applier/report.md) | review 2026-06-23 · counsel·applier 2026-06-24 | QA-01~10 (+NQA-A/B/C 신설) | 4 | 5 | 1 | red team 최초 리뷰(KPI ✕ 3·정의↔KPI 불일치·agentic 리스크 과소대표) → **blue team counsel**: KPI ✕ 3건 전부 측정가능화, C1~C5 응답, NQA-A/B/C 권고 → **applier 반영 완료**: QA-01~10 교정 + NQA-A/B/C 신설(임시 ID). 지적별 처리는 [applier/report.md](round-01/applier/report.md). |
+| round-02 [review](round-02/review/report.md) · [counsel](round-02/counsel/counsel.md) | review·counsel 2026-06-24 | QA-01~10 + NQA-A/B/C(13항목 재평가) | 1 | 5 | 7 | round-01 반영 검증: **KPI ✕ 3건 전부 소멸**(QA-01·07·08), **High 4→0**(기존 QA). 잔여 = **신설 QA 미채택(OI-8)으로 인한 교차의존 미닫힘**(QA-07/09↔NQA-B·QA-01/05↔NQA-C) + **KPI-DP 귀속 placeholder(OI-7)**. NQA-B가 세트 닫힘 병목(High). 신규 결함 0건 → **blue team counsel**: 닫힘 확인 7·채택 권장 3·조건부 동반닫힘 3, 신규 KPI 0 — **C3 단일 eval/검증 DP 수렴** 권고. 다음은 OI-8 채택 + DP 디스커션. |
 
 ## QA별 verdict 추세
 
 표기: ◎ 우수 · ○ 타당 · △ 부분결함 · ✕ 재설계 (형식: `Sound / KPI`). counsel = blue team 권고 stance.
 
 > round-01 counsel은 전 항목 `context/qa/`에 **반영 완료**(2026-06-24). 지적별 처리(반영/발표서사/생략)·다음 라운드 재검증 목록: [round-01/applier/report.md](round-01/applier/report.md).
+> round-02 review는 round-01 반영을 검증한 재평가다 — disposition 추적·근거는 [round-02/review/report.md](round-02/review/report.md).
 
-| QA | 속성 | round-01 review | round-01 counsel |
-|---|---|---|---|
-| QA-01 | Scalability | △ / ✕ | 채택 권장 (scaling efficiency + rate-limit 헤드룸) |
-| QA-02 | Availability | ○ / △ | 채택 권장 (MTTR 분해·무손실 + 외부 LLM 장애) |
-| QA-03 | Controllability | ◎ / △ | 채택 권장 (위반 0건 편입 + runaway cap) |
-| QA-04 | Observability | ○ / △ | 채택 권장 (trace 완전성 + event-history) |
-| QA-05 | Efficiency | ○ / △ | 채택 권장 (캐시 분리집계, top-line→NQA-C) |
-| QA-06 | Reliability (WF 격리) | ○ / ○ | 채택 권장 (쿼터 격리 KPI 추가) |
-| QA-07 | Performance (Agent 시간) | △ / ✕ | 채택 권장 (speedup + 품질 게이트) |
-| QA-08 | Performance (E2E) | △ / ✕ | 채택 권장 (E2E latency·throughput 추가) |
-| QA-09 | Reliability (일관성) | △ / △ | 채택 권장 (캐시우회 pass^k + 유효-결정률) |
-| QA-10 | Maintainability | ○ / ○ | 채택 권장 (CIS p95 + model 교체축) |
+| QA | 속성 | round-01 review | round-01 counsel | **round-02 review** | **round-02 counsel** | sev R01→R02 |
+|---|---|---|---|---|---|---|
+| QA-01 | Scalability | △ / ✕ | 채택 권장 (scaling efficiency + rate-limit 헤드룸) | **○ / ○** (High 해소·placeholder 소멸; 잔여 DP·NQA-C) | 닫힘 확인 (부하단위·헤드룸단위 Low + NQA-C 동반·rate-limit DP 위임) | High→**Low** |
+| QA-02 | Availability | ○ / △ | 채택 권장 (MTTR 분해·무손실 + 외부 LLM 장애) | **○ / ○** (4축 분해 정착; 잔여 외부 degradation DP) | 닫힘 확인 (외부 LLM degradation DP·`drives` 교정 위임) | High→**Low** |
+| QA-03 | Controllability | ◎ / △ | 채택 권장 (위반 0건 편입 + runaway cap) | **◎ / △** (C2 해소; ②위반0 측정수단 [발표 서사] 잔존) | 조건부 (②를 NQA-A 공유 red-team 하네스로 실측 전환·동반 닫힘) | Med |
+| QA-04 | Observability | ○ / △ | 채택 권장 (trace 완전성 + event-history) | **○ / ○** (span 환원; 잔여 DP-0003 span 보장) | 닫힘 확인 (측정 토대·다수 QA 수급 + DP-0003 span 위임) | Med→**Low** |
+| QA-05 | Efficiency | ○ / △ | 채택 권장 (캐시 분리집계, top-line→NQA-C) | **○ / ○** (캐싱 역페널티 제거; top-line NQA-C 부유 의존) | 닫힘 확인 (캐시 적중률 Low + NQA-C 동반·비용 라우팅 DP 위임) | Med→**Low** |
+| QA-06 | Reliability (WF 격리) | ○ / ○ | 채택 권장 (쿼터 격리 KPI 추가) | **○ / ○** (C3 닫힘·세트 모범; 잔여 DP-0005 오염격리) | 닫힘 확인 (세트 모범 + QA-01 헤드룸 cross-link·격리 DP 역검토) | Med→**Low** |
+| QA-07 | Performance (Agent 시간) | △ / ✕ | 채택 권장 (speedup + 품질 게이트) | **○ / △** (High 해소; **주 KPI가 미채택 NQA-B 게이트 의존**) | 조건부 (**NQA-B 동반 채택이 주 KPI 닫힘 전제** + baseline 프로토콜 Med) | High→**Med** |
+| QA-08 | Performance (E2E) | △ / ✕ | 채택 권장 (E2E latency·throughput 추가) | **○ / ○** (mislabel 복구·가장 깔끔; 잔여 DP-0004 산식) | 닫힘 확인 (DP-0004 5% 산식 실측·importance 상향 여지 사람 결정) | High→**Low** |
+| QA-09 | Reliability (일관성) | △ / △ | 채택 권장 (캐시우회 pass^k + 유효-결정률) | **○ / △** (contention으로 헤드라인 Δ·②2단·H_norm 해소; ②-2만 NQA-B 의존) | 조건부 (**부분 닫힘** — Δ·②-1·H_norm ○ / ②-2만 NQA-B 의존) | Med |
+| QA-10 | Maintainability | ○ / ○ | 채택 권장 (CIS p95 + model 교체축) | **○ / ○** (건강 유지; 잔여 DP-0004/0005 교체내성) | 닫힘 확인 (컴포넌트 경계 정의 전제 명시 + 교체내성 DP 역검토) | Low |
 
 ## 신규 QA 권고 추세
 
-| 후보 | 제안 라운드 | counsel stance | 상태 |
-|---|---|---|---|
-| NQA-A Security/Safety | round-01 | 신설·**강력권장** (우선순위 상위) | **반영(신설, 임시 ID)** — 정식 채택·번호 재정렬 OI-8 대기 |
-| NQA-B Correctness/Accuracy | round-01 | 신설·**권장** (QA-07/09 게이트 전제) | **반영(신설, 임시 ID)** — 정식 채택 OI-8 대기 |
-| NQA-C Cost-economy | round-01 | 신설·권장 (Med, QA-05/01 KPI 흡수) | **반영(신설, 임시 ID)** — 정식 채택 OI-8 대기 |
+| 후보 | 제안 라운드 | round-01 counsel stance | round-02 review verdict | **round-02 counsel stance** | 상태 |
+|---|---|---|---|---|---|
+| NQA-A Security/Safety | round-01 | 신설·**강력권장** (우선순위 상위) | **○ / △ · Med** — 정식화 권장(ISO Security 앵커); KPI 4/5축 [발표 서사] | **정식 채택 권장(상위 진입)** — red-team 4축 실측 전환 + **QA-03 ② 공유 하네스 동반 닫힘**(C3); 보안 tactic DP 위임 | **반영(신설, 임시 ID)** — 정식 채택·번호 재정렬 OI-8 대기 |
+| NQA-B Correctness/Accuracy | round-01 | 신설·**권장** (QA-07/09 게이트 전제) | **○ / △ · High** — **세트 닫힘 병목**(QA-07·QA-09 ②-2 닫힘이 NQA-B 채택에 달림); eval/검증 DP 부재(OI-7) | **정식 채택 강력 권장(최우선)** — golden+judge 실측 전환 + judge↔인간 일치도 SLI 신설 → **QA-07·QA-09 ②-2 동반 닫힘 단일 트리거** | **반영(신설, 임시 ID)** — 정식 채택 OI-8 대기(최우선) |
+| NQA-C Cost-economy | round-01 | 신설·권장 (Med, QA-05/01 KPI 흡수) | **○ / △ · Med** — 정식화 권장; **미채택 시 QA-01/05 KPI 부유**(채택이 이양 닫힘 트리거) | **정식 채택 권장(Med)** — $/완료모델 분해 + baseline 가정 슬라이드 명시 → **QA-01 활용률·QA-05 top-line 부유 해소**(C2) | **반영(신설, 임시 ID)** — 정식 채택 OI-8 대기 |

@@ -9,6 +9,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
     reason: "건강한 KPI 유지 + 자원-쿼터 격리·캐시오염 KPI 추가 + QA-02 경계 명문화 (자세히 → ## 변경 이력)"
+  - date: 2026-06-24
+    by: discussion/qa/round-02
+    reason: "닫힘 확인(Med→Low·세트 모범) — 외부 rate-limit 계정전역 silent cap 명문화(QA-01 헤드룸 cross-link) Low 보강"
 ---
 
 # QA-06 Reliability — Workflow 간 독립성 보장
@@ -28,8 +31,8 @@ updates:
 
 - **타 Workflow 실행 중단 ≤ 1% AND latency 증가 ≤ 10%** `[주 KPI · PoC 대상]` — 한 WF 폭주(noisy-neighbor) 주입 하에서
   - 쉽게: 한 워크플로우가 망가지거나 폭주해도, 같이 돌던 다른 워크플로우는 100건 중 1건 미만만 중단되고 지연도 10% 안쪽이어야 한다. *latency = 처리 지연 시간.*
-- **자원 격리: 단일 WF의 토큰/rate-limit 소비가 타 WF 쿼터 침범 = 0** — WF별 token-bucket 쿼터
-  - 쉽게: 한 워크플로우가 토큰·호출 한도를 아무리 많이 써도, 다른 워크플로우 몫으로 배정된 쿼터를 단 한 번도 침범하면 안 된다. *token-bucket = WF별로 사용량을 나눠 담는 통(한도 분배 장치).*
+- **자원 격리: 단일 WF의 토큰/rate-limit 소비가 타 WF 쿼터 침범 = 0** — WF별 token-bucket 쿼터 (계정전역 한도의 client-side 분배 — silent cap)
+  - 쉽게: 한 워크플로우가 토큰·호출 한도를 아무리 많이 써도, 다른 워크플로우 몫으로 배정된 쿼터를 단 한 번도 침범하면 안 된다. 단 token-bucket이 보장하는 건 **우리 쪽(client-side) 분배**까지다 — 외부 LLM 제공자의 TPM/RPM은 **계정 전역** 한도라(QA-01 rate-limit 헤드룸과 같은 천장) 제공자측 공유 한도 자체는 못 늘린다(silent cap). 즉 내부 공정 분배는 보장하되 전역 풀이 마르면 모든 WF가 함께 느려질 수 있다. *token-bucket = WF별로 사용량을 나눠 담는 통(한도 분배 장치), account-global = LLM 계정 전체에 걸리는 한도.*
 - **공유 캐시 오염 전파 = 0** — 한 WF의 오염 데이터가 타 WF로 미전파
   - 쉽게: 공유 캐시에 한 워크플로우가 잘못된 데이터를 넣어도, 그게 다른 워크플로우 결과로 새어 나가면 안 된다(0건). *오염 전파 = 잘못된 캐시 값이 다른 작업으로 퍼지는 것.*
 
@@ -78,3 +81,15 @@ updates:
 - **DP-0004(bulkhead)·DP-0005(캐시 격리)가 쿼터·상태 격리를 보장하는지 역검토** — 특히 **DP-0005 2안 채택 시 ④(오염 전파 0)가 R-1 위험과 직접 충돌** → 무효화·읽기전용 계층화 명시 필요 (`open-issues.md` 트래킹 대상).
 - QA-02 본문의 단방향 cross-link을 이번에 **양방향**으로 맞춤(QA-06 정의에 명시) — QA-02 정의의 altitude 줄과 짝.
 - 쿼터 침범 `0`·캐시오염 `0` 임계는 측정으로 확정(①② 1%·10%는 기존 건강 값 유지).
+
+### 2026-06-24 — round-02 디스커션 반영
+출처: [`discussion/qa/round-02`](../../discussion/qa/round-02/counsel/QA-06-reliability-workflow.md) (red team verdict: **Sound ○ / KPI ○ — Low** · Med→Low·세트 모범·C3 닫힘 확인)
+
+**무엇이 문제였나 (review 지적)**
+- round-01 쿼터 격리·캐시오염 KPI + QA-02 경계 양방향 명문화로 C3 닫힘·세트 모범. 잔여는 비-verdict: DP-0004/0005 격리 역검토(OI-7), 외부 rate-limit 계정전역 silent cap을 KPI 옆에 명문화 누락(Low·QA-01 헤드룸 단위와 연결).
+
+**무엇을 바꿨나 (반영)**
+- **Low 보강**: ③ 쿼터 침범 KPI 옆에 **외부 LLM rate-limit이 계정 전역**이라 token-bucket은 client-side 분배만 보장(제공자측 공유 한도는 못 늘림)임을 silent cap으로 명문화 + QA-01 rate-limit 헤드룸과 같은 천장임을 cross-link.
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0004/0005 격리 역검토(OI-7) — 특히 **DP-0005 2안 공유 캐시 채택 시 ④(오염 전파 0)가 R-1 위험과 충돌** → 무효화·읽기전용 계층화 명시 필요. DP 디스커션 위임.

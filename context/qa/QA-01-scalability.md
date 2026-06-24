@@ -9,6 +9,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
     reason: "KPI 측정가능 재설계 (자세히 → ## 변경 이력)"
+  - date: 2026-06-24
+    by: discussion/qa/round-02
+    reason: "닫힘 확인(High 해소) — rate-limit 헤드룸 측정단위 명시(계정전역 TPM/RPM 대비·큐별 쿼터 배분, QA-06 cross-link) Low 보강"
 ---
 
 # QA-01 Scalability — 시스템 확장성
@@ -28,8 +31,8 @@ updates:
 
 - **scaling efficiency ≥ 0.8** `[주 KPI · PoC 대상]` — 부하 2배 투입 시 처리량 ≥ 1.8배 (USL 기반)
   - 쉽게: 일을 2배로 주면 처리량도 거의 그만큼(예: 1.8배 이상) 따라 늘어야 한다. *USL = 확장성의 정통 측정 모델(Universal Scalability Law).*
-- **rate-limit 헤드룸 ≥ 20%** — 피크 시 TPM/RPM 한도 대비 여유, throttle(429) 0건
-  - 쉽게: 가장 바쁠 때도 LLM 한도를 80%까지만 쓰고 20%는 비워둔다. 꽉 채우면 호출이 거부(429 에러)돼 줄줄이 실패. *TPM = 분당 토큰 수, RPM = 분당 요청 수.*
+- **rate-limit 헤드룸 ≥ 20%** — 피크 시 **계정 전역 TPM/RPM 한도** 대비 여유, throttle(429) 0건 (보장 단위: 전역 풀 헤드룸 + 큐별 token-bucket 쿼터 배분)
+  - 쉽게: 가장 바쁠 때도 LLM 한도를 80%까지만 쓰고 20%는 비워둔다. 꽉 채우면 호출이 거부(429 에러)돼 줄줄이 실패. 측정 기준은 외부 LLM 제공자의 **계정 전역(account-global) 한도**(TPM/RPM은 계정 단위로 묶이므로 우리 client-side 큐가 아무리 나눠도 천장은 계정 합산)이고, 그 전역 풀을 큐별 token-bucket으로 배분해 한 큐가 다 먹지 않게 한다(WF별 쿼터 격리는 QA-06이 담당 — 같은 token-bucket 인프라 공유). *TPM = 분당 토큰 수, RPM = 분당 요청 수, account-global = 우리 큐가 아니라 LLM 계정 전체에 걸리는 한도.*
 - **큐 대기 p95 ≤ 5분** — backlog 오토스케일 트리거 SLI
   - 쉽게: 대기열 작업이 5분 안에 처리되기 시작해야 한다. *p95 = 가장 오래 걸린 상위 5%를 뺀 95% 기준(드문 예외에 안 휘둘리려는 통계), backlog = 처리 대기 중인 작업량, SLI = 서비스 수준을 재는 지표.*
 - **(보조·발표 앵커) 베이스라인(수작업) 대비 처리량 배수** — overview "모델 140개+" × 목표 기간으로 산출
@@ -81,3 +84,17 @@ updates:
 **남은 일 (이 라운드에서 미반영)**
 - DP-0001(동적 풀)·DP-0004(타입별 scale-out)가 rate-limit·admission control 차원을 명시 안 함 → DP 역검토 필요 (`open-issues.md` 트래킹 대상).
 - 활용률 KPI 이전은 **NQA-C 신설**이 전제 — 신설 전까지는 잠정 보류.
+
+### 2026-06-24 — round-02 디스커션 반영
+출처: [`discussion/qa/round-02`](../../discussion/qa/round-02/counsel/QA-01-scalability.md) (red team verdict: **Sound ○ / KPI ○ — Low** · High 해소·닫힘 확인)
+
+**무엇이 문제였나 (review 지적)**
+- round-01 KPI 재설계로 High 해소·닫힘. 잔여는 전부 비-verdict: rate-limit 헤드룸 측정단위(전역 vs 큐별) 모호(Low), 활용률 NQA-C 이양 미채택 시 부유(C2), rate-limit headroom·admission control·bounded queue DP 미명시(OI-7).
+
+**무엇을 바꿨나 (반영)**
+- **Low 보강**: rate-limit 헤드룸의 보장 단위를 명시 — **계정 전역 TPM/RPM 한도 대비** 헤드룸 + 큐별 token-bucket 쿼터 배분. WF별 쿼터 격리는 QA-06이 담당(같은 token-bucket 인프라 공유)임을 cross-link.
+
+**남은 일 (이 라운드에서 미반영)**
+- 활용률 NQA-C 이양은 **NQA-C 정식 채택(OI-8)** 동반 — 미채택 시 부유(C2). 사람 결정.
+- rate-limit headroom·admission control·bounded queue tactic이 DP-0001/0004에 미명시(OI-7) → DP 디스커션 위임. bounded queue 없으면 `큐 p95 ≤5분`이 폭주 시 깨짐.
+- 부하 단위(정규화 동시 WF 수 또는 토큰 처리량)·예시값은 실환경 측정으로 확정.
