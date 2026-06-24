@@ -1,6 +1,6 @@
 # 정합성 / 미해결 결정 트래커 (Open Issues)
 
-> category: meta | updated: 2026-06-19
+> category: meta | updated: 2026-06-24
 > 자료 변동으로 생긴 불일치 + 미확정 사항. 확정되면 해당 개념 파일에 반영하고 여기서 닫는다([x]).
 
 ## [ ] OI-1 QA 번호 불일치
@@ -28,3 +28,10 @@
 ## [ ] OI-6 As-Is/To-Be 시나리오 2개 버전
 - 슬라이드 9 vs 34: Compiler 시작 vs Quantizer 시작으로 서술 상이.
 - **남은 작업**: 기준 시나리오 확정.
+
+## [ ] OI-7 DP 역검토 — round-01 QA 디스커션에서 드러난 DP 미명시 차원
+- QA 디스커션 round-01 반영 중, 여러 DP가 새 KPI가 요구하는 차원을 명시하지 않음이 드러남(원본 DP는 고치지 않고 트래킹만).
+- **DP-0001(동적 풀)·DP-0004(타입별 scale-out)**: rate-limit·admission control 차원 미명시 (QA-01 반영 시 발견).
+- **DP-0002(Standby)·DP-0003(격리/모니터링)**: "외부 LLM degradation"(outage/429) 시나리오 미명시 — backoff·폴백 tactic 보강 필요 (QA-02 반영 시 발견).
+- **DP-0001 ↔ QA-02 링크 불일치**: QA-02 반영 시 related-dp에서 DP-0001 제거(가용성 기여가 '장애 격리'라 QA-06 소관)했으나, **DP-0001 파일은 여전히 `drives: QA-02`로 선언** → 단방향 불일치. DP-0001의 `drives`를 **QA-02→QA-06으로 교정**할지 DP 디스커션에서 결정.
+- **남은 작업**: 각 DP에 해당 tactic(rate-limit headroom·admission control·외부 의존성 backoff·폴백)을 후보 대안/ATAM에 명시할지 + DP-0001 drives 교정을 역검토.
