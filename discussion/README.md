@@ -20,6 +20,7 @@ discussion/
 └── <concept>/               ← 개념 영역별 인스턴스 (qa, dp, …)
     ├── Reviewer.md           red team 방법론 — 도메인별 렌즈·rubric
     ├── Council.md            blue team 방법론 — 도메인별 레퍼런스·PoC
+    ├── Applier.md            반영 방법론 — 원본 문서 골격·등급별 반영 규칙
     ├── README.md             그 영역의 마스터 인덱스 (라운드 이력·verdict 추세)
     └── round-NN/             한 라운드 (날짜 없음 — 메타는 보고서에 기록)
         ├── review/           red team 산출물: report.md(결론)·README.md·항목별 상세·신규후보
@@ -31,7 +32,7 @@ discussion/
 - **1 라운드 = 대상 전체 스냅샷에 대한 한 번의 심의**(비평 + 권고).
 - **`round-NN/` 폴더명에 날짜를 넣지 않는다.** 날짜 등 메타는 그 라운드의 종합 보고서(`review/report.md`, `counsel/counsel.md`)에 기록 — *공의회가 최종 결론을 문서화하듯*.
 - **append-only**: 지난 라운드는 수정하지 않고 보존(추세 비교용). 오타·링크만 예외.
-- **순환**: 심의(라운드 N) → Stage 2에서 원본(`context/<concept>/`) 개선 → 라운드 N+1로 검증 → 반복.
+- **순환**: 심의(라운드 N) → **원본(`context/<concept>/`) 반영** → 라운드 N+1로 검증 → 반복. 반영은 **Applier**(red→blue→applier의 3번째 역할)가 수행 — review·counsel·filter를 읽어 등급 [반영]만 원본에 쓴다. 방법론은 `discussion/<concept>/Applier.md`, 워커는 [`.claude/agents/discussion-applier.md`](../.claude/agents/discussion-applier.md).
 - **추적성**: 권고가 원본에 반영되면 `changelog.md` 델타 + 다음 라운드 종합 보고서에 verdict 변화 기록.
 
 ## 새 개념 영역 추가하는 법 (예: DP)
