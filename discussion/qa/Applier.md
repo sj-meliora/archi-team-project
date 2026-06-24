@@ -7,6 +7,7 @@
 ## 이 단계가 다른 점 (중요)
 - Reviewer/Council은 `discussion/`만 쓰고 원본은 안 건드린다(append-only). **Applier만 유일하게 `context/qa/` 원본을 수정**한다.
 - 입력(review·counsel·filter)은 **읽기 전용**. 절대 수정하지 않는다.
+- 단, Applier는 **자신의 반영 보고서**를 `discussion/<concept>/<round>/applier/`에 쓴다(아래 [§라운드 반영 보고서](#라운드-반영-보고서-reviewer-앞--다음-라운드로-루프-닫기)). review·counsel·filter는 여전히 읽기 전용이고, `applier/`만 Applier의 출력 폴더다. 이게 red→blue→**applier** 사이클을 다음 라운드 Reviewer에게 **보고**로 닫는 장치다.
 
 ## 입력 (호출자가 프롬프트로 준다)
 - `concept` — 영역 (여기선 `qa`)
@@ -90,7 +91,48 @@ updates:
 - DP 역검토 메모(예: "DP-0001이 rate-limit·admission control 미명시")는 원본 DP를 고치지 말고 `context/open-issues.md`에 트래킹 항목으로만 남긴다(또는 변경 이력의 "남은 일"에).
 - 신규 QA(NQA-x)는 같은 6섹션 골격으로 `context/qa/`에 신설. 번호 재정렬은 별도 결정 사항 — 임의로 재번호하지 않고 반환문에 제안만.
 
+## 라운드 반영 보고서 (Reviewer 앞 — 다음 라운드로 루프 닫기)
+
+반영을 마치면, **이번에 반영한 라운드의 review/counsel을 어떻게 처리했는지**를 Reviewer가 받아볼 보고서로 남긴다. 이게 red→blue→applier 사이클의 출력이며, **다음 라운드 Reviewer의 입력**이 된다(자기 지적이 [반영]/[발표 서사]/[생략]/[거부]/[이월] 중 무엇이 됐는지 확인하고 verdict 변화를 재평가하라고).
+
+- **출력 위치**: `discussion/<concept>/<round>/applier/report.md` (review/·counsel/와 나란한 **세 번째 폴더**). 라운드당 1개로 누적한다 — `targets`를 나눠 여러 번 반영해도 **한 파일에 append**(라운드가 닫힐 때까지 살아 있는 합본).
+- **append-only**(라운드 종료 후): 일단 다음 라운드가 시작되면 수정하지 않는다(오타·링크만 예외).
+- 보고서는 모든 red-team 지적에 **disposition(처리 등급)을 빠짐없이 단다** — "안 한 것"도 [생략]/[거부]/[이월]로 명시해 Reviewer가 추적 가능하게.
+
+### disposition 등급 (지적별 처리)
+- **[반영]** — 원본 `context/`에 실제 기입.
+- **[발표 서사]** — 검증 "방법 한 줄"만 남기고 실측은 미실행(슬라이드용).
+- **[생략]** — 원본에 안 씀(안 만들 시스템의 실행 관리물 등).
+- **[거부]** — counsel이 권고했으나 미채택. **반드시 사유**를 단다(자가당착·과에포트·범위 밖 등).
+- **[이월]** — 이번 라운드 미처리, 다음 라운드로 넘김(전제 미충족 등).
+
+### 보고서 골격 (`applier/report.md`)
+```
+# Applier 반영 보고서 — <round> (concept=<qa>)
+
+> 반영 대상: <round>의 review + counsel + _feasibility-filter
+> 반영 일자: YYYY-MM-DD · 반영 범위: <targets> · 원본: context/<concept>/
+> 다음 라운드 Reviewer는 이 보고서를 입력으로 읽고, 각 지적의 처리를 확인해 verdict 변화를 재평가한다.
+
+## 1. 한눈에 (항목별 처리 요약)
+| ID | review verdict | 처리 등급 | 무엇을 바꿨나(1줄) | 이월/재검증 |
+(QA·NQA별 1행)
+
+## 2. 지적별 처리 (closure)
+교차분석 C*와 개별 QA 핵심 지적마다 disposition + (필요시)사유.
+- **C2 정의↔KPI 불일치** → [반영]: QA-08 …
+- … 모든 지적이 등급을 받는다([거부]는 사유 필수)
+
+## 3. 다음 Reviewer가 다시 볼 것 (재검증 요청)
+[발표 서사]로 미룬 검증 · [이월] · 사람 결정 보류 · DP 역검토(open-issues OI-*) 목록.
+
+## 4. 사람 결정 보류
+수치 자가당착 · 번호 재정렬 · NQA 신설 가부 등.
+```
+- §1 표의 `이월/재검증` 칸과 §3가 다음 라운드 Reviewer의 **할 일 목록**이다 — 여기에 적힌 것이 라운드 N+1의 우선 점검 대상.
+- 개별 QA `## 변경 이력`의 "남은 일"과 정합을 맞춘다(중복이 아니라 **Reviewer 관점으로 재집계**: 무엇을 다시 봐달라).
+
 ## 반환 (호출자에게)
-- 생성·수정한 파일 목록.
-- 핵심 변경 요약(어느 KPI를 무엇으로, 무엇을 [생략]했나).
+- 생성·수정한 파일 목록(원본 `context/` + **`applier/report.md`**).
+- 핵심 변경 요약(어느 KPI를 무엇으로, 무엇을 [생략]/[거부]했나).
 - **사람 결정 필요점**(수치 자가당착·번호 재정렬·NQA 신설 가부·DP 역검토 등)을 **간결히** 별도로.

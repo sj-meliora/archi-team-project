@@ -24,7 +24,8 @@ discussion/
     ├── README.md             그 영역의 마스터 인덱스 (라운드 이력·verdict 추세)
     └── round-NN/             한 라운드 (날짜 없음 — 메타는 보고서에 기록)
         ├── review/           red team 산출물: report.md(결론)·README.md·항목별 상세·신규후보
-        └── counsel/          blue team 산출물: counsel.md(권고)·항목별 개선안·_poc-plan.md
+        ├── counsel/          blue team 산출물: counsel.md(권고)·항목별 개선안·_poc-plan.md
+        └── applier/          applier 산출물: report.md — 반영 보고서(지적별 disposition, 다음 Reviewer 입력)
 ```
 
 ## 라운드 규칙 (모든 영역 공통)
@@ -33,6 +34,7 @@ discussion/
 - **`round-NN/` 폴더명에 날짜를 넣지 않는다.** 날짜 등 메타는 그 라운드의 종합 보고서(`review/report.md`, `counsel/counsel.md`)에 기록 — *공의회가 최종 결론을 문서화하듯*.
 - **append-only**: 지난 라운드는 수정하지 않고 보존(추세 비교용). 오타·링크만 예외.
 - **순환**: 심의(라운드 N) → **원본(`context/<concept>/`) 반영** → 라운드 N+1로 검증 → 반복. 반영은 **Applier**(red→blue→applier의 3번째 역할)가 수행 — review·counsel·filter를 읽어 등급 [반영]만 원본에 쓴다. 방법론은 `discussion/<concept>/Applier.md`, 워커는 [`.claude/agents/discussion-applier.md`](../.claude/agents/discussion-applier.md).
+- **보고-루프(red↔applier 닫기)**: 반영을 마치면 Applier가 **반영 보고서**(`round-NN/applier/report.md`)를 남겨, 모든 지적의 처리([반영]/[발표 서사]/[생략]/[거부]+사유/[이월])를 명시한다. **다음 라운드 Reviewer는 이 보고서를 입력으로 받아**(Reviewer §8 절차 0), [반영]은 verdict 변화로 재평가하고 [발표 서사]/[이월]/[거부]는 다시 판정한다 — 지적이 처리됐는지 추적 가능해진다.
 - **추적성**: 권고가 원본에 반영되면 `changelog.md` 델타 + 다음 라운드 종합 보고서에 verdict 변화 기록.
 
 ## 새 개념 영역 추가하는 법 (예: DP)
