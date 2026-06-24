@@ -61,6 +61,12 @@
 - 후속(OI-9): §측정 하한 보정 8건이 짝 QAS-* Measure·glossary 수치 표기와 정합하는지 점검(이번 미반영).
 - 영향 ID: QA-01~13 전체, discussion/qa/Council.md(§9 신설), open-issues(OI-9 신설).
 
+## 2026-06-24 — OI-9 닫힘 (★ 등급 척도 ↔ QAS 수치 동기화)
+- 변경: round-03 §측정 하한 보정을 짝 QAS 9개(QAS-01·02·03·06·08·09·10·11·13)의 `응답 측정(Measure)` 행에 동기화 — scaling efficiency 0.8→0.70 / 재기동 1분→4분 / injection 95→70% / 타WF latency 10→25% / speedup 3배→1×~3배 / E2E 6h→24h / pass^k 70→25·40·60% / 절감률 70→50%·$/모델→게이트 / graceful stop+롤백 ★급간화. 각 QAS footnote 예시값 목록·`updated:`·`★ 급간 QA-XX` 포인터 갱신.
+- 불변: 게이트(0건/100% 절대형 — in-flight 손실=0·권한외배포=0·HITL 100%·서명 100% 등)는 그대로. QAS-04·07은 합격 하한 불변이라 제외. glossary는 수치 미포함이라 동기화 불요.
+- 사유: OI-9(QA 본문 보정 ↔ QAS 정합) 닫음. 경계는 예시값 — PoC 실측 시 확정.
+- 영향 ID: QAS-01·02·03·06·08·09·10·11·13, open-issues(OI-9 [x]).
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>
