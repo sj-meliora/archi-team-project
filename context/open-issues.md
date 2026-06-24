@@ -39,7 +39,7 @@
 - **DP-0001(2안 동적 풀)**: 작업별 최적 agent 선택이 **토큰 기준인지 비용 기준인지** 미명시 — 비용 기준 정렬 권고 (QA-05 반영 시 발견).
 - **DP-0001(1안 즉시 실행)**: latency만 보고 **품질 게이트(first-pass 성공)와 무연결** — "빠르게 틀리기" 차단 tactic 미명시 (QA-07 반영 시 발견).
 - **DP-0004/0005**: E2E latency 책임 및 **결정 산식(4단계×20GB÷대역폭 5% budget → A5 vs A8)의 실측 의존**, prompt/모델 교체 내성(workflow 버저닝·계약 분리) 미명시 (QA-08·QA-10 반영 시 발견).
-- **신규 QA 교차 의존(NQA-B 전제)**: QA-07 first-pass 품질 게이트·QA-09 유효-결정률이 **NQA-B(Correctness) golden 게이트에 의존** — NQA-B 신설과 함께 가야 두 QA의 KPI가 닫힘.
+- **신규 QA 교차 의존(NQA-B 전제)**: QA-07 first-pass 품질 게이트·QA-09 **②-2 정밀 유효-결정률**이 **NQA-B(Correctness) golden 게이트에 의존** — NQA-B 신설과 함께 가야 닫힘. (QA-09 contention 반영으로 ②-1 대리 유효-결정률은 golden 불요 룰 게이트로 분리·해소됨 — ②-2만 잔존 의존.)
 - **eval/검증 서브시스템 = 신규 DP 후보**: NQA-A red-team 하네스·NQA-B golden+judge 하네스가 **어떤 DP에도 없는 신규 인프라** — DP 디스커션에서 "eval/검증 서브시스템" DP 신설 검토 (NQA-A/B/QA-03 공유 자산).
 - **DP-0002/0003 보안 tactic 미명시**: 공급망 artifact 서명·secrets 관리·injection 가드레일이 후보 대안/ATAM에 없음 (NQA-A 신설 시 발견).
 - **`related-dp` 추가**: QA-05에 DP-0005, QA-07에 DP-0004 추가함(반영 완료). 역방향(DP의 `drives`)과 정합 확인 필요.
