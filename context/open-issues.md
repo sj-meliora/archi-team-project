@@ -1,6 +1,6 @@
 # 정합성 / 미해결 결정 트래커 (Open Issues)
 
-> category: meta | updated: 2026-06-24 (OI-8 닫힘 — NQA-A/B/C → QA-06/07/13 정식 편입·재번호; round-02 contention 반영)
+> category: meta | updated: 2026-06-24 (OI-8 닫힘 — NQA-A/B/C → QA-06/07/13 정식 편입·재번호; round-02 contention 반영; OI-9 신설 — ★ rubric 캘리브레이션)
 > 자료 변동으로 생긴 불일치 + 미확정 사항. 확정되면 해당 개념 파일에 반영하고 여기서 닫는다([x]).
 
 ## [ ] OI-1 QA 번호 불일치
@@ -53,3 +53,7 @@
 - **ASR 재선정(팀 판단, DP 생성 동인)**: **QA-01~07**(기존 5 + Security·Correctness). 기존 Reliability-WF(→QA-08)·Performance-Agent(→QA-09)는 ASR에서 빠짐. discussion 스킬·Contention 방법론 갱신.
 - **연결 확정**: QA-05 top-line·QA-01 활용률 → QA-13 이양 / QA-09·QA-11 ②-2 게이트 ↔ QA-07 양방향 / QA-03 ②-2 ↔ QA-06 red-team 하네스(round-02 contention; ②-1 선닫힘, ②-2만 QA-06 의존).
 - **잔여(OI-7로 이관)**: 검증 PoC 실측 전환·eval/검증 서브시스템 DP 신설은 DP 디스커션(OI-7). 발표 우선순위 추가 상향은 팀 논의.
+
+## [ ] OI-9 ★ 등급 척도 캘리브레이션의 하한 보정 ↔ QAS·glossary 정합
+- round-03 ★ rubric 캘리브레이션(2026-06-24)으로 8개 QA의 §측정 합격 하한을 재배치(QA-01 0.8→0.70 / QA-02 1분→4분 / QA-06 95→70% / QA-08 10→25% / QA-09 3배→1× / QA-10 6h→24h / QA-11 pass^k 70→25·40·60% / QA-13 70→50%·$/모델→게이트) + QA-03(graceful stop 재배치)·QA-04(★★★ 상한 캡)·QA-07(만점 캡+judge κ 조건) 상한/조건 추가. **QA 본문엔 옛값 보존 트레이스로 반영했으나 짝 QAS-* 6-part 시나리오 Measure 절·glossary.md 수치 표기는 미동기화.**
+- **남은 작업**: 각 QAS Measure가 구 KPI 수치(QA-13 70%·QA-10 6h·QA-11 pass^k 70% 등)를 재진술하는지 점검 → 재배치값 또는 `## 등급 척도` 참조로 동기화할지 결정. 등급 경계는 전부 예시값이라 PoC 실측 시 최종 확정.

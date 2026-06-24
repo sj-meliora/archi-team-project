@@ -16,6 +16,9 @@ updates:
   - date: 2026-06-24
     by: 팀 결정 (OI-8)
     reason: "재번호 QA-10 → QA-12 (NQA 정식 편입에 따른 +2 시프트, → changelog)"
+  - date: 2026-06-24
+    by: discussion/qa/round-03 (등급 척도 캘리브레이션)
+    reason: "★ rubric 추가 — CIS p95 역방향 급간(★★★=p95≤1 … ★☆☆=p95≤3 유지, 재배치 불요) + 컴포넌트 경계 정의 조건 (자세히 → ## 변경 이력)"
 ---
 
 # QA-12 Maintainability — 모듈 교체 용이성
@@ -69,6 +72,24 @@ updates:
 
 > 가정·한계: **CIS는 컴포넌트 경계 정의에 민감** — 경계 기준을 명시해야 비교 가능. mock의 결합도가 실제 시스템보다 낮으면 CIS가 낙관 편향. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — silent cap으로 명시.
 
+## 등급 척도 (★ rubric — ATAM trade-off용)
+
+> 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정.
+
+주 KPI `CIS p95 ≤3개`는 **역방향(낮을수록 좋음)** — **★★★가 가장 낮은 값**(p95≤1). gradable(CIS 정수 분포)이라 그대로 별점화. 측정 전제로 컴포넌트 경계 정의 선결이 걸리므로 규칙4의 `조건:`으로 고정. 모델교체 무중단·온보딩 ≤1일은 보조 게이트(별점 미적용).
+
+**조건 (측정 전제):** `조건: 컴포넌트 경계 정의 고정(무엇을 1개 컴포넌트로 세는가)` — 경계가 모호하면 동일 변경도 CIS가 들쭉날쭉해 두 설계 비교 불가(QA 본문 silent cap). 동일 경계 정의 하에서만 CIS p95 비교. 보조 게이트: 모델 교체 중 in-flight WF 무중단(pass/fail).
+
+| 등급 | 구간 — 주 KPI(main 축): CIS p95 (영향받은 컴포넌트 수, **낮을수록 좋음**) | 필드 근거 (경계 이유 + URL) |
+|---|---|---|
+| ★★★ (상) | p95 ≤ 1개 | 큐/계약 완전 분리 시 한 노드 교체가 인접 노드 미간섭(이상적 모듈성). Temporal activity 교체·계약 분리 천장 −margin ([Temporal versioning](https://docs.temporal.io/temporal)) |
+| ★★☆ (중) | p95 = 2개 | 노드+인접 계약 1개 동반 수정의 일반 우수 구간(낮은 결합 달성 시 현실값) ([결합도/영향분석](https://www.researchgate.net/publication/289063786_Identifying_coupling_metrics_and_impact_on_software_quality)) |
+| ★☆☆ (하) | p95 = 3개 — 합격 최소선=KPI 하한 | tail 3개까지 허용 — 결합 분리 설계의 합격 진입선. p95(상위 5% 제외) 기준 ([p50/p95/p99](https://oneuptime.com/blog/post/2025-09-15-p50-vs-p95-vs-p99-latency-percentiles/view)) |
+| 불합격 | p95 ≥ 4개, 또는 컴포넌트 경계 정의 미고정 / 모델교체 무중단 실패(게이트) | tail 4+면 변경 국소성 붕괴; 경계 미정이면 측정 무의미 |
+
+> **캘리브레이션 노트**: 하한 p95≤3은 필드 현실적(잘 분리된 모듈의 ripple 상단) — 비현실 하한 아님, **규칙2 재배치 불요**. **이론 근거: 결합도 기반 영향분석(ISM/CBO)·tail SLI 관행·Temporal 계약분리 버저닝(ResearchGate/Lehnert/Temporal) + PoC margin: mock 파이프라인은 결합도가 실시스템보다 낮아 CIS 낙관 편향 가능 → 천장 ★★★를 p95≤1로만 두고 ★★☆/★☆☆를 2·3으로 넓게**. 신뢰도 상한(silent cap): CIS는 컴포넌트 경계 정의 민감(조건 위반 시 게이트); mock 낙관 편향 명시. 보조 — 모델교체 비용은 필드상 막대(2 eng × 2주 ≈ $16k, 5개월 마이그레이션, [VentureBeat](https://venturebeat.com/ai/swapping-llms-isnt-plug-and-play-inside-the-hidden-cost-of-model-migration)·[TianPan](https://tianpan.co/blog/2026-04-10-model-migration-playbook-swap-llm-production))라 무중단·온보딩 ≤1일은 보조 게이트로 보존(별점 미부여).
+> **seats**: 발의 Seat 2(수석 아키텍트 — taxonomy/SLI) · consensus (Seat 3 경계 정의 고정 조건이 durable-WF 버저닝과 정합 동의)
+
 ## 변경 이력
 
 ### 2026-06-24 — round-01 디스커션 반영
@@ -100,3 +121,12 @@ updates:
 
 **남은 일 (이 라운드에서 미반영)**
 - DP-0004/0005에 workflow 버저닝·계약 분리·blue-green tactic 역검토(교체내성, OI-7) + FR-0003 영향범위 자동분석의 CIS 데이터 공급 역검토 → DP 디스커션 위임.
+
+### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
+출처: [`discussion/qa/round-03`](../../discussion/qa/round-03/) (Council 3 seats — reviewer-less ★ rubric 변형, 팀 승인)
+
+**무엇을 했나**
+- **★ rubric 추가**: main 급간 축 = `CIS p95` (역방향 — 낮을수록 ★ 높음). ★★★ p95≤1 / ★★☆ p95=2 / ★☆☆ p95=3(합격 하한) / 불합격 p95≥4.
+- **재배치 불요**: 하한 p95≤3은 필드 현실적이라 규칙2 재배치 없음. §측정 수치 보정 없음(CIS p95≤3 유지).
+- **규칙4(측정 전제 조건)**: `컴포넌트 경계 정의 고정`을 조건으로 명시 — 동일 경계에서만 CIS p95 비교. 모델교체 무중단·온보딩 ≤1일은 보조 게이트(별점 미부여).
+- 근거 출처: [p50/p95/p99 tail SLI](https://oneuptime.com/blog/post/2025-09-15-p50-vs-p95-vs-p99-latency-percentiles/view), [결합도/영향분석(ISM/CBO)](https://www.researchgate.net/publication/289063786_Identifying_coupling_metrics_and_impact_on_software_quality), [Temporal versioning](https://docs.temporal.io/temporal), 모델 마이그레이션 비용([VentureBeat](https://venturebeat.com/ai/swapping-llms-isnt-plug-and-play-inside-the-hidden-cost-of-model-migration)).

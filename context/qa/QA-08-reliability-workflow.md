@@ -15,6 +15,9 @@ updates:
   - date: 2026-06-24
     by: 팀 결정 (OI-8)
     reason: "재번호 QA-06 → QA-08 (NQA 정식 편입에 따른 +2 시프트, → changelog)"
+  - date: 2026-06-24
+    by: discussion/qa/round-03 (등급 척도 캘리브레이션)
+    reason: "★ rubric 추가 + 타 WF latency 증가 합격 하한 ≤10% → ≤25%(★☆☆, 10%는 ★★☆) 보정 (중단율 ≤1%·쿼터침범 0은 조건/게이트 불변) (자세히 → ## 변경 이력)"
 ---
 
 # QA-08 Reliability — Workflow 간 독립성 보장
@@ -32,8 +35,9 @@ updates:
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `타 WF 중단 ≤1% AND latency 증가 ≤10%` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
 
-- **타 Workflow 실행 중단 ≤ 1% AND latency 증가 ≤ 10%** `[주 KPI · PoC 대상]` — 한 WF 폭주(noisy-neighbor) 주입 하에서
-  - 쉽게: 한 워크플로우가 망가지거나 폭주해도, 같이 돌던 다른 워크플로우는 100건 중 1건 미만만 중단되고 지연도 10% 안쪽이어야 한다. *latency = 처리 지연 시간.*
+- **타 Workflow 실행 중단 ≤ 1% AND latency 증가 ≤ 25%** `[주 KPI · PoC 대상]` — 한 WF 폭주(noisy-neighbor) 주입 하에서
+  - 쉽게: 한 워크플로우가 망가지거나 폭주해도, 같이 돌던 다른 워크플로우는 100건 중 1건 미만만 중단되고 지연도 25% 안쪽이어야 한다(합격 하한). *latency = 처리 지연 시간.*
+  > 보정(2026-06-24, 등급 척도 캘리브레이션 round-03): 타 WF latency 증가 합격 하한 구 `≤10%` → 신 `≤25%`(★☆☆ 합격 하한, 옛 10%는 ★★☆로 상향) — ★1~3 급간 확보 + 무격리 시 p99 doubling(+100%)·CPU 56% degradation 바닥과 충분한 간격. **중단율 ≤1%·쿼터침범 0은 조건/게이트라 불변.** ★ 급간(★★★ ≤5% / ★★☆ ≤10% / ★☆☆ ≤25%)은 ## 등급 척도 참조.
 - **자원 격리: 단일 WF의 토큰/rate-limit 소비가 타 WF 쿼터 침범 = 0** — WF별 token-bucket 쿼터 (계정전역 한도의 client-side 분배 — silent cap)
   - 쉽게: 한 워크플로우가 토큰·호출 한도를 아무리 많이 써도, 다른 워크플로우 몫으로 배정된 쿼터를 단 한 번도 침범하면 안 된다. 단 token-bucket이 보장하는 건 **우리 쪽(client-side) 분배**까지다 — 외부 LLM 제공자의 TPM/RPM은 **계정 전역** 한도라(QA-01 rate-limit 헤드룸과 같은 천장) 제공자측 공유 한도 자체는 못 늘린다(silent cap). 즉 내부 공정 분배는 보장하되 전역 풀이 마르면 모든 WF가 함께 느려질 수 있다. *token-bucket = WF별로 사용량을 나눠 담는 통(한도 분배 장치), account-global = LLM 계정 전체에 걸리는 한도.*
 - **공유 캐시 오염 전파 = 0** — 한 WF의 오염 데이터가 타 WF로 미전파
@@ -65,7 +69,34 @@ updates:
 
 > 가정·한계: 폭주 강도·WF 수·token-bucket 파라미터는 **가정 파라미터**다. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다. **외부 LLM 제공자 측 rate-limit이 계정 전역이면 token-bucket은 client-side 분배만 보장**(제공자측 공유 한도 자체는 못 늘림) — silent cap으로 명시.
 
+## 등급 척도 (★ rubric — ATAM trade-off용)
+
+> 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정.
+>
+> 헤드라인 `타 WF 중단 ≤1% AND latency 증가 ≤10%`는 2-index(둘 다 연속·gradable) → main + 조건. PoC 측정 쉬운 `타 WF latency 증가율(p95)`을 main 축에, `중단율`을 표 밖 조건으로 고정. 둘 다 역방향(낮을수록 ★ 높음).
+
+**조건 (2-index — 표 밖):** `타 WF 실행 중단율 ≤ 1% 고정 AND 폭주 WF의 쿼터 침범 = 0건` — noisy-neighbor 폭주(무한 재시도·대량 토큰) 주입 하에서. 중단율을 고정해야 latency 급간이 "같은 격리 강도"를 비교하는 의미를 가짐. 쿼터 침범 0건은 0건 절대형 게이트(규칙5)로 동반.
+
+| 등급 | 구간 — 주 KPI(main 축): 폭주 주입 하 타 WF latency(p95) 증가율 (중단율 ≤1% 고정) | 필드 근거 (경계 이유 + URL) |
+|---|---|---|
+| ★★★ (상) | latency 증가 ≤ 5% | 적절한 격리 시 "unrelated workload가 더 이상 간섭 못 해 tail latency 안정화"가 필드 최상위 — 무간섭 이상에 PoC margin 두고 5%로 [HorizonIQ noisy neighbor](https://www.horizoniq.com/blog/what-are-noisy-neighbors-in-cloud-computing/) · [TiDB noisy-neighbor playbook](https://www.pingcap.com/playbook-noisy-neighbor-multi-tenant-mysql/) |
+| ★★☆ (중) | 5% < latency 증가 ≤ 10% | KPI 원본 하한(10%)이 이 대역. bulkhead·큐별 동시성으로 간섭을 한 자릿수%로 묶는 일반 우수 격리 [KEDA](https://keda.sh/) · [Google SRE Workbook](https://sre.google/workbook/implementing-slos/) |
+| ★☆☆ (하) | 10% < latency 증가 ≤ 25% — 합격 최소선 (옛 하한 10%를 ★★☆로 올리고 합격 하한 재배치) | 격리는 작동하나 여유가 빠듯한 대역. 무격리 시 p99 doubling(+100%)·CPU 56% degradation이 필드 관측 바닥이므로 그 한참 위인 25%를 합격 하한으로 [noisy-neighbor causal inference](https://arxiv.org/html/2604.03145v1) · [simplyblock p99](https://simplyblock.io/glossary/p99-storage-latency/) |
+| 불합격 | latency 증가 > 25% / 또는 중단율 > 1% / 쿼터 침범 > 0건 | 무격리(p99 2배·56% 저하)에 근접 — |
+
+> **캘리브레이션 노트**: KPI 원본 하한 `≤10%`는 필드 기준 건강한 합격선(이 세트에서 드물게 건강 — round-01 verdict)이라 비현실 재배치는 불요. 다만 ★1~3을 띄우려고 하한(10%)을 ★★☆로 올리고 ★☆☆ 합격 하한을 25%로 한 칸 내려 급간 확보(무격리 +100% 바닥과 충분한 간격). 이론 근거 = 무격리 56% degradation/p99 doubling 관측, PoC margin = noisy-neighbor 주입 모델의 폭주 강도·WF 수·token-bucket 파라미터가 가정값이라 ★★★(≤5%)를 무간섭 이상보다 다소 넓게. silent cap: 외부 LLM 제공자 rate-limit은 **계정 전역**이라 token-bucket은 client-side 분배만 보장(전역 풀 마르면 전 WF 동반 저하 — 쿼터 침범 0 게이트는 내부 분배 기준; QA-01 헤드룸과 같은 천장).
+> **seats**: 발의 Seat 3(격리·멀티테넌시) · consensus (Seat 1이 runaway 폭주 차단=QA-03 cap 연동을 폭주 주입 조건의 전제로 확인 — 2-index를 main=latency/조건=중단율+쿼터로 흡수)
+
 ## 변경 이력
+
+### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
+출처: discussion/qa/round-03 (등급 척도 캘리브레이션 — Council blue team, 팀 검토·승인). main 급간 축 = **폭주 주입 하 타 WF latency(p95) 증가율**(역방향, 낮을수록 ★ 높음).
+
+- **★ 급간**: ★★★ ≤5% / ★★☆ ≤10% / ★☆☆ ≤25%. 하한 미만 불합격.
+- **조건/게이트(표 밖)**: `타 WF 중단율 ≤1% 고정 AND 쿼터 침범 = 0건`(0건 절대형 게이트, 규칙5·규칙4 2-index). 중단율을 고정해야 latency 급간이 같은 격리 강도를 비교.
+- **구→신(§측정 보정)**: 타 WF latency 증가 합격 하한 `≤10% → ≤25%`(★☆☆). 옛 10%는 ★★☆로 상향 — ★1~3 급간 확보(무격리 p99 doubling·56% degradation 바닥과 간격). 중단율 ≤1%·쿼터침범 0은 조건/게이트라 불변.
+- **근거 출처**: 무격리 noisy-neighbor 56% degradation·p99 doubling([causal inference](https://arxiv.org/html/2604.03145v1), [simplyblock p99](https://simplyblock.io/glossary/p99-storage-latency/)) · 격리 시 tail latency 안정화([HorizonIQ](https://www.horizoniq.com/blog/what-are-noisy-neighbors-in-cloud-computing/), [TiDB playbook](https://www.pingcap.com/playbook-noisy-neighbor-multi-tenant-mysql/)) · bulkhead/큐별 동시성([KEDA](https://keda.sh/), [SRE Workbook](https://sre.google/workbook/implementing-slos/)).
+- 합격 하한 보정(10%→25%, 10%는 ★★☆)은 `open-issues.md` 등록 대상(KPI 정의 정합 재확인).
 
 ### 2026-06-24 — round-01 디스커션 반영
 출처: [`discussion/qa/round-01`](../../discussion/qa/round-01/counsel/QA-06-reliability-workflow.md) (red team verdict: **Sound ○ / KPI ○ — Med** — KPI 건강, 자원-쿼터 격리 추가 + QA-02 경계 명문화)

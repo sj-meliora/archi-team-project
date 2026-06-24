@@ -12,6 +12,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-02
     reason: "닫힘 확인(High 해소) — rate-limit 헤드룸 측정단위 명시(계정전역 TPM/RPM 대비·큐별 쿼터 배분, QA-08 cross-link) Low 보강"
+  - date: 2026-06-24
+    by: discussion/qa/round-03 (등급 척도 캘리브레이션)
+    reason: "★ rubric(ATAM trade-off) 신설 + scaling efficiency 합격 하한 0.8 → 0.70 보정 (필드 USL 근거 + PoC margin, 헤드룸≥20% 고정 조건 하)"
 ---
 
 # QA-01 Scalability — 시스템 확장성
@@ -29,8 +32,9 @@ updates:
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `scaling efficiency` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
 
-- **scaling efficiency ≥ 0.8** `[주 KPI · PoC 대상]` — 부하 2배 투입 시 처리량 ≥ 1.8배 (USL 기반)
-  - 쉽게: 일을 2배로 주면 처리량도 거의 그만큼(예: 1.8배 이상) 따라 늘어야 한다. *USL = 확장성의 정통 측정 모델(Universal Scalability Law).*
+- **scaling efficiency ≥ 0.70** `[주 KPI · PoC 대상]` — 부하 2배 투입 시 처리량 ≥ 1.40배 (USL 기반, rate-limit 헤드룸 ≥20% 고정 조건 하)
+  - 쉽게: 일을 2배로 주면 처리량도 거의 그만큼(예: 1.4배 이상) 따라 늘어야 한다. *USL = 확장성의 정통 측정 모델(Universal Scalability Law).*
+  - > 보정(2026-06-24, 등급 척도 캘리브레이션 round-03): 구 `≥0.8` → 신 `≥0.70` — 실제 USL 회귀 사례(우수 구성도 ~0.72)·가상 PoC 미완성 margin 반영. ★ 급간은 ## 등급 척도 참조.
 - **rate-limit 헤드룸 ≥ 20%** — 피크 시 **계정 전역 TPM/RPM 한도** 대비 여유, throttle(429) 0건 (보장 단위: 전역 풀 헤드룸 + 큐별 token-bucket 쿼터 배분)
   - 쉽게: 가장 바쁠 때도 LLM 한도를 80%까지만 쓰고 20%는 비워둔다. 꽉 채우면 호출이 거부(429 에러)돼 줄줄이 실패. 측정 기준은 외부 LLM 제공자의 **계정 전역(account-global) 한도**(TPM/RPM은 계정 단위로 묶이므로 우리 client-side 큐가 아무리 나눠도 천장은 계정 합산)이고, 그 전역 풀을 큐별 token-bucket으로 배분해 한 큐가 다 먹지 않게 한다(WF별 쿼터 격리는 QA-08이 담당 — 같은 token-bucket 인프라 공유). *TPM = 분당 토큰 수, RPM = 분당 요청 수, account-global = 우리 큐가 아니라 LLM 계정 전체에 걸리는 한도.*
 - **큐 대기 p95 ≤ 5분** — backlog 오토스케일 트리거 SLI
@@ -66,7 +70,31 @@ updates:
 
 > 가정·한계: 서비스 시간·도착률·cold-start·LLM 한도는 **가정 파라미터**다. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — 슬라이드엔 가정값을 명시한다.
 
+## 등급 척도 (★ rubric — ATAM trade-off용)
+
+> 동일 조건에서 설계 대안의 본 QA 만족도를 ★1~3으로 비교(별 많은 안 채택). **KPI 합격선(하한)이 ★☆☆ 진입선**, ★★☆/★★★는 **필드 기준 현실 도달 범위**로 캘리브레이션. 하한 미만은 불합격(별 없음). 수치는 예시값이며 경계는 PoC로 확정.
+
+**조건 (2-index → main + 조건):** `측정 조건: rate-limit 헤드룸 ≥ 20% 고정`. efficiency를 main 급간 축에 두되, **계정 전역 TPM/RPM 한도가 포화되지 않은(헤드룸 ≥20%) 동일 조건에서만** efficiency를 비교한다. rate-limit 포화로 인한 등급 하락을 배제 — 순수 확장 메커니즘(공유 풀·병목단계 worker 확장)의 효율만 급간화.
+
+| 등급 | 구간 — 주 KPI: scaling efficiency (부하 2배 시 처리량 배수 ÷ 2) | 필드 근거 (왜 이 경계인가 + 출처) |
+|---|---|---|
+| ★★★ (상) | **efficiency ≥ 0.85** (2배 → ≥1.70배) | 이론·HPC 최상위는 0.90~1.0(linear)지만, PoC는 가상 큐잉 시뮬(가정 파라미터)이라 이론 천장까지 못 올린다 → 이론치(0.90)에서 margin 0.05를 빼 **≥0.85로 하향 배치**. HPC "Good=75%" 위의 excellent 대역. [HemeLB/HPC Carpentries — Benchmarking & Scaling](https://hemelb-dev.github.io/HemeLB-Carpentries/03-benchmarking-and-scaling/index.html) |
+| ★★☆ (중) | **0.75 ≤ efficiency < 0.85** (2배 → 1.50~1.70배) | HPC 관례 "Good" 라인 75%가 중급 진입선. 실제 USL 회귀(SPARCcenter SPEC SDM91)에서 우수 구성도 관측 efficiency 최대 **0.72**에 그친 점을 고려, 0.75~0.85를 "필드 일반 우수"로 둔다. [WSO2 — USL로 확장성 측정](https://wso2.com/blog/research/measuring-software-scalability-using-universal-scalability-law/) · [Perfdynamics — How to Quantify Scalability](https://www.perfdynamics.com/Manifesto/USLscalability.html) |
+| ★☆☆ (하) | **0.70 ≤ efficiency < 0.75** (합격 최소선 = 보정된 KPI 하한) | KPI 하한을 **0.8 → 0.70으로 하향 보정**: 실제 USL 우수 구성도 0.72에 머문 필드 현실 + PoC 미완성 margin 반영. HPC "Good 75%" 바로 아래까지를 합격으로 허용. [WSO2 — USL](https://wso2.com/blog/research/measuring-software-scalability-using-universal-scalability-law/) |
+| 불합격 | **efficiency < 0.70** | coherency(β)·contention(α)이 지배해 자원 추가가 처리량으로 이어지지 않는 영역. [WSO2 — USL](https://wso2.com/blog/research/measuring-software-scalability-using-universal-scalability-law/) |
+
+> **캘리브레이션 노트**: 원 KPI 하한 0.8은 HPC 일반 기준(Good=75% 위)으론 현실적이나, **LLM rate-limited 워크로드 + 가상 PoC에는 낙관적**이다. 실제 USL 회귀 사례는 우수 구성도 **이론 근거 ~0.72**에서 멈췄고, PoC는 가정 파라미터 기반 큐잉 시뮬이라 이론 완성도 미달이 예상된다 → **이론 근거 0.72 + PoC 미완성 대비 margin ≈0.02~0.05 반영해 전 급간을 하향**([상 ≥0.85 / 중 0.75~0.85 / 하 0.70~0.75]). rate-limit 포화로 등급이 깎이는 문제는 표 밖 `측정 조건`(헤드룸 ≥20% 고정)으로 흡수. 경계 수치는 모두 예시값 — PoC 큐잉 시뮬(공유 풀 vs 고정배치)로 확정.
+> **seats**: 발의 Seat 3 (인프라·USL·rate-limit) · Seat 2 동의(SLI 형식) · Seat 1 합의(dissent였던 "rate-limit 조건부 efficiency"가 `측정 조건` 줄로 흡수 → consensus).
+
 ## 변경 이력
+
+### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
+출처: [`discussion/qa/round-03`](../../discussion/qa/round-03/) (등급 척도 캘리브레이션, 팀 승인)
+
+- **main 급간 축**: scaling efficiency (부하 2배 시 처리량 배수 ÷ 2). 2-index 구조에서 PoC로 측정 가능한 efficiency를 main 축, rate-limit 헤드룸은 `측정 조건: 헤드룸 ≥20% 고정`으로 분리(rate-limit 포화로 등급이 깎이지 않게).
+- **★ 급간**: 상 ≥0.85 / 중 0.75~0.85 / 하 0.70~0.75 / 불합격 <0.70.
+- **§측정 보정(구→신)**: scaling efficiency 합격 하한 `≥0.8` → `≥0.70`. 사유: 실제 USL 회귀 사례(우수 구성도 ~0.72, SPARCcenter SPEC SDM91)·가상 PoC 미완성 margin 반영. HPC "Good=75%" 라인 기준.
+- **근거 출처**: HemeLB/HPC Carpentries(Good=75%), WSO2·Perfdynamics(USL 회귀 ~0.72 실측).
 
 ### 2026-06-24 — round-01 디스커션 반영
 출처: [`discussion/qa/round-01`](../../discussion/qa/round-01/counsel/QA-01-scalability.md) (red team verdict: **KPI ✕ / High** — KPI 전면 재설계 필요)

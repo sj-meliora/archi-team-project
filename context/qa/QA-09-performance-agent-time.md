@@ -12,6 +12,9 @@ updates:
   - date: 2026-06-24
     by: 팀 결정 (OI-8)
     reason: "재번호 QA-07 → QA-09 (NQA 정식 편입에 따른 +2 시프트, → changelog)"
+  - date: 2026-06-24
+    by: discussion/qa/round-03 (등급 척도 캘리브레이션)
+    reason: "★ rubric(ATAM trade-off) 추가 + speedup 합격 하한 보정(구 ≥3배 → 신 1×~3× ★☆☆, 3배는 ★★☆ 진입선). first-pass 게이트·커버리지≥80%는 조건 (→ ## 변경 이력)"
 ---
 
 # QA-09 Performance — Agent 수행 시간 (per-node)
@@ -29,8 +32,9 @@ updates:
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `노드타입별 speedup(first-pass 성공분)` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
 
-- **노드타입별 speedup ≥ 3배 (first-pass 성공 작업에만 집계)** `[주 KPI · PoC 대상]` — = 수동 baseline 중앙값 / agent 중앙값
-  - 쉽게: 각 노드 종류(IR 변환·최적화·양자화·컴파일)마다, 사람이 직접 할 때보다 3배 이상 빨라야 한다. 단 **한 번에 제대로 성공한 작업만** 센다(틀리고 다시 한 건 제외). *speedup = 속도 배수, 중앙값 = 한가운데 값(드문 극단치에 안 휘둘림).*
+- **노드타입별 speedup > 1배 (first-pass 성공 작업에만 집계)** `[주 KPI · PoC 대상]` — = 수동 baseline 중앙값 / agent 중앙값
+  - 쉽게: 각 노드 종류(IR 변환·최적화·양자화·컴파일)마다, 사람이 직접 할 때보다 빨라야 한다(>1배가 합격 진입선). 단 **한 번에 제대로 성공한 작업만** 센다(틀리고 다시 한 건 제외). *speedup = 속도 배수, 중앙값 = 한가운데 값(드문 극단치에 안 휘둘림).*
+  > 보정(2026-06-24, 등급 척도 캘리브레이션 round-03): 구 `≥3배` → 신 `1×~3×(★☆☆ 합격 진입선)` — 사람-협업형 필드(METR 0.84×·Copilot 2.26×) 기준 3배는 비현실 상단이라 ★★☆ 진입선으로 흡수, "사람보다 빠름(>1×)"을 최소 합격선으로. ★ 급간은 ## 등급 척도 참조.
 - **품질 게이트(paired) = first-pass 성공률** — 위 speedup의 분모 조건. 성공 판정은 정확성 게이트(QA-07 golden)
   - 쉽게: "빠르게 틀리기"를 막는 짝 지표. 시간이 빨라도 first-pass 성공률이 낮으면 의미 없다. *paired metric = 한 지표가 나빠지는 걸 감시하는 짝 지표(가드레일).*
 - **커버리지 ≥ 80%** — 측정 대상 노드 집합 고정(easy-node cherry-picking 방지)
@@ -66,7 +70,37 @@ updates:
 
 > 가정·한계: 수동 baseline은 **표본·숙련도 편차가 큼**(공정 baseline 확보가 최대 난점) → baseline 출처·측정조건을 명시. golden 게이트가 작으면 first-pass 성공 판정이 낙관 편향될 수 있음. tool 실행 시간(외부 컴파일러)은 우리 최적화 대상 밖(분리는 되나 단축 레버 아님) — silent cap.
 
+## 등급 척도 (★ rubric — ATAM trade-off용)
+
+> 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정.
+
+헤드라인 `노드타입별 speedup`은 그 자체로 binary가 아니라 **연속 배수**라 급간화 가능 → 별점은 speedup을 main 축으로 매긴다. 단 전제 조건(first-pass 성공분만 집계·커버리지)을 충족 못 하면 **게이트 불합격**(아래 조건/불합격 행).
+
+**조건 (2-index → main+조건):**
+- `조건 A: first-pass 성공(품질 게이트, QA-07 golden) 통과분만 speedup 집계` — "빠르게 틀리기"를 별점으로 보상하지 않기 위해. 미통과분 포함 집계는 측정 무효.
+- `조건 B: 커버리지 ≥ 80% (측정 노드집합 고정, easy-node cherry-picking 금지)` — easy-node만 골라 배수를 부풀리는 gaming 차단. 80% 미만이면 main 배수와 무관하게 불합격.
+
+| 등급 | 구간 — 주 KPI(main 축): 노드타입별 speedup (first-pass 성공분 중앙값, 수동 baseline 대비) | 필드 근거 (경계 이유 + URL) |
+|---|---|---|
+| ★★★ (상) | speedup ≥ 8배 (모든 측정 노드타입에서) | 완전자율(headless) 엔지니어링 작업의 필드 상단: InfEngine은 사람 대비 assistant-type 작업에서 8.6–22.7×를 보고 — 우리는 가상 설계·제한 PoC라 이 천장 하단인 **8배**를 ★★★ 진입선으로(이론 22× − PoC margin). https://arxiv.org/pdf/2602.18985 |
+| ★★☆ (중) | 3배 ≤ speedup < 8배 | 자율 최적화/변환형 작업의 필드 "일반 우수" 대역(InfEngine optimization-type 1.2–4.4×, GitHub Copilot RCT 55.8%↑≈2.26×, Anthropic 고객 2×를 자율·배치로 환산 시 상회). 사람 협업형(assist)은 이 하단, 완전자율 배치는 그 위. https://arxiv.org/pdf/2602.18985 · https://thenewstack.io/how-ai-coding-makes-developers-56-faster-and-19-slower/ |
+| ★☆☆ (하) | 1.0배 < speedup < 3배 (= 보정된 합격 하한, 조건 A·B 충족 시) | 합격 진입선. 사람보다 빠르긴 하나(>1×) 우수 대역 미달. 필드에서 숙련 개발자 협업형은 오히려 19% 느림(METR RCT, 0.84×)도 관측 — 자동화가 "사람보다 빠름"을 입증하는 것 자체가 최소 가치선. https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/ |
+| 불합격 | speedup ≤ 1.0배 (사람보다 안 빠름) / 조건 A 위반(first-pass 미통과분 포함 집계) / 조건 B 위반(커버리지 < 80%) | 게이트 위반 — 별점 없음 |
+
+> **캘리브레이션 노트**: 원 KPI 하한 `≥3배`는 필드 기준 **다소 높음**으로 판정(규칙2 약식 적용). METR RCT는 사람 협업형에서 0.84×(오히려 감속)를, GitHub Copilot RCT는 2.26×를 보고 — "3배"는 협업형 도구라면 비현실 상단이다. 그러나 우리 시스템은 **사람 개입 없는 headless 배치 자동화**(반복·대기 시간 제거)라 협업형보다 본질적으로 빠르고, 동류 완전자율 사례(InfEngine 8.6–22.7×)가 3배를 충분히 상회한다. 따라서 3배는 ★★☆ 진입선으로 **유지하되**, ★☆☆을 `1×<x<3×`로 두어 "사람보다 빠름"이라는 최소선을 합격에 흡수했다(하한 사실상 1×로 하향 보정 → open-issues 등록 권고: KPI 정의 §측정의 합격 하한과 정합 확인). **이론 근거: 완전자율 8.6–22.7× + PoC margin: 이론 천장 22×에서 ★★★를 8배로 끌어내려 가상 설계의 이론 미달 흡수.** silent cap: speedup 신뢰도는 (i) 수동 baseline 표본·숙련도 편차, (ii) first-pass 성공 판정용 golden set 크기(작으면 낙관 편향), (iii) 외부 컴파일러 tool 실행시간은 단축 레버 밖 — 세 요인이 별점 상한을 제약한다.
+> **seats**: 발의 Seat 1(Agentic Workflow — first-pass 게이트·gaming) · consensus (Seat 2 측정가능성 / Seat 3 runner 오버헤드 분해 동의)
+
 ## 변경 이력
+
+### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
+출처: discussion/qa/round-03 (등급 척도 캘리브레이션, Council 3 seats). 팀이 13개 ★ 척도 전부 검토·승인(하한 재배치 포함).
+
+- **main 급간 축**: 노드타입별 speedup(first-pass 성공분 중앙값, 수동 baseline 대비) — 연속 배수라 급간화.
+- **★ 급간**: ★★★ `≥8배` / ★★☆ `3배~8배` / ★☆☆ `1×~3배`(합격 진입선) / 불합격 `≤1.0배`.
+- **조건·게이트**: 조건 A = first-pass 성공(QA-07 golden) 통과분만 집계, 조건 B = 커버리지 ≥80%. 둘 중 위반 시 배수 무관 불합격(2-index를 규칙4로 main+조건 분리).
+- **§측정 보정 (구→신)**: speedup 합격 하한 `≥3배 → 1×~3배(★☆☆)` — 3배는 ★★☆ 진입선으로 흡수. 사람-협업형 필드 기준 3배는 비현실 상단(METR 0.84×·Copilot 2.26×)이나 완전자율 사례(InfEngine 8.6–22.7×)는 상회 → "사람보다 빠름(>1×)"을 최소 합격선으로(하한 사실상 1×로 하향 보정). open-issues 등록 권고.
+- **근거 출처**: InfEngine(완전자율 8.6–22.7×) https://arxiv.org/pdf/2602.18985 · METR RCT(0.84×) https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/ · Copilot RCT(2.26×) https://thenewstack.io/how-ai-coding-makes-developers-56-faster-and-19-slower/
+- **silent cap**: 수동 baseline 표본·숙련도 편차, golden set 크기(낙관 편향), 외부 컴파일러 tool 시간은 단축 레버 밖.
 
 ### 2026-06-24 — round-01 디스커션 반영
 출처: [`discussion/qa/round-01`](../../discussion/qa/round-01/counsel/QA-07-performance-agent-time.md) (red team verdict: **Sound △ / KPI ✕ — High** — "최대화"는 테스트 불가, altitude 의심)

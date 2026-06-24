@@ -13,6 +13,9 @@ updates:
   - date: 2026-06-24
     by: 팀 결정 (OI-8)
     reason: "재번호 QA-08 → QA-10 (NQA 정식 편입에 따른 +2 시프트, → changelog)"
+  - date: 2026-06-24
+    by: discussion/qa/round-03 (등급 척도 캘리브레이션)
+    reason: "★ rubric(ATAM trade-off) 추가 + E2E latency 합격 하한 재배치(구 ≤6h → 신 p95 ≤24h ★☆☆, 6h는 ★★☆). throughput≥50/일·전달무결성100%는 조건/게이트 (→ ## 변경 이력)"
 ---
 
 # QA-10 Performance — E2E 개발 시간
@@ -30,8 +33,9 @@ updates:
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `모델당 E2E latency(p50/p95)` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
 
-- **E2E latency / 모델 ≤ 6시간 (p50/p95)** `[주 KPI · PoC 대상]` — 모델 1건 처음→끝
-  - 쉽게: 모델 한 건이 IR 변환부터 컴파일까지 전 과정을 끝내는 데 걸리는 시간이 (가장 오래 걸린 상위 5%를 봐도) 6시간 이하여야 한다. *p50/p95 = 중앙값 / 상위 5%를 뺀 95% 기준값.*
+- **E2E latency / 모델 ≤ 24시간 (p95)** `[주 KPI · PoC 대상]` — 모델 1건 처음→끝
+  - 쉽게: 모델 한 건이 IR 변환부터 컴파일까지 전 과정을 끝내는 데 걸리는 시간이 (가장 오래 걸린 상위 5%를 봐도) 하루(24시간) 이하여야 한다. 6시간 이하면 우수(★★☆ 이상). *p50/p95 = 중앙값 / 상위 5%를 뺀 95% 기준값.*
+  > 보정(2026-06-24, 등급 척도 캘리브레이션 round-03): 구 `≤6시간` → 신 `p95 ≤24시간(★☆☆ 합격 진입선)` — 배치 ML 파이프라인 업계 허용 SLA가 6–24h라 `≤6h`를 합격선으로 쓰면 ★☆☆가 죽음(규칙2 재배치). 6h는 ★★☆ 경계로 상향. ★ 급간은 ## 등급 척도 참조.
 - **throughput ≥ 50 모델/일** — QA-01과 정렬(공유 축)
   - 쉽게: 하루에 50개 이상 모델을 끝낼 수 있어야 한다. (확장성 QA-01의 처리량과 같은 축이라 정렬해 관리.)
 - **(하위) artifact 전달 오버헤드 ≤ E2E의 5%** — handoff 시간 / E2E
@@ -67,7 +71,35 @@ updates:
 
 > 가정·한계: **mock compute가 실제 Quantize/Compile 시간 분포를 근사 못 하면 critical path가 왜곡**된다. 실제 20GB 대역폭·노드 사양에 의존(DP-0004 산식은 실측 필요 — 그 전엔 구조만 고정). 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — silent cap으로 명시.
 
+## 등급 척도 (★ rubric — ATAM trade-off용)
+
+> 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정. **시간은 낮을수록 ★ 높음(역방향).**
+
+**조건 (2-index → main+조건):**
+- `조건 C: throughput ≥ 50 모델/일 고정` — E2E latency는 부하가 낮으면 자명히 낮아지므로, latency 별점은 **QA-01 정렬 throughput(처리량)을 SLO로 만족한 부하 하에서** 측정해야 유효. throughput은 QA-01 공유 축이라 main 축이 아닌 측정 조건으로 고정.
+- `조건 D: artifact 전달 무결성 = 100% (누락·손상 0건)` — overview 20GB Loss pain 직결. 무결성은 0건 절대형(Constraint 성격)이라 별점화하지 않고 게이트로 둠. 위반 시 latency 무관 불합격.
+
+| 등급 | 구간 — 주 KPI(main 축): 모델당 E2E latency p50/p95 (throughput ≥50모델/일 부하 하) | 필드 근거 (경계 이유 + URL) |
+|---|---|---|
+| ★★★ (상) | p95 ≤ 2시간 | 배치 ML 파이프라인 필드 상단. 업계 배치 표준 하한(6–24h)의 1/3 수준으로, 완전자율·병렬 파이프라인이 도달 가능한 우수치 — 이론적으로 더 낮출 수 있으나 실제 Quantize/Compile compute가 critical path라 PoC margin으로 2h를 ★★★ 진입선에 둠. https://www.domo.com/glossary/ml-pipeline-orchestration |
+| ★★☆ (중) | 2시간 < p95 ≤ 6시간 (p50 ≤ 6시간 동시 충족) | 배치 ML 파이프라인 "일반 우수" 대역. 업계는 배치 SLA를 6–24h로 보는데, 그 하단(6h)을 우수 대역 경계로 — 6h는 사람 수동 파이프라인 대비 유의미 단축이면서 배치 관례 내. p50/p95 dual-threshold는 SRE 표준(p50=전형, p95=tail). https://datadef.io/guides/en/ml-pipeline-architecture · https://oneuptime.com/blog/post/2025-09-15-p50-vs-p95-vs-p99-latency-percentiles/view |
+| ★☆☆ (하) | 6시간 < p95 ≤ 24시간 (= 합격 하한) | 합격 진입선. 배치 ML 파이프라인 업계 허용 상한(24h, "nightly 턴어라운드")까지는 합격으로 인정 — 24h 초과면 자동화의 E2E 가치가 사라짐(수동 수일과 차별성 약화). https://www.domo.com/glossary/ml-pipeline-orchestration |
+| 불합격 | p95 > 24시간 / 조건 C 미달(throughput < 50모델/일) / 조건 D 위반(전달 무결성 < 100%) | 게이트 위반 — 별점 없음 |
+
+> **캘리브레이션 노트**: 원 KPI 하한 `≤6시간(p50/p95)`은 필드 기준 **오히려 보수적(낮춰 잡힌 천장에 가까움)**으로 판정. 업계 배치 ML 파이프라인 허용 SLA는 6–24h이며 6h는 그 하단 — 즉 `≤6h`를 합격 하한으로 쓰면 ★☆☆가 사실상 죽고 ★★☆/★★★만 남는다(규칙2 trigger). 따라서 표를 현실 대역으로 **재배치**: 합격 하한을 `p95 ≤ 24h`(배치 관례 상한)로 완화하고 `≤6h`는 ★★☆ 경계로, `≤2h`를 ★★★로 올렸다(KPI 하한 사실상 6h→24h 하향 보정 → **open-issues 등록 권고**, KPI 정의 §측정의 합격 하한과 정합 확인 필요). **이론 근거: 배치 ML 필드 6–24h + PoC margin: ★★★를 이론 최저가 아닌 2h로 둬 mock compute가 실제 Quantize/Compile 분포를 근사 못 할 위험 흡수.** silent cap: (i) mock compute가 실제 단계 시간 분포를 못 맞추면 critical path 왜곡, (ii) 실제 20GB 대역폭·노드 사양 의존(DP-0004 산식 실측 전엔 구조만 고정) — PoC는 "이 메커니즘으로 KPI 달성·측정 가능"만 보일 뿐 실측치 아님.
+> **seats**: 발의 Seat 2(20년차 — percentile SLI·dual-threshold) · consensus (Seat 3 data-plane/handoff 분해 / Seat 1 throughput 조건 고정 동의)
+
 ## 변경 이력
+
+### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
+출처: discussion/qa/round-03 (등급 척도 캘리브레이션, Council 3 seats). 팀이 13개 ★ 척도 전부 검토·승인(하한 재배치 포함).
+
+- **main 급간 축**: 모델당 E2E latency p50/p95 (시간은 낮을수록 ★ 높음, 역방향).
+- **★ 급간**: ★★★ `p95 ≤2h` / ★★☆ `2h~6h(p50 ≤6h 동시)` / ★☆☆ `6h~24h`(합격 진입선) / 불합격 `p95 >24h`.
+- **조건·게이트**: 조건 C = throughput ≥50모델/일 부하 하 측정(QA-01 공유 축이라 main 아닌 측정 조건), 조건 D = 전달 무결성 100%(0건 절대형 → 별점화 않고 게이트). 위반 시 latency 무관 불합격(2-index를 규칙4로 main+조건 분리).
+- **§측정 보정 (구→신)**: E2E latency 합격 하한 `≤6시간 → p95 ≤24시간(★☆☆)` — 6h는 ★★☆ 경계로 상향. 배치 ML 파이프라인 업계 허용 SLA가 6–24h라 `≤6h`를 합격선으로 쓰면 ★☆☆가 죽음 → 규칙2로 현실 대역 재배치(하한 6h→24h 하향 보정). open-issues 등록 권고.
+- **근거 출처**: 배치 ML 파이프라인 SLA 6–24h https://www.domo.com/glossary/ml-pipeline-orchestration · https://datadef.io/guides/en/ml-pipeline-architecture · p50/p95 dual-threshold(SRE) https://oneuptime.com/blog/post/2025-09-15-p50-vs-p95-vs-p99-latency-percentiles/view
+- **silent cap**: mock compute가 실제 Quantize/Compile 분포 미근사 시 critical path 왜곡, 실제 20GB 대역폭·노드 사양 의존(DP-0004 산식 실측 필요).
 
 ### 2026-06-24 — round-01 디스커션 반영
 출처: [`discussion/qa/round-01`](../../discussion/qa/round-01/counsel/QA-08-performance-e2e.md) (red team verdict: **Sound △ / KPI ✕ — High** — 정의↔KPI 불일치(mislabel))

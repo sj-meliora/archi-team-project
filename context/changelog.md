@@ -44,6 +44,23 @@
 - ⚠️ 위 2026-06-24 round-02 반영 항목 및 `discussion/qa/round-01·02/`(append-only 스냅샷)는 **재번호 이전 번호**로 서술됨 — 현재 번호는 이 매핑표로 환산.
 - 영향 ID: qa/ 전체(QA·QAS 16파일 리네임 + cross-ref), dp/(DP-0001/0002/0004/0005·dp4/*), requirements(FR-0001~0003), INDEX, glossary, open-issues(OI-1·OI-7·OI-8), discussion(qa/README·SKILL·Contention).
 
+## 2026-06-24 — QA 등급 척도(★ rubric) 캘리브레이션 (round-03)
+- 변경: 13개 QA 전체에 `## 등급 척도 (★ rubric — ATAM trade-off용)` 섹션 신설. ATAM의 QA 간 trade-off(동일 조건 두 아키텍처 안 비교 → ★ 많은 안 채택)를 위해 각 주 KPI를 ★1~3(상/중/하)으로 급간화. KPI 합격선=★☆☆ 진입선, ★★☆/★★★는 Council 3 seats가 **실제 필드 벤치마크 + PoC margin**으로 캘리브레이션(reviewer-less 변형 — 팀이 reviewer 자리). 방법론은 `discussion/qa/Council.md §9`에 codify.
+- 변경(§측정 하한 재배치 — 규칙2, 옛값 보존 트레이스 부착): 필드 기준 비현실적으로 높거나(★★★ 사문화) 보수적인(★☆☆ 사문화) 하한을 현실 대역으로 재배치 —
+  - QA-01 scaling efficiency `≥0.8 → ≥0.70` (USL 회귀 우수도 ~0.72)
+  - QA-02 재기동 `≤1분 → ≤4분` (손실=0·멱등100%는 게이트 불변)
+  - QA-06 injection 차단율 `≥95% → ≥70%` (+FPR≤1% 조건; 헤드라인 권한상승·범위외배포=0은 Constraint성 게이트 불변)
+  - QA-08 타WF latency 증가 `≤10% → ≤25%` (10%는 ★★☆로)
+  - QA-09 speedup `≥3배 → 1×~3배` (3배는 ★★☆로; headless 완전자율이라 협업형 3배 상회 가능)
+  - QA-10 E2E latency `≤6h → p95 ≤24h` (6h는 ★★☆로; 배치 ML 관례 6~24h 대비 6h는 보수적)
+  - QA-11 보조 pass^k `≥70% → 25/40/60%(★☆☆/★★☆/★★★)` (τ-bench 대비 70% 비현실)
+  - QA-13 절감률 `≥70% → ≥50%` (70%는 ★★☆로) + `$/완료모델 ≤$5` 주KPI→게이트(pass/fail)
+- 변경(§측정 상한 캡·조건 추가): QA-03 graceful stop+롤백 `≤30초`를 ★★☆ 상한으로 흡수(★☆☆=>30초+hard-kill 폴백) / QA-04 ★★★ trace 완전성 100% 미만(≥98%) 캡(CoT 비공개) / QA-07 정답률 `≥90%`에 만점 캡(★★★ 92~98%, 100%=난이도부족 불합격)+judge↔인간 일치도 κ 조건 / QA-05 신규토큰 tier 정식화(≤6k 일반·≤8k 복합)+캐시적중≥85% 조건. QA-12 보정 없음(CIS p95≤3 유지).
+- 변경(2-index → main+조건, 규칙4): QA-01 헤드룸≥20% / QA-03 ack≤5초 / QA-04 안전액션100% / QA-08 중단율≤1%·쿼터침범0 / QA-10 throughput≥50·전달무결성100% / QA-11 H_norm·②-1·Δ시연 / QA-13 baseline·단가·캐시 고정 등을 게이트/조건으로 분리.
+- 사유: ATAM trade-off의 ★ 비교를 필드 현실에 정착(임의 경계 방지). council 근거는 실제 웹 출처(USL/HPC, Unit42·arXiv injection, τ-bench, 배치 ML SLA, prompt caching 등)만 사용·각 표에 URL 명시. 경계는 전부 예시값 — PoC 실측으로 확정.
+- 후속(OI-9): §측정 하한 보정 8건이 짝 QAS-* Measure·glossary 수치 표기와 정합하는지 점검(이번 미반영).
+- 영향 ID: QA-01~13 전체, discussion/qa/Council.md(§9 신설), open-issues(OI-9 신설).
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>

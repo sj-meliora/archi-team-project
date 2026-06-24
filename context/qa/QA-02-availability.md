@@ -9,6 +9,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
     reason: "MTTR 단일지표 분해 → 무손실·멱등·가용률·외부장애 4축 재설계 (자세히 → ## 변경 이력)"
+  - date: 2026-06-24
+    by: discussion/qa/round-03 (등급 척도 캘리브레이션)
+    reason: "★ rubric 추가 + 재기동 합격 하한 ≤1분 → ≤4분(★☆☆) 보정 (손실=0·멱등=100%는 게이트 불변) (자세히 → ## 변경 이력)"
 ---
 
 # QA-02 Availability — 운영 안정성
@@ -26,8 +29,9 @@ updates:
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `재기동 ≤1분 AND 손실=0` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
 
-- **agent/노드 재기동 ≤ 1분 AND in-flight 작업 손실 = 0** `[주 KPI · PoC 대상]` — durable state(영속 상태) 기준
-  - 쉽게: 죽은 일꾼(agent/노드)은 1분 안에 되살아나되, 그때 **진행 중이던 작업은 한 건도 잃지 않고** 마지막 저장지점부터 이어가야 한다. *in-flight = 처리 도중(아직 안 끝난) 작업, durable state = 죽어도 안 사라지게 외부에 영속화한 작업 상태.*
+- **agent/노드 재기동 ≤ 4분 AND in-flight 작업 손실 = 0** `[주 KPI · PoC 대상]` — durable state(영속 상태) 기준
+  - 쉽게: 죽은 일꾼(agent/노드)은 4분 안에 되살아나되, 그때 **진행 중이던 작업은 한 건도 잃지 않고** 마지막 저장지점부터 이어가야 한다. *in-flight = 처리 도중(아직 안 끝난) 작업, durable state = 죽어도 안 사라지게 외부에 영속화한 작업 상태.*
+  > 보정(2026-06-24, 등급 척도 캘리브레이션 round-03): 재기동 시간 구 `≤1분` → 신 `≤4분`(★☆☆ 합격 하한) — stateful 워크플로우 종단 재개에 1분은 비현실(중복 redundancy 라우팅 필드 관례 "최대 3~4분"). **단 `in-flight 손실=0`은 0건 게이트라 불변.** ★ 급간(★★★ ≤10초 / ★★☆ ≤1분 / ★☆☆ ≤4분)은 ## 등급 척도 참조.
 - **장애에도 불구한 워크플로우 성공률 ≥ 99.5%** — 가용률 상위 지표(SLO)
   - 쉽게: 중간에 무언가 죽더라도 100건 중 99.5건 이상은 끝까지 성공해야 한다. MTTR만 보면 "자주 죽지만 빨리 복구"도 합격처럼 보이므로, 이 성공률로 그걸 막는다. *SLO = 서비스 수준 목표(달성하기로 약속한 합격선).*
 - **외부 LLM 장애 시 자동 재개율 ≥ 95%** — backoff+큐잉으로 흡수, 무한 재시도 폭주 없이
@@ -63,7 +67,34 @@ updates:
 
 > 가정·한계: 서비스 시간·도착률·failover 시간·lease timeout·외부 장애 길이는 **가정 파라미터**다. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — 슬라이드엔 가정값을 명시한다. control-plane 자체의 split-brain·외부 시스템(Jira·빌드서버)이 멱등 키를 실제 존중하는지는 통합 환경이 필요해 미검증.
 
+## 등급 척도 (★ rubric — ATAM trade-off용)
+
+> 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정.
+>
+> 헤드라인 `재기동 ≤1분 AND in-flight 손실=0`에서 `손실=0`은 0건 절대형(Constraint 성격) → 별점은 보조지표 `재기동(failover) 시간`으로 급간화(gradable이라 QA 성립). 시간은 역방향(낮을수록 ★ 높음). 보조 축으로 워크플로우 성공률(가용률 SLO) 병기.
+
+**조건 (게이트 — 표 밖):** `in-flight 손실 = 0건 AND side-effect 멱등성 = 100%` — durable state(event history) 기준. 이 게이트를 깨면 재기동이 아무리 빨라도 불합격(가용성의 본질은 "빨리 재기동"이 아니라 "무손실 멱등 재개"이므로 — 정의 §). 0건 절대형이라 별점 급간 불가 → pass/fail 게이트로 둔다.
+
+| 등급 | 구간 — 주 KPI(main 축): 장애 단위 재기동/failover 시간 (손실=0 게이트 통과 전제) | 필드 근거 (경계 이유 + URL) |
+|---|---|---|
+| ★★★ (상) | 재기동 ≤ 10초 (보조: 워크플로우 성공률 ≥ 99.95%) | healthy dispatcher 잔존 시 재스케줄 ~0.5초, 컨테이너 재기동 ~10초, job manager 교체 ~10초/항상 <20초가 durable execution 관측 대역 — 이론 frontier에 PoC margin 두고 10초로 [Temporal recover-vs-restart](https://www.xgrid.co/resources/temporal-recover-instead-of-restart/) · [geo-distributed job recovery](https://arxiv.org/pdf/1802.00245) · 99.95% = 자동 failover·무손실 redundancy 대역 [Axel Springer SLA](https://medium.com/axel-springer-tech/whats-the-difference-between-99-9-and-99-99-sla-uptime-489e201a3c7b) |
+| ★★☆ (중) | 10초 < 재기동 ≤ 1분 (보조: 99.5% ≤ 성공률 < 99.95%) | lease timeout + 재스케줄이 분 단위 내로 수렴하는 일반 우수 대역. DORA elite MTTR <1hr는 인시던트 단위라 worker-restart 단위(훨씬 짧음)와 별개 [AWS Reducing MTTR](https://docs.aws.amazon.com/whitepapers/latest/availability-and-beyond-improving-resilience/reducing-mttr.html) |
+| ★☆☆ (하) | 1분 < 재기동 ≤ 4분 — 합격 최소선=(보정된) KPI 하한 (보조: 성공률 ≥ 99.5%) | KPI 원본 하한 `≤1분`은 durable runner 기준 비현실적으로 빡빡 → 재배치. 중복 redundancy 라우팅 "최대 3~4분"이 필드 관례라 합격 진입선을 4분으로 완화 [Temporal recover-vs-restart](https://www.xgrid.co/resources/temporal-recover-instead-of-restart/) |
+| 불합격 | 재기동 > 4분 / 또는 손실=0·멱등=100% 게이트 위반 / 성공률 < 99.5% | 게이트 위반은 시간 무관 즉시 탈락 — |
+
+> **캘리브레이션 노트**: KPI 원본 하한 `재기동 ≤1분`은 *stateless agent*엔 현실적이나, half-done 20GB 산출물을 가진 *stateful 워크플로우* 종단 재개에는 빡빡함(정의 §의 "1분에 묶으면 비현실" 자인). 표 급간을 현실 대역으로 재배치 → ★☆☆ 진입선을 1분 → **4분**으로 완화(중복 redundancy 라우팅 "최대 3~4분" 근거). 이론 근거 = durable execution 0.5~20초 관측, PoC margin = 우리 chaos 모델은 가정 파라미터(failover·lease timeout·서비스시간) 기반이라 이론 frontier(10초)보다 ★★★를 넓게. 하한 보정은 `open-issues.md` 등록 대상(KPI 정의 `≤1분`과 정합 재확인 — 손실=0 게이트는 불변). silent cap: control-plane split-brain·외부 시스템(Jira/빌드서버)의 멱등키 실존중은 통합환경 미검증 — 게이트 통과는 mock 기준.
+> **seats**: 발의 Seat 3(durable execution·failover) · consensus (Seat 2가 성공률 SLO 보조 병기로 SLI 형식 보강 — main=시간/게이트=손실 구조에 합의)
+
 ## 변경 이력
+
+### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
+출처: discussion/qa/round-03 (등급 척도 캘리브레이션 — Council blue team, 팀 검토·승인). main 급간 축 = **장애 단위 재기동/failover 시간**(역방향, 낮을수록 ★ 높음).
+
+- **★ 급간**: ★★★ 재기동 ≤10초(+성공률 ≥99.95%) / ★★☆ ≤1분 / ★☆☆ ≤4분(+성공률 ≥99.5%). 하한 미만 불합격.
+- **조건/게이트(표 밖)**: `in-flight 손실=0 AND side-effect 멱등성=100%` — 0건 절대형 게이트(규칙5). 게이트 위반 시 시간 무관 즉시 불합격. 헤드라인의 `손실=0`은 별점 급간 불가라 gradable한 재기동 시간을 main 축으로 급간화.
+- **구→신(§측정 보정)**: 재기동 합격 하한 `≤1분 → ≤4분`(★☆☆). stateful 워크플로우 종단 재개에 1분은 비현실 → 중복 redundancy 라우팅 "최대 3~4분" 필드 관례로 완화(규칙2 재배치). 손실=0·멱등=100%는 게이트라 불변.
+- **근거 출처**: durable execution 재개 0.5~20초([Temporal recover-vs-restart](https://www.xgrid.co/resources/temporal-recover-instead-of-restart/), [geo-distributed job recovery](https://arxiv.org/pdf/1802.00245)) · 자동 failover/무손실 redundancy 99.95% 대역([Axel Springer SLA](https://medium.com/axel-springer-tech/whats-the-difference-between-99-9-and-99-99-sla-uptime-489e201a3c7b)) · MTTR 단위 구분([AWS Reducing MTTR](https://docs.aws.amazon.com/whitepapers/latest/availability-and-beyond-improving-resilience/reducing-mttr.html)).
+- 하한 보정(≤1분→≤4분)은 `open-issues.md` 등록 대상(KPI 정의 정합 재확인).
 
 ### 2026-06-24 — round-01 디스커션 반영
 출처: [`discussion/qa/round-01`](../../discussion/qa/round-01/counsel/QA-02-availability.md) (red team verdict: **Sound ○ / KPI △ — High** — MTTR 단독 지표 분해 + 외부 장애 시나리오 신설 필요)

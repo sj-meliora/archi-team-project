@@ -15,6 +15,9 @@ updates:
   - date: 2026-06-24
     by: 팀 결정 (OI-8)
     reason: "재번호 QA-09 → QA-11 (NQA 정식 편입에 따른 +2 시프트, → changelog)"
+  - date: 2026-06-24
+    by: discussion/qa/round-03 (등급 척도 캘리브레이션)
+    reason: "★ rubric 추가 + 보조 KPI pass^k 합격선 ≥70% → 25/40/60%(★☆☆/★★☆/★★★) 전면 재배치 (헤드라인 Δ 대조는 시연 게이트 불변) (자세히 → ## 변경 이력)"
 ---
 
 # QA-11 Reliability — Agent 결과 일관성
@@ -34,8 +37,9 @@ updates:
 
 - **캐시 On/Off 일관성 갭 Δ = pass^k(캐시 On) − pass^k(캐시 우회)** `[주 KPI · PoC 대상]` — 명제: "캐시는 일관성을 입증하지 못한다"
   - 쉽게: 같은 입력을 반복하면 **캐시를 켜면** 저장된 답을 돌려줘 ~100% 일관처럼 보이지만, **캐시를 끄면(순수 추론)** 그보다 낮게 나온다. 이 **갭 Δ가 크다는 것 자체**가 "캐시가 일관성을 가린다(치트)"의 증거다. 방법론 모델에서 이 대조를 **직접 시연**하는 게 헤드라인 — 시연 0건이 아니라 모델 자체가 시연이다.
-- **(보조) 순수 추론 pass^k (k=5)** — 예시 합격선 ≥ 70%, 절대값은 실환경 측정으로 확정
+- **(보조) 순수 추론 pass^k (k=5)** — 합격 하한 ≥ 25%(★☆☆), 절대값은 실환경 측정으로 확정
   - 쉽게: 캐시 끈 상태에서 5번 모두 일관한 비율. 헤드라인을 받치는 가드레일 값이며, 절대값 실측은 실제 에이전트가 있어야 가능([발표 서사]). *pass^k = k회 전부 통과(일관)한 비율 — pass@1 90%여도 k=8이면 57%로 급락하는 엄격한 척도.*
+  > 보정(2026-06-24, 등급 척도 캘리브레이션 round-03): pass^k(k=5) 합격선 구 `≥70%` → 신 `25/40/60%`(★☆☆/★★☆/★★★ 전면 재배치) — τ-bench 대비 70%는 비현실(frontier도 retail pass^1 ~80%, GPT-4o pass^4 ~37%·pass^8 ~25%)이라 ★★★조차 죽는 등급. **헤드라인 Δ 대조는 시연 게이트라 불변**, pass^k는 캐시 우회(순수 추론) main 축. ★ 급간은 ## 등급 척도 참조.
 - **(보조) ②-1 대리 유효-결정률 ≥ 95%** — 정책 룰셋/제약 위반 검사 통과율 (golden 불요)
   - 쉽게: golden 정답이 없어도 **명백히 무효인 결정**(제약 C 위반·allowlist 위반·스키마/구조 위반 = hard-invalid)은 룰로 걸러낼 수 있다. 재실행 결과가 이 "필요조건 게이트"를 통과하는 비율 ≥ 95%. 우리 조건에서 룰 체커로 산출 가능. *대리(proxy) = golden 없이도 무효를 거르는 1차 게이트.*
 - **(보조·open-issue) ②-2 정밀 유효-결정률** — golden 대비 정답성까지 본 유효 비율 (QA-07 의존)
@@ -72,7 +76,36 @@ updates:
 
 > 가정·한계: **"유사 입력"의 흔들림은 동일 입력 반복으로 못 봄**(semantic-equivalent 입력 세트가 별도로 필요 — 본 라운드 범위 밖). 유효성 판정 게이트가 작으면 유효-결정률이 낙관 편향. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — silent cap으로 명시.
 
+## 등급 척도 (★ rubric — ATAM trade-off용)
+
+> 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정.
+>
+> 헤드라인 `캐시 On/Off 일관성 갭 Δ`는 대조/명제형 시연(0건 절대형·Constraint 성격)이라 별점 급간이 무의미 → Δ는 시연 게이트로 두고, 별점은 보조지표 `순수 추론 pass^k (k=5)`로 급간화(gradable이라 QA 성립). pass^k는 정방향(높을수록 ★ 높음). ②-1·H_norm은 동반 게이트로 병기.
+
+**조건 (시연 게이트 + 측정 조건 — 표 밖):**
+- `캐시 On/Off 갭 Δ > 0이 그래프로 시연됨` — 헤드라인 명제("캐시는 일관성 입증 아님"). Δ 절대값은 등급화 대상 아님(대조 시연 자체가 pass/fail). pass^k는 반드시 캐시 우회(memoization 우회) 순수 추론 모드에서 측정(캐시 On은 ~100%로 자명히 부풀어 측정 오염).
+- `k = 5 고정` · `H_norm ≤ 0.2 AND ②-1 대리 유효-결정률 ≥ 95% 동반 통과` — pass^k가 "일관되게 틀린" 결과를 통과시키지 않도록 유효성 게이트 동반(일관 ≠ 정확, QA-07 짝). ②-2 정밀 유효-결정률은 QA-07 golden 의존이라 open-issue(OI-7)로 제외.
+
+| 등급 | 구간 — 주 KPI(main 축): 순수 추론 pass^k (k=5, 캐시 우회) | 필드 근거 (경계 이유 + URL) |
+|---|---|---|
+| ★★★ (상) | pass^5 ≥ 60% | frontier 모델이 retail에서 pass^1 ~80% crossing → pass^5 상한 대역. GPT-4o는 pass^1 61%→k=4 ~37%로 떨어지므로 60%대 pass^5는 frontier+structured output/self-consistency voting 가정 최상위. 이론 천장에 PoC margin [Sierra τ-bench](https://sierra.ai/blog/tau-bench-shaping-development-evaluation-agents) · [τ-bench arXiv](https://arxiv.org/pdf/2406.12045) |
+| ★★☆ (중) | 40% ≤ pass^5 < 60% | GPT-4o retail pass^4 ~37%·k=8 ~25% 관측 대역 바로 위 — 안정성 레버(temp=0·fixed seed·voting) 적용한 일반 우수 [Sierra τ-bench](https://sierra.ai/blog/tau-bench-shaping-development-evaluation-agents) · [Alan agent benchmarking](https://medium.com/alan/benchmarking-ai-agents-stop-trusting-headline-scores-start-measuring-trade-offs-0fdae3a418cf) |
+| ★☆☆ (하) | 25% ≤ pass^5 < 40% — 합격 최소선 (KPI 원본 `pass^k ≥70%`를 현실 재배치) | GPT-4o pass^8 ~25%가 필드 바닥 — pass^5 합격 진입을 그 수준으로. 단 H_norm ≤0.2·②-1 ≥95% 동반 통과 필수 [τ-bench arXiv](https://arxiv.org/pdf/2406.12045) |
+| 불합격 | pass^5 < 25% / 또는 Δ 시연 실패 / H_norm > 0.2 / ②-1 < 95% | pass^k가 필드 worst 이하거나 유효성 게이트 위반 — |
+
+> **캘리브레이션 노트**: KPI 원본 보조선 `pass^k ≥70%`는 필드 기준 비현실적으로 높음 — frontier도 retail pass^1 ~80%, GPT-4o는 pass^4 ~37%·pass^8 ~25%라 pass^5 70%는 ★★★조차 죽는 등급. 표 급간을 현실 대역으로 재배치 → pass^5 기준 **25%(하)–40%(중)–60%(상)**. 이론 근거 = τ-bench frontier ~80% pass^1 / GPT-4o 61%→25%(k=1→8), PoC margin = pass^5 절대값은 우리 조건상 실측 불가(실제 에이전트 필요·[발표 서사])라 ★★★를 frontier보다 보수적으로. 하한 보정은 `open-issues.md`(OI-7) 등록 대상(KPI 정의 `pass^k 70%` 예시값과 정합 재확인 — 70%는 도메인 쉬운 단일 task 가정이었음). silent cap: ① pass^5 *절대값*은 미실측(헤드라인 Δ 대조만 시연 — main 축은 "이렇게 등급화한다"는 형식 제시) ② "유사 입력" semantic-equivalent 흔들림은 동일 입력 반복으로 못 봄(범위 밖) ③ ②-2 정밀 유효-결정률은 QA-07 golden 미구축으로 게이트에서 제외(OI-7). importance L 유지(상향은 헤드라인 Δ + ②-1 게이트 선결 — 본 캘리브레이션이 충족 보강). ②-1·H_norm이 우리 조건에서 산출 가능한 gradable proxy라 Constraint flag 불요(QA로 성립).
+> **seats**: 발의 Seat 1(비결정·일관성·eval 하네스) · consensus (Seat 2가 Δ=시연 게이트·pass^k=유일 gradable main이라 규칙5 적용 타당성 확인 — Seat 3은 보조지표 전원 미실측 시 Constraint flag 우려했으나 ②-1·H_norm이 산출 가능 gradable이라 QA 성립으로 합의)
+
 ## 변경 이력
+
+### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
+출처: discussion/qa/round-03 (등급 척도 캘리브레이션 — Council blue team, 팀 검토·승인). main 급간 축 = **순수 추론 pass^k (k=5, 캐시 우회)**(정방향, 높을수록 ★ 높음).
+
+- **★ 급간**: ★★★ pass^5 ≥60% / ★★☆ ≥40% / ★☆☆ ≥25%. 하한 미만 불합격.
+- **조건/게이트(표 밖)**: 헤드라인 `캐시 On/Off 갭 Δ > 0 시연`은 대조/명제형이라 pass/fail 시연 게이트(규칙5) — 별점은 gradable한 pass^k로 급간화. 측정 조건 `k=5 고정 · 캐시 우회 순수 추론 · H_norm ≤0.2 AND ②-1 ≥95% 동반 통과`(일관 ≠ 정확 유효성 게이트). ②-2는 QA-07 golden 의존이라 제외(OI-7).
+- **구→신(§측정 보정)**: 보조 KPI pass^k(k=5) `≥70% → 25/40/60%`(★☆☆/★★☆/★★★ 전면 재배치). τ-bench 대비 70%는 ★★★조차 죽는 비현실(규칙2). 헤드라인 Δ 대조는 시연 게이트라 불변.
+- **근거 출처**: τ-bench frontier retail pass^1 ~80% / GPT-4o pass^1 61%→pass^4 ~37%→pass^8 ~25%([Sierra τ-bench](https://sierra.ai/blog/tau-bench-shaping-development-evaluation-agents), [τ-bench arXiv 2406.12045](https://arxiv.org/pdf/2406.12045), [Alan agent benchmarking](https://medium.com/alan/benchmarking-ai-agents-stop-trusting-headline-scores-start-measuring-trade-offs-0fdae3a418cf)).
+- pass^k 합격선 재배치(70%→25/40/60%)는 `open-issues.md`(OI-7) 등록 대상(KPI 정의 정합 재확인). ②-1·H_norm이 gradable proxy라 Constraint flag 불요(QA 성립).
 
 ### 2026-06-24 — round-01 디스커션 반영
 출처: [`discussion/qa/round-01`](../../discussion/qa/round-01/counsel/QA-09-reliability-agent-consistency.md) (red team verdict: **Sound △ / KPI △ — Med** — 일관성/정확성 혼동 + 결정성 목표 재고 + 캐시 치트)

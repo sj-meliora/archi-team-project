@@ -3,7 +3,7 @@
 > `context/qa/`의 QA·KPI를 **반복 심의(라운드)**하며 완성도를 끌어올리는 작업의 색인.
 > 한 라운드 = red team 비평(review) + blue team 권고(counsel)의 한 묶음.
 > 공통 프로토콜·다른 영역(DP 등)은 상위 [`../README.md`](../README.md). 트리거: "QA 디스커션 돌리자".
-> updated: 2026-06-24 (round-02 완료 + OI-8 닫힘·QA 재번호)
+> updated: 2026-06-24 (round-03 ★ 등급 척도 캘리브레이션 — Council.md §9; round-02 완료 + OI-8 닫힘·QA 재번호)
 >
 > ⚠️ **2026-06-24 QA 재번호(OI-8 닫힘)**: 신규 QA 정식 편입 — `NQA-A→QA-06`(Security)·`NQA-B→QA-07`(Correctness) 6·7위 삽입, 기존 **QA-06~10 → QA-08~12**(+2), `NQA-C→QA-13`(Cost). **ASR = QA-01~07.** 아래 라운드 이력·verdict 추세표의 번호는 **각 라운드 당시(구 번호)** 기준이다 — 현재 번호 환산은 이 매핑 또는 `context/changelog.md`. (round-NN 폴더는 append-only라 미수정.)
 
@@ -29,6 +29,7 @@
 |---|---|---|:---:|:---:|:---:|---|
 | round-01 [review](round-01/review/report.md) · [counsel](round-01/counsel/counsel.md) · [applier](round-01/applier/report.md) | review 2026-06-23 · counsel·applier 2026-06-24 | QA-01~10 (+NQA-A/B/C 신설) | 4 | 5 | 1 | red team 최초 리뷰(KPI ✕ 3·정의↔KPI 불일치·agentic 리스크 과소대표) → **blue team counsel**: KPI ✕ 3건 전부 측정가능화, C1~C5 응답, NQA-A/B/C 권고 → **applier 반영 완료**: QA-01~10 교정 + NQA-A/B/C 신설(임시 ID). 지적별 처리는 [applier/report.md](round-01/applier/report.md). |
 | round-02 [review](round-02/review/report.md) · [counsel](round-02/counsel/counsel.md) | review·counsel 2026-06-24 | QA-01~10 + NQA-A/B/C(13항목 재평가) | 1 | 5 | 7 | round-01 반영 검증: **KPI ✕ 3건 전부 소멸**(QA-01·07·08), **High 4→0**(기존 QA). 잔여 = **신설 QA 미채택(OI-8)으로 인한 교차의존 미닫힘**(QA-07/09↔NQA-B·QA-01/05↔NQA-C) + **KPI-DP 귀속 placeholder(OI-7)**. NQA-B가 세트 닫힘 병목(High). 신규 결함 0건 → **blue team counsel**: 닫힘 확인 7·채택 권장 3·조건부 동반닫힘 3, 신규 KPI 0 — **C3 단일 eval/검증 DP 수렴** 권고. 다음은 OI-8 채택 + DP 디스커션. |
+| round-03 [counsel](round-03/counsel/counsel.md) ★rubric | 2026-06-24 | QA-01~13 주 KPI | — | — | — | **등급 척도 캘리브레이션(reviewer-less 변형)**: red-team 없이 팀이 reviewer, Council 3 seats가 각 주 KPI를 ★1~3으로 필드 벤치마크+PoC margin 캘리브레이션 → 13개 QA에 `## 등급 척도` 신설. §측정 하한 8건 재배치(옛값 보존)+상한 캡/조건 추가. 방법론 [`Council.md §9`](Council.md). 후속 OI-9(QAS·glossary 정합). |
 
 ## QA별 verdict 추세
 

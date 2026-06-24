@@ -149,6 +149,47 @@ Reviewer가 *“무엇이 틀렸나”*를 말했다면, Council은 세 가지�
 
 ---
 
+## 9. ★ 등급 척도(rubric) 캘리브레이션 — ATAM trade-off용
+
+> 표준 라운드(Reviewer→Council)와 다른 **reviewer-less 변형**: red-team 비평 대신 **사람(팀)이 reviewer 자리**를 맡고, Council seats가 **각 QA 주 KPI를 ★1~3 등급 척도로 캘리브레이션**한다. 산출물 = 각 QA 파일의 `## 등급 척도` 섹션(`context/qa/`). 용도 = ATAM에서 **동일 조건 두 아키텍처 대안을 비교해 ★ 많은 안 채택**(★ = 설계 대안이 이 QA를 얼마나 잘 만족시키는가의 절대 수치 구간).
+
+### 9.1 5대 규칙
+
+1. **하한 = ★☆☆ 진입선**. KPI에 적힌 합격선(하한)이 ★☆☆ 진입선, 미만은 불합격(별 없음). ★★☆·★★★는 위로 올라가되 **실제 필드 도달 범위**로 캘리브레이션 — 웹 레퍼런스(필드 벤치마크·논문·업계 표준) 필수, 수치 복제 금지.
+2. **비현실 하한 flag + (B) 재배치**. 하한이 필드 기준 비현실적으로 높아 ★★★가 죽은 등급이 되면, 캘리브레이션 노트에만 적지 말고 **표 급간 자체를 현실 대역으로 재배치**한다(KPI 하한 사실상 보정). 보정 사실을 노트에 명시하고, 하한 보정은 `open-issues.md` 등록(KPI 정의 섹션과 정합 확인).
+3. **현실 급간에 PoC margin**. 이론 천장(웹 근거)에 급간을 빡빡하게 붙이지 말 것 — 우리 PoC는 가상 설계·제한 구현이라 이론 완성도 미달이 예상되므로 **이론치보다 다소 낮게/넓게** 잡아 margin을 둔다. 노트에 `이론 근거 X + PoC 미완성 대비 margin Y` 형태로 명시.
+4. **2-index → main + 조건**. KPI가 2개 이상 지표(A·B)면 **PoC 측정 가능한 쪽을 main 급간 축**에, 나머지는 표 밖 `조건:`/`측정 조건:` 줄로 고정("B = xxx 고정 하에 A를 급간"). seat dissent는 이 구조로 흡수해 consensus 전환.
+5. **보조지표 0건 가드 → Constraint 분기**. binary/대조형 헤드라인은 별점 급간이 무의미 → pass/fail 게이트로 두고 별점은 **gradable한 보조지표**에 매긴다. 단 그 보조지표가 **또 0건/위반 절대형**(1·2·3건을 허용할 게 아님)이면 급간 원천 불가 → QA 아니라 **Constraint(C)로 보낸다**. gradable proxy가 있을 때만 QA로 성립(없으면 QA 전체가 Constraint 후보). 가짜 급간 날조 금지.
+
+### 9.2 섹션 포맷 (`context/qa/QA-0X-*.md`에 추가)
+
+```
+## 등급 척도 (★ rubric — ATAM trade-off용)
+
+> 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정.
+
+**조건 (2-index일 때):** `조건: <B 고정값>` — <왜 고정하나>
+
+| 등급 | 구간 — 주 KPI(main 축): <KPI명> | 필드 근거 (경계 이유 + URL) |
+|---|---|---|
+| ★★★ (상) | <범위> | <필드 최상위 − margin + 출처> |
+| ★★☆ (중) | <범위> | <필드 일반 우수 + 출처> |
+| ★☆☆ (하) | <범위 — 합격 최소선=(보정된) KPI 하한> | <합격 진입 근거> |
+| 불합격 | <하한 미만 / 게이트 위반> | — |
+
+> **캘리브레이션 노트**: <하한 현실성 판정 + (재배치 시) 이론 근거 X + PoC margin Y + 신뢰도 상한(커버리지 등) silent cap>
+> **seats**: 발의 <Seat n> · <consensus / Seat m dissent>
+```
+
+- binary/대조형 헤드라인은 표 위에 한 줄: "헤드라인 `<...>`은 0건 절대형(Constraint 성격) → 별점은 보조지표 `<X>`로 급간화 (gradable이라 QA 성립)".
+
+### 9.3 운영
+
+- seats(§2)·레퍼런스 라이브러리(§4)·PoC margin 정신은 표준 council과 공유. **1~2개 샘플 먼저 확인 후 fan-out**(프로젝트 규칙).
+- 반영 시 QA `updated:` + `changelog.md` 델타. 재배치로 KPI 하한을 보정하면 KPI 정의 섹션·`open-issues.md`와 정합 확인.
+
+---
+
 ## 레퍼런스 (라이브러리 출처)
 
 - Google SRE — SLO/SLI·error budget: https://sre.google/sre-book/service-level-objectives/ , https://sre.google/workbook/implementing-slos/
