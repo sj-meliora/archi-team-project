@@ -24,7 +24,9 @@ updates:
 > 이 QA는 "장애 단위의 **복구**(죽은 걸 되살려 이어가기)"만 다룬다 — 한 장애가 다른 단위로 번지지 않게 막는 "**격리**(blast-radius 차단)"는 QA-06에서 따로 본다(서로 겹치지 않게 분리).
 
 ## 측정 (KPI)
-- **agent/노드 재기동 ≤ 1분 AND in-flight 작업 손실 = 0** — durable state(영속 상태) 기준
+> **주 KPI(헤드라인·PoC 대상)는 `재기동 ≤1분 AND 손실=0` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
+
+- **agent/노드 재기동 ≤ 1분 AND in-flight 작업 손실 = 0** `[주 KPI · PoC 대상]` — durable state(영속 상태) 기준
   - 쉽게: 죽은 일꾼(agent/노드)은 1분 안에 되살아나되, 그때 **진행 중이던 작업은 한 건도 잃지 않고** 마지막 저장지점부터 이어가야 한다. *in-flight = 처리 도중(아직 안 끝난) 작업, durable state = 죽어도 안 사라지게 외부에 영속화한 작업 상태.*
 - **장애에도 불구한 워크플로우 성공률 ≥ 99.5%** — 가용률 상위 지표(SLO)
   - 쉽게: 중간에 무언가 죽더라도 100건 중 99.5건 이상은 끝까지 성공해야 한다. MTTR만 보면 "자주 죽지만 빨리 복구"도 합격처럼 보이므로, 이 성공률로 그걸 막는다. *SLO = 서비스 수준 목표(달성하기로 약속한 합격선).*
@@ -54,10 +56,10 @@ updates:
 
 | KPI | 책임지는 설계 (DP 주장) | 검증 실험·모델 |
 |---|---|---|
-| **재기동 ≤ 1분 AND 손실 = 0** | **DP-0002 3안 H+Standby**(Active-Passive 이중화·상태 외부화로 Availability ★★☆ → ★★★) · **DP-0002 SP-1** Orchestrator 가용성이 전체 MTTR을 좌우 | chaos 모델: durable 워크플로우 엔진(Temporal류) + mock 4단계 파이프라인에서 **worker를 무작위 강제 종료** → lease 만료·재스케줄로 다른 worker가 체크포인트부터 재개 → **손실 건수·재개 시간**을 분포로 산출 |
-| **워크플로우 성공률 ≥ 99.5%** | **DP-0002 R-1** Orchestrator SPOF 완화(3안 Standby) · **DP-0003 3안 모니터링**(빠른 탐지·복구로 MTTR 단축) | 위 chaos 모델을 N회 반복해 **장애 주입 하에서의 종단 성공률**을 집계 (failover 시간을 파라미터로) |
-| **외부 LLM 자동 재개율 ≥ 95%** | **DP-0003 2안 격리(브로커/프록시)** + **3안 모니터링**으로 외부 장애를 흡수 — 단, **외부 LLM degradation을 명시 안 함**(아래 "남은 일") | fault-injection 모델: LLM 호출 프록시에 timeout/429/5xx 주입 → retry backoff + bounded queue → **outage 종료 후 자동 재개율**과 backpressure 작동(무한 재시도 폭주 없음)을 곡선으로 |
-| **side-effect 멱등성 = 100%** | **DP-0003 1안 사전 권한 게이트**(허용 액션만 통과) + 멱등 키 부여한 activity | 위 chaos 모델에서 deploy/쓰기 activity에 멱등 키 부여 → 강제 재실행 후 **중복 배포·중복 쓰기 건수(=0 목표)** 집계 |
+| **재기동 ≤ 1분 AND 손실 = 0** `[주]` | **DP-0002 3안 H+Standby**(Active-Passive 이중화·상태 외부화로 Availability ★★☆ → ★★★) · **DP-0002 SP-1** Orchestrator 가용성이 전체 MTTR을 좌우 | **▶ 실제 제작:** chaos 모델 — durable 워크플로우 엔진(Temporal류) + mock 4단계 파이프라인에서 **worker를 무작위 강제 종료** → lease 만료·재스케줄로 다른 worker가 체크포인트부터 재개 → **손실 건수·재개 시간**을 분포로 산출 |
+| 워크플로우 성공률 ≥ 99.5% | **DP-0002 R-1** Orchestrator SPOF 완화(3안 Standby) · **DP-0003 3안 모니터링**(빠른 탐지·복구로 MTTR 단축) | 보조 모델: 위 chaos 모델을 N회 반복해 장애 주입 하 종단 성공률 집계 (failover 시간 파라미터) |
+| 외부 LLM 자동 재개율 ≥ 95% | **DP-0003 2안 격리(브로커/프록시)** + **3안 모니터링**으로 외부 장애를 흡수 — 단, **외부 LLM degradation을 명시 안 함**(아래 "남은 일") | 보조 모델: fault-injection — LLM 프록시에 timeout/429/5xx 주입 → retry backoff + bounded queue → outage 종료 후 자동 재개율·backpressure 작동을 곡선으로 |
+| side-effect 멱등성 = 100% | **DP-0003 1안 사전 권한 게이트**(허용 액션만 통과) + 멱등 키 부여한 activity | 보조 모델: 위 chaos 모델에서 deploy/쓰기 activity에 멱등 키 부여 → 강제 재실행 후 중복 배포·중복 쓰기 건수(=0 목표) 집계 |
 
 > 가정·한계: 서비스 시간·도착률·failover 시간·lease timeout·외부 장애 길이는 **가정 파라미터**다. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — 슬라이드엔 가정값을 명시한다. control-plane 자체의 split-brain·외부 시스템(Jira·빌드서버)이 멱등 키를 실제 존중하는지는 통합 환경이 필요해 미검증.
 
