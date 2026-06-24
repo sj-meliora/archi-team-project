@@ -43,6 +43,7 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 - QA-05 Efficiency / QA-06 Reliability(Workflow) / QA-07 Performance(Agent수행시간)
 - QA-08 Performance(E2E) / QA-09 Reliability(Agent일관성) / QA-10 Maintainability
 - QAS-01.. (QA별 6-part 시나리오)
+- **NQA-A Security/Safety** (ISO 25010 Security+Safety) **· NQA-B Correctness** (ISO Functional Correctness) **· NQA-C Cost-economy** (ISO Performance Efficiency: Resource Utilization) + 짝 QAS-A/B/C *(round-01 디스커션 신설, 임시 ID — 우선순위 번호 재정렬은 팀 결정 대기, open-issues #8)*
 
 ### dp/
 - DP-0001 Workflow–Agent 매핑

@@ -40,5 +40,13 @@
 - **DP-0001(1안 즉시 실행)**: latency만 보고 **품질 게이트(first-pass 성공)와 무연결** — "빠르게 틀리기" 차단 tactic 미명시 (QA-07 반영 시 발견).
 - **DP-0004/0005**: E2E latency 책임 및 **결정 산식(4단계×20GB÷대역폭 5% budget → A5 vs A8)의 실측 의존**, prompt/모델 교체 내성(workflow 버저닝·계약 분리) 미명시 (QA-08·QA-10 반영 시 발견).
 - **신규 QA 교차 의존(NQA-B 전제)**: QA-07 first-pass 품질 게이트·QA-09 유효-결정률이 **NQA-B(Correctness) golden 게이트에 의존** — NQA-B 신설과 함께 가야 두 QA의 KPI가 닫힘.
+- **eval/검증 서브시스템 = 신규 DP 후보**: NQA-A red-team 하네스·NQA-B golden+judge 하네스가 **어떤 DP에도 없는 신규 인프라** — DP 디스커션에서 "eval/검증 서브시스템" DP 신설 검토 (NQA-A/B/QA-03 공유 자산).
+- **DP-0002/0003 보안 tactic 미명시**: 공급망 artifact 서명·secrets 관리·injection 가드레일이 후보 대안/ATAM에 없음 (NQA-A 신설 시 발견).
 - **`related-dp` 추가**: QA-05에 DP-0005, QA-07에 DP-0004 추가함(반영 완료). 역방향(DP의 `drives`)과 정합 확인 필요.
 - **남은 작업**: 각 DP에 해당 tactic(rate-limit headroom·admission control·외부 의존성 backoff·폴백·runaway cap·graceful 정지·span trace·품질 게이트·workflow 버저닝)을 후보 대안/ATAM에 명시할지 + DP-0001 drives 교정 + NQA-B 교차 의존을 DP 디스커션에서 역검토.
+
+## [ ] OI-8 신규 QA(NQA-A/B/C) 정식 승격·번호 재정렬
+- round-01 디스커션에서 신규 QA 3개 신설(임시 ID): **NQA-A Security/Safety(H)·NQA-B Correctness(H)·NQA-C Cost-economy(M)**. 파일은 `context/qa/`에 6섹션 골격으로 존재하나 **2자리 우선순위 번호 미부여**.
+- **결정 필요**: ① 정식 채택 여부(팀원 논의) ② 채택 시 우선순위 번호 재정렬 — 최소 NQA-A(Security)·NQA-B(Correctness)는 "사람 없이 믿고 맡길 수 있는가"의 두 기둥이라 상위 진입이 자연스러움 ③ 재번호 시 기존 QA-01~10 전부 + INDEX·glossary·cross-ref 동기화.
+- **연결 정리(채택 전제)**: QA-05 top-line·QA-01 "자원 활용률" → NQA-C 이양 확정 / QA-07·QA-09 게이트 ↔ NQA-B 양방향 cross-link / QA-03 ↔ NQA-A 양방향 cross-link.
+- **검증 전략 전환**: 현재 NQA 검증은 [발표 서사](실측 미실행). **정식 QA 승격 시 PoC를 실측으로 전환**(팀 결정 — 2026-06-24).
