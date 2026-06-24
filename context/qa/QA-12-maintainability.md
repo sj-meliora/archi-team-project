@@ -1,5 +1,5 @@
 ---
-id: QA-10
+id: QA-12
 category: QA
 importance: L
 difficulty: M
@@ -13,9 +13,12 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-02
     reason: "닫힘 확인(건강 유지) — CIS p95 측정 전제로 컴포넌트 경계 정의 선결 명문화 Low 보강"
+  - date: 2026-06-24
+    by: 팀 결정 (OI-8)
+    reason: "재번호 QA-10 → QA-12 (NQA 정식 편입에 따른 +2 시프트, → changelog)"
 ---
 
-# QA-10 Maintainability — 모듈 교체 용이성
+# QA-12 Maintainability — 모듈 교체 용이성
 
 ## 정의 / Refinement
 컴포넌트·**prompt/tool-def·LLM 모델** 교체 시 타 요소로의 영향을 최소화하고(낮은 결합), **모델 교체에 무중단(model-agnostic)**이다. agentic 시스템 유지보수의 지배적 비용은 컴포넌트 자체가 아니라 **prompt·tool 정의·모델 교체·신규 모델 온보딩**이므로, 이 축을 KPI에 포함한다.
@@ -79,7 +82,7 @@ updates:
 **무엇을 바꿨나 (반영)**
 - **정의**: "컴포넌트·prompt/tool-def·LLM 모델 교체 내성 + model-agnostic 무중단"으로 확장. workflow-as-code(activity 교체·큐/계약 분리) altitude 명시.
 - **KPI 확장**: 旧 `평균 CIS ≤2` → ① `CIS p95 ≤3 + 컴포넌트 경계 정의` ② `prompt/tool-def 수정 ≤2` ③ `모델 교체 무중단(model-agnostic)` ④ `신규 모델 온보딩 ≤1일`.
-- 짝 시나리오 `QAS-10`의 자극(prompt/모델 교체 추가)·Response·Measure를 동기화.
+- 짝 시나리오 `QAS-12`의 자극(prompt/모델 교체 추가)·Response·Measure를 동기화.
 
 **남은 일 (이 라운드에서 미반영)**
 - **DP-0004/0005가 prompt/모델 교체 내성을 명시 안 함** → workflow 버저닝·계약 분리 tactic 보강 역검토 (`open-issues.md` 트래킹 대상). FR-0003(영향 범위 자동 분석)이 CIS 측정 데이터를 제공하는지 역검토.

@@ -1,6 +1,6 @@
-# QAS-08 E2E 개발 시간 시나리오
+# QAS-10 E2E 개발 시간 시나리오
 
-> category: QAS | refines: QA-08 (Performance-E2E) | updated: 2026-06-24
+> category: QAS | refines: QA-10 (Performance-E2E) | updated: 2026-06-24
 
 | 요소 | 내용 |
 |---|---|
@@ -13,5 +13,5 @@
 
 ## 비고
 - 설계 연결: DP-0004(A5 claim-check / A8 로컬 — 5% 산식으로 택일), DP-0005(2안 공유 캐시로 E2E 단축).
-- 수치(6시간·50모델/일·5%)는 예시값 — 합격선은 부하시험으로 확정. 상세는 QA-08 본문.
-- Performance 3분할: throughput은 QA-01과 공유 축, per-node는 QA-07. 전달 무결성은 overview 20GB Loss pain 직결.
+- 수치(6시간·50모델/일·5%)는 예시값 — 합격선은 부하시험으로 확정. 상세는 QA-10 본문.
+- Performance 3분할: throughput은 QA-01과 공유 축, per-node는 QA-09. 전달 무결성은 overview 20GB Loss pain 직결.

@@ -1,5 +1,5 @@
 ---
-id: NQA-A
+id: QA-06
 category: QA
 importance: H
 difficulty: H
@@ -12,12 +12,15 @@ updates:
     reason: "신설 — 자율 에이전트 보안/안전을 1급 QA로 발굴 (자세히 → ## 변경 이력)"
   - date: 2026-06-24
     by: discussion/qa/round-01
-    reason: "ISO/IEC 25010 Security 앵커링 + 짝 QAS-A 신설"
+    reason: "ISO/IEC 25010 Security 앵커링 + 짝 QAS-06 신설"
+  - date: 2026-06-24
+    by: 팀 결정 (OI-8)
+    reason: "정식 QA 편입 — NQA-A → QA-06(우선순위 6위), ASR 선정(QA-01~07) (자세히 → ## 변경 이력)"
 ---
 
-# NQA-A Security / Safety — 자율 에이전트 보안·안전
+# QA-06 Security / Safety — 자율 에이전트 보안·안전
 
-> ⚠️ **신규 QA (번호 미확정).** `NQA-A`는 임시 ID다. 이 QA는 우선순위 상위 진입이 자연스러워 **QA 2자리 번호 재정렬 후보**다(예: Security를 QA-01급으로). 재번호는 기존 전 QA의 cross-ref에 영향을 주는 **팀 결정 사항** — 확정 전까지 `NQA-A`로 둔다.
+> 📌 **정식 QA (2026-06-24 팀 결정, OI-8).** round-01 발굴 → round-02 정식 채택. 우선순위 **6위**로 편입(NQA-A → QA-06). 기존 QA-06~10은 +2 시프트(→QA-08~12), Correctness는 QA-07, Cost-economy는 QA-13. **ASR 선정(QA-01~07)** — DP 생성 동인. `번호 = 발표 우선순위` 규칙상 추가 상향은 팀 논의 후 별도.
 >
 > **ISO/IEC 25010:2023 앵커**: 주 특성 **Security**(기밀성·무결성·부인방지·책임추적성·인증성), 보조 **Safety**(fail-safe·운영 제약). KPI↔하위특성: secrets 노출 0 → **기밀성(Confidentiality)** / 권한상승·범위외배포 0·artifact 서명 → **무결성·인증성(Integrity·Authenticity)** / HITL 통과·우회 0 → **책임추적성·부인방지(Accountability·Non-repudiation)**(감사 trace는 QA-04) / runaway·고위험 안전 정지 → **Safety**(QA-03 공유).
 
@@ -29,7 +32,7 @@ updates:
 - **자율 권한 = 신종 공격면** — prompt injection으로 에이전트가 악성 config를 배포하거나, 자격증명을 유출하거나, 비인가 도구를 호출하거나, 공급망(artifact)을 변조할 수 있다. 방어는 **zero-trust 최소권한 + 고위험 액션 사람 승인(HITL) + 별도 가드레일 + injection 내성 + 공급망 서명**의 다층 구조다.
 - **secrets·공급망·감사까지 포함한다** — 단순 "허용 범위 내 동작"을 넘어, **비밀관리(secrets 노출 0)·artifact 무결성(서명 검증)·감사 추적(QA-04 trace 100%)**이 보안의 구성요소다.
 
-> 이 QA는 **보안 전반**을 다룬다 — 그 부분집합인 "중단·권한 게이트(제어성)"는 QA-03(Controllability)에서 본다(**Controllability ⊂ Security**: 제어성은 안전의 한 수단, NQA-A는 비밀관리·공급망·injection·감사를 포괄). 두 문서는 양방향 cross-link.
+> 이 QA는 **보안 전반**을 다룬다 — 그 부분집합인 "중단·권한 게이트(제어성)"는 QA-03(Controllability)에서 본다(**Controllability ⊂ Security**: 제어성은 안전의 한 수단, QA-06는 비밀관리·공급망·injection·감사를 포괄). 두 문서는 양방향 cross-link.
 
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `권한 상승·범위 외 배포 = 0` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
@@ -86,11 +89,24 @@ updates:
 - **정의**: 권한·자격증명·공급망 안전 + injection 내성. Controllability ⊂ Security 경계 명문화.
 - **KPI 5축**: ① 권한 상승·범위 외 배포 0(주) ② HITL 통과율 100%·우회 0(QA-03 공유) ③ artifact 서명·무결성 100% ④ injection 차단율 ≥95% ⑤ secrets 노출 0(QA-04 교차).
 - 검증은 QA-03 PoC-C2와 **공유 red-team 하네스**로 설계(실행은 [발표 서사]).
-- **ISO/IEC 25010 앵커**: 주 특성 Security(+Safety). 짝 시나리오 `QAS-A` 신설.
+- **ISO/IEC 25010 앵커**: 주 특성 Security(+Safety). 짝 시나리오 `QAS-06` 신설.
 
 **남은 일 (이 라운드에서 미반영)**
-- **번호 재정렬(팀 결정)**: NQA-A를 우선순위 상위(QA-01급)로 재번호할지 — 확정 시 전 QA cross-ref·glossary·INDEX 동기화 필요. 현재 `NQA-A` 임시 ID 유지.
+- **번호 재정렬(팀 결정)**: QA-06를 우선순위 상위(QA-01급)로 재번호할지 — 확정 시 전 QA cross-ref·glossary·INDEX 동기화 필요. 현재 `QA-06` 임시 ID 유지.
 - **red-team 세트 구축·실행은 [생략]** — eval/검증 서브시스템은 모듈 다이어그램에 박스로만 존치(설계 산출물), 50~100건 세트 구축은 실행 노동이라 drop.
-- QA-03 정의의 단방향 cross-link을 **양방향**으로 맞춤(NQA-A 정의에 명시) — QA-03 "남은 일"과 짝.
+- QA-03 정의의 단방향 cross-link을 **양방향**으로 맞춤(QA-06 정의에 명시) — QA-03 "남은 일"과 짝.
 - injection 차단율 `95%`는 **예시값**이며 red-team 세트로 확정.
 - DP-0002/0003이 공급망 서명·secrets 관리·injection 가드레일을 명시 안 함 → DP 역검토(`open-issues.md` 트래킹 대상).
+
+### 2026-06-24 — 정식 QA 편입 (팀 결정, OI-8)
+출처: 팀 결정 — round-02 디스커션이 정식 채택 강력 권장(최우선급)으로 올린 신규 QA 3종(NQA-A/B/C)을 정식 편입. OI-8 닫음.
+
+**무엇을 바꿨나**
+- **ID 확정**: `NQA-A`(임시) → **`QA-06`**(우선순위 6위). 짝 `QAS-A` → `QAS-06`. 기존 QA-06~10은 +2 시프트(→QA-08~12), Correctness=QA-07, Cost-economy=QA-13.
+- 위 "남은 일"의 **번호 재정렬(팀 결정)** 항목을 이 결정으로 **닫음**.
+- 전 QA·QAS·INDEX·glossary·open-issues의 cross-ref를 새 번호로 일괄 동기화.
+- **ASR 선정 확장: QA-01~07**(Security·Correctness 편입) — DP 생성 동인(팀 판단).
+
+**남은 일**
+- 발표 우선순위 추가 상향(Security를 더 위로)은 팀 논의 후 별도 — `번호 = 발표 우선순위`와 분리해 잠정 6위.
+- red-team 세트 실행 [생략]·예시값 확정·DP 역검토(OI-7)는 종전대로.

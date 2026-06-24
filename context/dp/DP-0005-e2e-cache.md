@@ -1,7 +1,7 @@
 # DP-0005 E2E 개발시간 최적화 (캐시 전략)
 
 > category: DP | status: 결정대기 | source: pptx p.33 | updated: 2026-06-20
-> drives: QA-08(Performance-E2E), QA-06(Reliability-Workflow), QA-09(Reliability-Agent), QA-10(Maintainability)
+> drives: QA-10(Performance-E2E), QA-08(Reliability-Workflow), QA-11(Reliability-Agent), QA-12(Maintainability)
 > realizes: FR-0002
 
 ## 결정 포인트
@@ -29,15 +29,15 @@ E2E 개발시간 단축을 위해 캐시를 **Workflow별 독립 vs Workflow 간
 
 ## ATAM 분석
 ### 민감점 (Sensitivity Points)
-- **SP-1**: 캐시 공유 범위가 Performance(QA-08, E2E)와 Reliability-Workflow(QA-06)에 동시 민감.
-- **SP-2**: 캐시 공유가 Agent 판단 일관성(QA-09, 재현율≥80%)에 민감.
+- **SP-1**: 캐시 공유 범위가 Performance(QA-10, E2E)와 Reliability-Workflow(QA-08)에 동시 민감.
+- **SP-2**: 캐시 공유가 Agent 판단 일관성(QA-11, 재현율≥80%)에 민감.
 
 ### 교환점 (Tradeoff Points)
 - **TP-1 (Performance/Agent일관성 ↔ Workflow독립성)**: 공유(2안)는 재사용·일관성↑·장애전파 위험↑, 로컬(1안)은 반대. 본 DP의 핵심 교환점.
 
 ### 위험 (Risks)
-- **R-1**: 2안은 공유 캐시 오염이 다수 Workflow로 전파 → QA-06(중단≤1%) 미달 위험.
-- **R-2**: 1안은 재사용 불가로 QA-08(E2E) 개선폭 제한.
+- **R-1**: 2안은 공유 캐시 오염이 다수 Workflow로 전파 → QA-08(중단≤1%) 미달 위험.
+- **R-2**: 1안은 재사용 불가로 QA-10(E2E) 개선폭 제한.
 
 ### 비위험 (Non-Risks)
 - **NR-1**: 두 안 모두 FR-0002(Artifact 저장·전달) 인프라 위에 구현 가능.

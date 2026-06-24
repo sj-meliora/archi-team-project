@@ -38,12 +38,13 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 - C-0001 표준 패키징
 - C-0002 배포 이식성
 
-### qa/
-- QA-01 Scalability / QA-02 Availability / QA-03 Controllability / QA-04 Observability
-- QA-05 Efficiency / QA-06 Reliability(Workflow) / QA-07 Performance(Agent수행시간)
-- QA-08 Performance(E2E) / QA-09 Reliability(Agent일관성) / QA-10 Maintainability
-- QAS-01.. (QA별 6-part 시나리오)
-- **NQA-A Security/Safety** (ISO 25010 Security+Safety) **· NQA-B Correctness** (ISO Functional Correctness) **· NQA-C Cost-economy** (ISO Performance Efficiency: Resource Utilization) + 짝 QAS-A/B/C *(round-01 디스커션 신설, 임시 ID — 우선순위 번호 재정렬은 팀 결정 대기, open-issues #8)*
+### qa/ (우선순위 = 번호, 2026-06-24 재번호 / **ASR = QA-01~07**)
+- QA-01 Scalability / QA-02 Availability / QA-03 Controllability / QA-04 Observability / QA-05 Efficiency
+- **QA-06 Security/Safety** (ISO 25010 Security+Safety) / **QA-07 Correctness** (ISO Functional Correctness)
+- QA-08 Reliability(Workflow) / QA-09 Performance(Agent수행시간) / QA-10 Performance(E2E) / QA-11 Reliability(Agent일관성) / QA-12 Maintainability
+- **QA-13 Cost-economy** (ISO Performance Efficiency: Resource Utilization)
+- QAS-01~13 (QA별 6-part 시나리오, 같은 번호)
+- *QA-06/07/13은 round-01 디스커션 발굴 → 2026-06-24 정식 편입(OI-8). 기존 QA-06~10 +2 시프트.*
 
 ### dp/
 - DP-0001 Workflow–Agent 매핑

@@ -21,7 +21,7 @@ Agent loop 전구간(**prompt·입력 context·tool 호출/결과·model 버전�
 - **무엇을 캡처해야 재구성되나(trace 완전성)** — 한 결정의 재현에 필요한 최소 단위 span = **prompt + 입력 context + tool I/O + model 버전 + token 사용량 + timestamp**. 이 중 하나라도 빠지면 "재구성 가능"은 빈말이 된다. 배포·권한 사용 같은 **안전 관련 액션은 95%가 아니라 ~100%** 추적돼야 한다(제어성·보안과 연계).
 - **관측은 3축이다(traces·metrics·alerting)** — trace(결정 재구성) 1축만으론 좁다. 운영 지표 대시보드(처리량·에러율·**결정당 비용**)와 **이상 탐지 시간(MTTD)**까지 갖춰야 정통 observability다. durable 엔진의 **event-history(모든 워크플로우 전이를 이벤트로 기록)**로 골격은 ~100% 재생되고, LLM 비결정 부분만 prompt/seed 캡처로 보강한다.
 
-> 이 QA는 "관측 인프라를 갖춘다"까지만 다룬다 — 그 trace로 재는 **결정당 비용**은 QA-05/NQA-C, **안전 액션 100% 추적**은 QA-03/NQA-A, **MTTD→MTTR**는 QA-02에서 각각 활용한다. 즉 QA-04는 측정 데이터를 *공급*하고, 합격 임계는 각 QA가 정한다.
+> 이 QA는 "관측 인프라를 갖춘다"까지만 다룬다 — 그 trace로 재는 **결정당 비용**은 QA-05/QA-13, **안전 액션 100% 추적**은 QA-03/QA-06, **MTTD→MTTR**는 QA-02에서 각각 활용한다. 즉 QA-04는 측정 데이터를 *공급*하고, 합격 임계는 각 QA가 정한다.
 
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `trace 완전성` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
@@ -32,7 +32,7 @@ Agent loop 전구간(**prompt·입력 context·tool 호출/결과·model 버전�
   - 쉽게: 워크플로우가 거쳐 간 모든 단계 전이가 이벤트로 빠짐없이 남아, 골격은 100% 그대로 재생(replay)할 수 있어야 한다. LLM의 비결정적 부분만 prompt/seed로 따로 보강. *event-history = 모든 상태 변화를 순서대로 적은 기록, replay = 그 기록으로 실행을 그대로 되돌려 재생.*
 - **MTTD(이상 탐지 시간) ≤ 5분** — 이상 발생→탐지까지
   - 쉽게: 뭔가 잘못됐을 때 5분 안에 알아채야 한다. 이건 QA-02의 복구시간(MTTR)이 시작되기 위한 전제다. *MTTD = Mean Time To Detect(평균 탐지 시간).*
-- **결정당 비용/토큰 기록 = 100%** — QA-05/NQA-C 측정 인프라
+- **결정당 비용/토큰 기록 = 100%** — QA-05/QA-13 측정 인프라
   - 쉽게: 모든 의사결정에 든 토큰·비용이 trace에 100% 기록돼야, 효율·비용 QA가 그 데이터를 가져다 쓸 수 있다.
 
 > 위 수치(100%·95%·5분)는 **"측정 가능한 KPI는 이런 모양이다"를 보여주는 예시값**이며, 실제 합격 기준은 실제 환경에서 측정해 확정한다.
@@ -59,7 +59,7 @@ Agent loop 전구간(**prompt·입력 context·tool 호출/결과·model 버전�
 | **trace 완전성** `[주]` | **DP-0003 3안 실시간 모니터링**([Observability] 실행·판단 근거 추적) — 단, **규칙 기반 한정 적용** 권고(LLM 탐지는 토큰 폭증). **span 수준 trace를 DP-0003이 보장하는지 역검토 필요** | **▶ 실제 제작:** OTel GenAI span 계측 모델 — mock 파이프라인에 `invoke_agent/execute_tool` span 삽입 + W3C traceparent 전파 → 워크플로우 1건 실행 후 한 결정을 **trace만으로 재구성** 시도 → 누락 span 카테고리(분모: 액션 종류)를 집계해 완전성 산출 |
 | event-history 완전성 = 100% | durable 엔진(Temporal류)의 event-history — 워크플로우 골격 결정론적 재생 | 보조 모델: 위 모델에 durable event-history 붙여 골격 replay 성공률 집계 (LLM 호출만 비결정으로 분리 표시) |
 | MTTD ≤ 5분 | **DP-0003 3안 모니터링**(빠른 탐지·복구로 MTTR 단축) + 간단 이상탐지 룰 | 보조 모델: 이상(에러·이탈) 주입 → 탐지까지 시간 분포 산출 |
-| 결정당 비용/토큰 기록 = 100% | OTel `gen_ai.usage.*` 토큰 계측(QA-05/NQA-C 공급) | 보조 모델: span에 토큰/비용 필드 부착 후 결정 N건 기록 누락률(=0 목표) 집계 |
+| 결정당 비용/토큰 기록 = 100% | OTel `gen_ai.usage.*` 토큰 계측(QA-05/QA-13 공급) | 보조 모델: span에 토큰/비용 필드 부착 후 결정 N건 기록 누락률(=0 목표) 집계 |
 
 > 가정·한계: 결정 수·이상 주입 빈도·이상탐지 룰은 **가정 파라미터**다. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — 슬라이드엔 가정값을 명시한다. **"재구성됨"의 판정 자동화 한계**(감사자 판단 개입 여지)와 LLM 내부 추론(CoT 비공개)은 prompt/출력으로만 근사하는 점은 silent cap으로 명시.
 
@@ -74,7 +74,7 @@ Agent loop 전구간(**prompt·입력 context·tool 호출/결과·model 버전�
 - 관측성 폭이 좁음 — traces 1축뿐. metrics(처리량·에러율·비용)·alerting·**MTTD** 누락.
 
 **무엇을 바꿨나 (반영)**
-- **정의**: agent loop 전구간 span 캡처 + traces·metrics·alerting 3축 + 다수 QA의 측정 인프라 토대임을 명시. altitude로 QA-05/NQA-C·QA-03/NQA-A·QA-02와의 공급 관계 분리.
+- **정의**: agent loop 전구간 span 캡처 + traces·metrics·alerting 3축 + 다수 QA의 측정 인프라 토대임을 명시. altitude로 QA-05/QA-13·QA-03/QA-06·QA-02와의 공급 관계 분리.
 - **KPI 환원·확장**: 旧 `재구성 ≥95%` → ① `trace 완전성(안전 100%/일반 ≥95%, span 구성요소 명시)` ② `event-history 완전성 100%` ③ `MTTD ≤5분` ④ `결정당 비용/토큰 기록 100%`.
 - 짝 시나리오 `QAS-04`의 Response·Measure를 span 완전성·event-history·MTTD로 동기화.
 

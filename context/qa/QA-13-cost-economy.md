@@ -1,5 +1,5 @@
 ---
-id: NQA-C
+id: QA-13
 category: QA
 importance: M
 difficulty: M
@@ -12,14 +12,17 @@ updates:
     reason: "신설 — 완료 모델당 비용(ROI top-line) 발굴, QA-05 top-line·QA-01 활용률 흡수 (자세히 → ## 변경 이력)"
   - date: 2026-06-24
     by: discussion/qa/round-01
-    reason: "ISO/IEC 25010 Performance Efficiency(Resource Utilization) 앵커링 + 짝 QAS-C 신설"
+    reason: "ISO/IEC 25010 Performance Efficiency(Resource Utilization) 앵커링 + 짝 QAS-13 신설"
+  - date: 2026-06-24
+    by: 팀 결정 (OI-8)
+    reason: "정식 QA 편입 — NQA-C → QA-13(우선순위 13위 유지) (자세히 → ## 변경 이력)"
 ---
 
-# NQA-C Cost-economy — 완료 모델당 비용
+# QA-13 Cost-economy — 완료 모델당 비용
 
-> ⚠️ **신규 QA (번호 미확정).** `NQA-C`는 임시 ID다. 우선순위 Med(Security·Correctness보다 후순위이나 비즈니스 설득에 필수) — 재번호는 팀 결정 사항이라 확정 전까지 `NQA-C`로 둔다.
+> 📌 **정식 QA (2026-06-24 팀 결정, OI-8).** round-01 발굴 → round-02 정식 채택. 우선순위 **13위**(말미 유지, NQA-C → QA-13) — Med, Security·Correctness보다 후순위이나 비즈니스 설득에 필수. ASR 비대상(QA-01~07만).
 >
-> **ISO/IEC 25010:2023 앵커**: 주 특성 **Performance Efficiency** / 하위특성 **Resource Utilization(자원 활용성)** — 비용을 "완료 모델당 소비 자원(토큰+compute+재시도)"으로 본다. ⚠️ QA-05(Efficiency)도 같은 ISO 특성이나 **altitude가 다름**: QA-05 = 요청당 토큰(per-request), NQA-C = 완료 모델당 총비용·ROI(business). 경계는 아래 정의의 altitude 줄.
+> **ISO/IEC 25010:2023 앵커**: 주 특성 **Performance Efficiency** / 하위특성 **Resource Utilization(자원 활용성)** — 비용을 "완료 모델당 소비 자원(토큰+compute+재시도)"으로 본다. ⚠️ QA-05(Efficiency)도 같은 ISO 특성이나 **altitude가 다름**: QA-05 = 요청당 토큰(per-request), QA-13 = 완료 모델당 총비용·ROI(business). 경계는 아래 정의의 altitude 줄.
 
 ## 정의 / Refinement
 모델 1건 완료에 드는 **총비용(LLM 토큰 + runner compute + 재시도)**을 **수작업/기존 파이프라인 대비 절감**한다. 비즈니스 ROI의 top-line은 "완료 모델당 비용"이며, 발표에서 "**수작업 대비 N% 절감**"이 가장 강력한 설득 포인트다.
@@ -80,10 +83,21 @@ updates:
 - **정의**: 모델 1건 완료 총비용(토큰+compute+재시도)을 수작업 대비 절감. QA-05를 sub-metric으로 흡수, QA-04에서 데이터 수급.
 - **KPI 3축**: ① 완료 모델당 비용 ≤$5(주, 예시) ② 수작업 대비 절감률 ≥70% ③ 비용 분해(토큰/compute/재시도).
 - 검증은 QA-05 caching A/B 공유 + 수작업 baseline 추정(실행은 [발표 서사]).
-- **ISO/IEC 25010 앵커**: Performance Efficiency / Resource Utilization(QA-05와 altitude로 분리). 짝 시나리오 `QAS-C` 신설.
+- **ISO/IEC 25010 앵커**: Performance Efficiency / Resource Utilization(QA-05와 altitude로 분리). 짝 시나리오 `QAS-13` 신설.
 
 **남은 일 (이 라운드에서 미반영)**
-- **KPI 이동 닫기**: QA-05 top-line(`$/완료모델`)·QA-01 "자원 활용률"이 NQA-C로 흡수됨 — 두 QA 본문에 이미 "NQA-C로 이양" 명시. NQA-C 정식 채택 시 이양 확정·cross-link.
+- **KPI 이동 닫기**: QA-05 top-line(`$/완료모델`)·QA-01 "자원 활용률"이 QA-13로 흡수됨 — 두 QA 본문에 이미 "QA-13로 이양" 명시. QA-13 정식 채택 시 이양 확정·cross-link.
 - **수작업 baseline 비용·compute 단가는 추정** — 실측 미실행([발표 서사]).
-- **번호 재정렬(팀 결정)**: NQA-C는 Med라 상위 진입은 NQA-A/B보다 후순위 — 확정 전까지 임시 ID.
+- **번호 재정렬(팀 결정)**: QA-13는 Med라 상위 진입은 QA-06/07보다 후순위 — 확정 전까지 임시 ID.
 - 완료 모델당 비용 `$5`·절감률 `70%`는 **예시값**이며 인프라 단가·baseline으로 확정.
+
+### 2026-06-24 — 정식 QA 편입 (팀 결정, OI-8)
+출처: 팀 결정 — NQA-C 정식 편입. OI-8 닫음.
+
+**무엇을 바꿨나**
+- **ID 확정**: `NQA-C`(임시) → **`QA-13`**(우선순위 13위 유지, 말미). 짝 `QAS-C` → `QAS-13`.
+- 위 "남은 일"의 **번호 재정렬(팀 결정)** 항목을 닫음. QA-05 top-line·QA-01 활용률의 QA-13 이양 cross-link 확정.
+- **ASR 비대상**(ASR = QA-01~07만) — Cost-economy는 DP 생성 동인이 아님(비즈니스 설득 지표).
+
+**남은 일**
+- 수작업 baseline·단가 추정 [발표 서사]·예시값 확정은 종전대로.

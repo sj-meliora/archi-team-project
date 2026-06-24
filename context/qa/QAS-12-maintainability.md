@@ -1,6 +1,6 @@
-# QAS-10 모듈 교체 용이성 시나리오
+# QAS-12 모듈 교체 용이성 시나리오
 
-> category: QAS | refines: QA-10 (Maintainability) | updated: 2026-06-24
+> category: QAS | refines: QA-12 (Maintainability) | updated: 2026-06-24
 
 | 요소 | 내용 |
 |---|---|
@@ -13,5 +13,5 @@
 
 ## 비고
 - 설계 연결: DP-0004(A5/A8 Job/단계 단위 독립 배포), DP-0005(캐시 계층), FR-0003(영향 범위 자동 분석).
-- 수치(p95 3개·2·1일)는 예시값 — 합격선은 변경 시나리오 측정으로 확정. 상세는 QA-10 본문.
+- 수치(p95 3개·2·1일)는 예시값 — 합격선은 변경 시나리오 측정으로 확정. 상세는 QA-12 본문.
 - agentic 유지보수의 지배적 비용은 prompt/tool-def·모델 교체·온보딩 — 컴포넌트 CIS만으론 부족.

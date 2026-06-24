@@ -11,7 +11,7 @@ updates:
     reason: "KPI 측정가능 재설계 (자세히 → ## 변경 이력)"
   - date: 2026-06-24
     by: discussion/qa/round-02
-    reason: "닫힘 확인(High 해소) — rate-limit 헤드룸 측정단위 명시(계정전역 TPM/RPM 대비·큐별 쿼터 배분, QA-06 cross-link) Low 보강"
+    reason: "닫힘 확인(High 해소) — rate-limit 헤드룸 측정단위 명시(계정전역 TPM/RPM 대비·큐별 쿼터 배분, QA-08 cross-link) Low 보강"
 ---
 
 # QA-01 Scalability — 시스템 확장성
@@ -24,7 +24,7 @@ updates:
 - **무엇이 먼저 막히나(병목)** — 이 시스템은 서버 CPU가 아니라, **외부 LLM(예: Claude)을 호출하는 양·횟수의 한도**에 먼저 막힌다. LLM 서비스는 보통 *분당 토큰 수*(**TPM**, Tokens Per Minute = 1분에 처리해줄 수 있는 글자량)와 *분당 요청 수*(**RPM**, Requests Per Minute = 1분에 받아줄 수 있는 호출 횟수)에 상한을 둔다. 즉 확장의 진짜 천장은 이 한도다.
 - **언제 자원을 더 붙이나(확장 신호)** — CPU 사용률을 보고 늘리는 게 아니라, **처리 대기열에 일이 얼마나 쌓였는지(backlog = 아직 처리 못 하고 줄 서 있는 작업의 양)와 얼마나 오래 기다리는지**를 보고 일꾼(worker)을 늘린다.
 
-> 이 QA는 "처리량(throughput, 단위 시간당 처리한 양)"만 다룬다 — 노드 1건의 처리 속도는 QA-07, 모델 1개의 전체 소요시간은 QA-08에서 따로 본다(서로 겹치지 않게 분리).
+> 이 QA는 "처리량(throughput, 단위 시간당 처리한 양)"만 다룬다 — 노드 1건의 처리 속도는 QA-09, 모델 1개의 전체 소요시간은 QA-10에서 따로 본다(서로 겹치지 않게 분리).
 
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `scaling efficiency` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
@@ -32,14 +32,14 @@ updates:
 - **scaling efficiency ≥ 0.8** `[주 KPI · PoC 대상]` — 부하 2배 투입 시 처리량 ≥ 1.8배 (USL 기반)
   - 쉽게: 일을 2배로 주면 처리량도 거의 그만큼(예: 1.8배 이상) 따라 늘어야 한다. *USL = 확장성의 정통 측정 모델(Universal Scalability Law).*
 - **rate-limit 헤드룸 ≥ 20%** — 피크 시 **계정 전역 TPM/RPM 한도** 대비 여유, throttle(429) 0건 (보장 단위: 전역 풀 헤드룸 + 큐별 token-bucket 쿼터 배분)
-  - 쉽게: 가장 바쁠 때도 LLM 한도를 80%까지만 쓰고 20%는 비워둔다. 꽉 채우면 호출이 거부(429 에러)돼 줄줄이 실패. 측정 기준은 외부 LLM 제공자의 **계정 전역(account-global) 한도**(TPM/RPM은 계정 단위로 묶이므로 우리 client-side 큐가 아무리 나눠도 천장은 계정 합산)이고, 그 전역 풀을 큐별 token-bucket으로 배분해 한 큐가 다 먹지 않게 한다(WF별 쿼터 격리는 QA-06이 담당 — 같은 token-bucket 인프라 공유). *TPM = 분당 토큰 수, RPM = 분당 요청 수, account-global = 우리 큐가 아니라 LLM 계정 전체에 걸리는 한도.*
+  - 쉽게: 가장 바쁠 때도 LLM 한도를 80%까지만 쓰고 20%는 비워둔다. 꽉 채우면 호출이 거부(429 에러)돼 줄줄이 실패. 측정 기준은 외부 LLM 제공자의 **계정 전역(account-global) 한도**(TPM/RPM은 계정 단위로 묶이므로 우리 client-side 큐가 아무리 나눠도 천장은 계정 합산)이고, 그 전역 풀을 큐별 token-bucket으로 배분해 한 큐가 다 먹지 않게 한다(WF별 쿼터 격리는 QA-08이 담당 — 같은 token-bucket 인프라 공유). *TPM = 분당 토큰 수, RPM = 분당 요청 수, account-global = 우리 큐가 아니라 LLM 계정 전체에 걸리는 한도.*
 - **큐 대기 p95 ≤ 5분** — backlog 오토스케일 트리거 SLI
   - 쉽게: 대기열 작업이 5분 안에 처리되기 시작해야 한다. *p95 = 가장 오래 걸린 상위 5%를 뺀 95% 기준(드문 예외에 안 휘둘리려는 통계), backlog = 처리 대기 중인 작업량, SLI = 서비스 수준을 재는 지표.*
 - **(보조·발표 앵커) 베이스라인(수작업) 대비 처리량 배수** — overview "모델 140개+" × 목표 기간으로 산출
   - 쉽게: 사람이 직접 할 때 대비 몇 배 빠른가(발표용 효과 수치).
 
 > 위 수치(0.8·20%·5분)는 **"측정 가능한 KPI는 이런 모양이다"를 보여주는 예시값**이며, 실제 합격 기준은 실제 환경에서 측정해 확정한다.
-> 폐기: `시간당 완료 모델 수 ≥ N`(N=placeholder, 테스트 불가) · `자원 활용률 ≥ 70%`(확장성 아닌 cost 지표 + burst headroom 상충 → NQA-C로 이전).
+> 폐기: `시간당 완료 모델 수 ≥ N`(N=placeholder, 테스트 불가) · `자원 활용률 ≥ 70%`(확장성 아닌 cost 지표 + burst headroom 상충 → QA-13로 이전).
 
 ## 근거 / 레퍼런스
 
@@ -74,27 +74,27 @@ updates:
 **무엇이 문제였나 (review 지적)**
 - KPI ① `시간당 완료 모델 수 ≥ N` — `N`이 미정의 placeholder라 acceptance test 작성 불가.
 - KPI ② `자원 활용률 ≥ 70%` — 확장성이 아니라 **cost/효율 지표**의 오용. 70%를 상시 유지하면 피크 흡수용 headroom이 사라져 **가용성과 상충**.
-- 정의 "비례해 확장"이 *무엇이* 비례하는지(throughput/latency/cost) 불명 → QA-07·QA-08과 경계 모호. 진짜 병목은 compute가 아니라 **LLM rate-limit**인데 KPI에 부재.
+- 정의 "비례해 확장"이 *무엇이* 비례하는지(throughput/latency/cost) 불명 → QA-09·QA-10과 경계 모호. 진짜 병목은 compute가 아니라 **LLM rate-limit**인데 KPI에 부재.
 
 **무엇을 바꿨나 (반영)**
 - **정의**: throughput 차원으로 고정 + 1차 병목=LLM rate-limit + backlog 신호 구동 명시.
-- **KPI 교체**: `완료모델 ≥N`·`활용률 ≥70%` 폐기 → `scaling efficiency ≥0.8` + `rate-limit 헤드룸 ≥20%` + `큐 대기 p95 ≤5분`. 활용률은 cost 지표이므로 **NQA-C(Cost)로 이전**.
+- **KPI 교체**: `완료모델 ≥N`·`활용률 ≥70%` 폐기 → `scaling efficiency ≥0.8` + `rate-limit 헤드룸 ≥20%` + `큐 대기 p95 ≤5분`. 활용률은 cost 지표이므로 **QA-13(Cost)로 이전**.
 - 짝 시나리오 `QAS-01`의 Response·Measure도 동일하게 동기화.
 
 **남은 일 (이 라운드에서 미반영)**
 - DP-0001(동적 풀)·DP-0004(타입별 scale-out)가 rate-limit·admission control 차원을 명시 안 함 → DP 역검토 필요 (`open-issues.md` 트래킹 대상).
-- 활용률 KPI 이전은 **NQA-C 신설**이 전제 — 신설 전까지는 잠정 보류.
+- 활용률 KPI 이전은 **QA-13 신설**이 전제 — 신설 전까지는 잠정 보류.
 
 ### 2026-06-24 — round-02 디스커션 반영
 출처: [`discussion/qa/round-02`](../../discussion/qa/round-02/counsel/QA-01-scalability.md) (red team verdict: **Sound ○ / KPI ○ — Low** · High 해소·닫힘 확인)
 
 **무엇이 문제였나 (review 지적)**
-- round-01 KPI 재설계로 High 해소·닫힘. 잔여는 전부 비-verdict: rate-limit 헤드룸 측정단위(전역 vs 큐별) 모호(Low), 활용률 NQA-C 이양 미채택 시 부유(C2), rate-limit headroom·admission control·bounded queue DP 미명시(OI-7).
+- round-01 KPI 재설계로 High 해소·닫힘. 잔여는 전부 비-verdict: rate-limit 헤드룸 측정단위(전역 vs 큐별) 모호(Low), 활용률 QA-13 이양 미채택 시 부유(C2), rate-limit headroom·admission control·bounded queue DP 미명시(OI-7).
 
 **무엇을 바꿨나 (반영)**
-- **Low 보강**: rate-limit 헤드룸의 보장 단위를 명시 — **계정 전역 TPM/RPM 한도 대비** 헤드룸 + 큐별 token-bucket 쿼터 배분. WF별 쿼터 격리는 QA-06이 담당(같은 token-bucket 인프라 공유)임을 cross-link.
+- **Low 보강**: rate-limit 헤드룸의 보장 단위를 명시 — **계정 전역 TPM/RPM 한도 대비** 헤드룸 + 큐별 token-bucket 쿼터 배분. WF별 쿼터 격리는 QA-08이 담당(같은 token-bucket 인프라 공유)임을 cross-link.
 
 **남은 일 (이 라운드에서 미반영)**
-- 활용률 NQA-C 이양은 **NQA-C 정식 채택(OI-8)** 동반 — 미채택 시 부유(C2). 사람 결정.
+- 활용률 QA-13 이양은 **QA-13 정식 채택(OI-8)** 동반 — 미채택 시 부유(C2). 사람 결정.
 - rate-limit headroom·admission control·bounded queue tactic이 DP-0001/0004에 미명시(OI-7) → DP 디스커션 위임. bounded queue 없으면 `큐 p95 ≤5분`이 폭주 시 깨짐.
 - 부하 단위(정규화 동시 WF 수 또는 토큰 처리량)·예시값은 실환경 측정으로 확정.

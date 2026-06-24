@@ -22,6 +22,28 @@
 - 사유: round-02 QA 디스커션(수렴 단계) — actionable [반영]은 QA-03 contention 델타 + Low cross-link뿐. 닫힘 7건(QA-01·02·04·05·06·08·10)은 round-01 반영분 재확인(신규 본문 대수정 없음). NQA-A/B/C 정식 채택·번호 재정렬·예시값 확정은 [이월](OI-8 사람 결정), DP 귀속은 [이월](OI-7 DP 디스커션).
 - 영향 ID: QA-03, QAS-03, QA-01, QA-05, QA-06, QA-10, open-issues(OI-7·OI-8).
 
+## 2026-06-24 — 신규 QA 정식 편입 + 번호 재정렬 (OI-8 닫힘)
+- 변경(정식 채택): round-01 발굴 신규 QA 3종(NQA-A/B/C, 임시 ID)을 **정식 QA로 편입**(팀 결정). 6섹션 본문·짝 QAS는 기존 작성분 유지, ID만 확정.
+- 변경(번호 재정렬) — **우선순위 6·7위 삽입, 기존 06~10 +2 시프트, C는 말미 유지**:
+
+  | 구 ID | → 새 ID | 속성 |
+  |---|---|---|
+  | NQA-A | **QA-06** | Security/Safety |
+  | NQA-B | **QA-07** | Correctness |
+  | QA-06 | QA-08 | Reliability(Workflow) |
+  | QA-07 | QA-09 | Performance(Agent수행시간) |
+  | QA-08 | QA-10 | Performance(E2E) |
+  | QA-09 | QA-11 | Reliability(Agent일관성) |
+  | QA-10 | QA-12 | Maintainability |
+  | NQA-C | **QA-13** | Cost-economy |
+
+  (QA-01~05 불변. 짝 QAS-NN·QAS-A/B/C도 동일 매핑.)
+- 변경(ASR 재선정, DP 생성 동인·팀 판단): ASR = **QA-01~07**(기존 5 + Security·Correctness). 기존 Reliability-WF(→QA-08)·Performance-Agent(→QA-09)는 ASR 제외. `discussion/qa/Contention.md`·discussion 스킬 갱신.
+- 반영: context/qa/ 16파일 리네임 + 전 context(qa·dp·requirements·INDEX·glossary·open-issues) cross-ref 일괄 동기화(경로 링크·frozen discussion 스냅샷은 보존). 각 신규 QA 변경이력 + frontmatter updates. OI-8 [x] 닫힘.
+- 사유: round-02 counsel이 NQA-A/B/C 정식 채택 권장(NQA-B 최우선)했고, 팀이 6·7위 삽입으로 확정. 발표 우선순위 추가 상향(Security를 더 위로)은 팀 논의 후 별도.
+- ⚠️ 위 2026-06-24 round-02 반영 항목 및 `discussion/qa/round-01·02/`(append-only 스냅샷)는 **재번호 이전 번호**로 서술됨 — 현재 번호는 이 매핑표로 환산.
+- 영향 ID: qa/ 전체(QA·QAS 16파일 리네임 + cross-ref), dp/(DP-0001/0002/0004/0005·dp4/*), requirements(FR-0001~0003), INDEX, glossary, open-issues(OI-1·OI-7·OI-8), discussion(qa/README·SKILL·Contention).
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>

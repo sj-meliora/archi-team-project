@@ -1,7 +1,7 @@
 # DP-0002 Agent Hierarchy
 
 > category: DP | status: 결정대기 | source: pptx p.30 | updated: 2026-06-20
-> drives: QA-03(Controllability)↑, QA-02(Availability), QA-08(Performance-E2E), QA-01(Scalability)
+> drives: QA-03(Controllability)↑, QA-02(Availability), QA-10(Performance-E2E), QA-01(Scalability)
 > realizes: FR-0004
 
 ## 결정 포인트
@@ -25,7 +25,7 @@ Agent들을 어떤 위상(topology)으로 구성할 것인가 — **중앙 제�
 - **구조**: 1안 + Orchestrator를 Active-Passive 이중화, 상태 외부화.
 - **근거 tactic**: [Availability] Redundancy(Active-Passive) + Heartbeat + State resync.
 - **의도**: 1안의 Controllability ★★★를 유지하면서 SPOF를 완화.
-- **미검증 trade-off**: 페일오버 중 일관성(QA-09), 대기 인스턴스 자원, 페일오버 시간 vs MTTR<1분(QA-02).
+- **미검증 trade-off**: 페일오버 중 일관성(QA-11), 대기 인스턴스 자원, 페일오버 시간 vs MTTR<1분(QA-02).
 - → 상세 논의: `_backlog.md` BL-1.
 
 ## Trade-off 매트릭스

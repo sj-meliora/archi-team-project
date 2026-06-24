@@ -8,7 +8,7 @@ related-dp: [DP-0001, DP-0003, DP-0005]
 updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
-    reason: "raw 총토큰 8k → 신규/캐시 토큰 분리집계 + compute 효율, top-line은 NQA-C로 승격 (자세히 → ## 변경 이력)"
+    reason: "raw 총토큰 8k → 신규/캐시 토큰 분리집계 + compute 효율, top-line은 QA-13로 승격 (자세히 → ## 변경 이력)"
   - date: 2026-06-24
     by: discussion/qa/round-02
     reason: "닫힘 확인(Med 해소) — 캐시 적중률 보조 KPI 노출(≤6k 합격이 적중률에 좌우, 측정 정직성) Low 보강"
@@ -24,7 +24,7 @@ updates:
 - **raw 토큰이 아니라 비용·캐시 분리로 잰다** — 50k 컨텍스트를 캐시해 비용을 1/10로 줄인 전략이 raw 토큰 지표에선 "나쁨"으로 찍힌다. 빌드 로그·에러 트레이스·config diff를 받는 파이프라인 에이전트는 입력만 8k를 쉽게 넘으므로, "총 토큰 ≤ 8k" 캡은 비현실적이다. **캐시 적중 토큰은 별도 집계**하고, 신규(새로 생성한) 토큰에만 캡을 건다.
 - **토큰 효율 ≠ 전부 — runner compute 효율도 비용이다** — cold start마다 컨텍스트·모델을 다시 로딩하면 낭비다. warm worker 재사용·task 친화도 스케줄링·배칭으로 compute를 아끼고, 이를 토큰비와 합쳐 **task/모델당 총비용**으로 본다. (QA-01에서 빼낸 "자원 활용률"이 사실 이 자리다.)
 
-> 이 QA는 "**요청·task 단위의 효율(per-request)**"을 다룬다 — 비즈니스 top-line인 **`$/완료모델`·수작업 대비 절감률**은 altitude가 달라 **NQA-C(Cost-economy)로 승격**한다(NQA-C 신설 전까지 발표 ROI 수치는 잠정적으로 여기서 참조). 결정당 비용/토큰 측정 데이터는 **QA-04(Observability)**가 공급한다.
+> 이 QA는 "**요청·task 단위의 효율(per-request)**"을 다룬다 — 비즈니스 top-line인 **`$/완료모델`·수작업 대비 절감률**은 altitude가 달라 **QA-13(Cost-economy)로 승격**한다(QA-13 신설 전까지 발표 ROI 수치는 잠정적으로 여기서 참조). 결정당 비용/토큰 측정 데이터는 **QA-04(Observability)**가 공급한다.
 
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `신규 토큰 캡 + 캐시 토큰 분리집계` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
@@ -37,7 +37,7 @@ updates:
   - 쉽게: 캐시에서 값싸게 재사용한 토큰의 비율. 주 KPI(신규 토큰 ≤6k)가 "캐시가 잘 맞았기 때문"인지 "실제로 토큰을 적게 썼기 때문"인지 구분하려면 적중률을 같이 봐야 한다. 적중률이 낮은데도 신규 토큰이 적으면 진짜 효율이고, 적중률에만 의존하면 워크로드 다양성이 커질 때 절감폭이 무너질 수 있다(silent cap). *cache hit-rate = 전체 입력 중 캐시로 재사용된 토큰 비율.*
 - **(보조) worker 가동률 / task당 compute 비용** — runner 효율
   - 쉽게: 일꾼(worker)이 놀지 않고 얼마나 일하는지, task 1건당 컴퓨팅 비용이 얼마인지. 토큰비와 합쳐 총비용으로 본다. *가동률 = 전체 시간 중 실제 일한 시간 비율.*
-- **(이양) 완료 모델당 비용($)** — **→ NQA-C(Cost-economy)로 승격**(본 QA에 남기지 않음)
+- **(이양) 완료 모델당 비용($)** — **→ QA-13(Cost-economy)로 승격**(본 QA에 남기지 않음)
 
 > 위 수치(6k·tier 4~8k)는 **"측정 가능한 KPI는 이런 모양이다"를 보여주는 예시값**이며, 실제 합격 기준은 실제 환경에서 측정해 확정한다.
 > 폐기: 旧 `단일 요청 총 토큰 ≤ 8k`(raw 총토큰 단독) — 입력+출력 여부 미명시 + **prompt caching을 역페널티**(캐시로 비용 1/10인 전략이 "나쁨"으로 찍힘) + 빌드로그·config diff에 비현실. → 신규/캐시 분리집계로 교정.
@@ -50,7 +50,7 @@ updates:
 |---|---|---|
 | **신규/캐시 토큰 분리 집계** | raw token이 아닌 $/task가 옳은 효율 척도. prompt caching은 cache read가 정상가의 ~10%(지연도 대폭↓)라, 신규/캐시 토큰을 분리해야 캐싱 전략이 페널티 받지 않음 | [Anthropic — prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) · [Anthropic — pricing](https://platform.claude.com/docs/en/about-claude/pricing) |
 | **compute 효율(worker 가동률)** | 토큰비와 별개로 worker 가동률·배칭은 SRE/오토스케일 효율 영역 — task/모델당 총비용으로 통합 | [Google SRE Workbook — SLO 구현](https://sre.google/workbook/implementing-slos/) |
-| **top-line $/완료모델은 별 altitude** | 요청당 토큰을 줄여도 요청 수가 폭발하면 무의미 — 비즈니스 효율 top-line은 완료 모델당 비용 → NQA-C로 분리 | round-01 counsel(C5) — NQA-C 신설 |
+| **top-line $/완료모델은 별 altitude** | 요청당 토큰을 줄여도 요청 수가 폭발하면 무의미 — 비즈니스 효율 top-line은 완료 모델당 비용 → QA-13로 분리 | round-01 counsel(C5) — QA-13 신설 |
 
 > ⚠️ 레퍼런스의 수치(캐시 ~10%·8k 등)는 **패턴 정당화용**이며 그대로 복제하지 않는다. 우리 합격선은 위 [검증 전략](#검증-전략)의 실측(A/B)으로 확정한다.
 
@@ -77,25 +77,25 @@ updates:
 - runner compute 효율(worker 가동률 등)을 토큰비와 합쳐 task/모델당 총비용으로 통합 필요.
 
 **무엇을 바꿨나 (반영)**
-- **정의**: 모델 1건 총비용(토큰+compute) 최소화 + 캐싱 페널티 없는 측정으로 재정의. per-request·캐싱 효율 축으로 좁히고 top-line은 NQA-C로 승격 명시.
-- **KPI 교정**: 旧 `총 토큰 ≤8k` 폐기 → ① `신규 토큰 ≤6k + 캐시 토큰 별도 집계(입력+출력 명시)` ② tier(★) 표 유지(복합 노드 캡 완화) ③ `worker 가동률/compute 비용`(QA-01에서 빼낸 "활용률"의 올바른 자리). top-line `$/완료모델`은 **NQA-C로 이양**.
+- **정의**: 모델 1건 총비용(토큰+compute) 최소화 + 캐싱 페널티 없는 측정으로 재정의. per-request·캐싱 효율 축으로 좁히고 top-line은 QA-13로 승격 명시.
+- **KPI 교정**: 旧 `총 토큰 ≤8k` 폐기 → ① `신규 토큰 ≤6k + 캐시 토큰 별도 집계(입력+출력 명시)` ② tier(★) 표 유지(복합 노드 캡 완화) ③ `worker 가동률/compute 비용`(QA-01에서 빼낸 "활용률"의 올바른 자리). top-line `$/완료모델`은 **QA-13로 이양**.
 - `related-dp`에 **DP-0005 추가**(공유 캐시=캐시 토큰 분리집계와 직결).
 - 짝 시나리오 `QAS-05`의 Response·Measure를 신규/캐시 분리·compute 효율로 동기화.
 
 **남은 일 (이 라운드에서 미반영)**
 - **DP-0001(2안 작업별 최적 agent)이 토큰 기준인지 비용 기준인지 역검토** — 비용 기준 정렬 권고 (`open-issues.md` 트래킹 대상).
-- top-line `$/완료모델` 이양은 **NQA-C 신설이 전제** — 신설 전까지 발표 ROI 수치는 잠정 보유.
+- top-line `$/완료모델` 이양은 **QA-13 신설이 전제** — 신설 전까지 발표 ROI 수치는 잠정 보유.
 - 신규 토큰 `6k`·tier 경계·compute 단가는 **예시값**이며 실환경 A/B로 확정.
 
 ### 2026-06-24 — round-02 디스커션 반영
 출처: [`discussion/qa/round-02`](../../discussion/qa/round-02/counsel/QA-05-efficiency.md) (red team verdict: **Sound ○ / KPI ○ — Low** · Med 해소·닫힘 확인)
 
 **무엇이 문제였나 (review 지적)**
-- round-01 캐시 분리집계로 Med 해소·닫힘. 잔여는 비-verdict: `$/완료모델` top-line NQA-C 이양 미채택 시 부유(C2), DP-0001 라우팅 토큰 vs 비용 기준 미명시(OI-7), 캐시 적중률 보조 노출 누락(Low).
+- round-01 캐시 분리집계로 Med 해소·닫힘. 잔여는 비-verdict: `$/완료모델` top-line QA-13 이양 미채택 시 부유(C2), DP-0001 라우팅 토큰 vs 비용 기준 미명시(OI-7), 캐시 적중률 보조 노출 누락(Low).
 
 **무엇을 바꿨나 (반영)**
 - **Low 보강**: **캐시 적중률을 보조 KPI로 노출** — 주 KPI(신규 토큰 ≤6k) 합격이 적중률에 좌우되므로 둘을 함께 봐야 진짜 효율과 캐시 의존을 구분(측정 정직성). 워크로드 다양성 의존은 기존 silent cap과 정합.
 
 **남은 일 (이 라운드에서 미반영)**
-- `$/완료모델` top-line NQA-C 이양은 **NQA-C 정식 채택(OI-8)** 동반 — 미채택 시 부유(C2·QA-01 활용률과 동일 구조). 사람 결정.
+- `$/완료모델` top-line QA-13 이양은 **QA-13 정식 채택(OI-8)** 동반 — 미채택 시 부유(C2·QA-01 활용률과 동일 구조). 사람 결정.
 - DP-0001 2안 라우팅을 비용 기준 정렬로 명시(현재 토큰/비용 기준 미명시, OI-7) → DP 디스커션 위임.

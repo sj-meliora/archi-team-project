@@ -1,6 +1,6 @@
-# QAS-06 Workflow 독립성 시나리오
+# QAS-08 Workflow 독립성 시나리오
 
-> category: QAS | refines: QA-06 (Reliability-Workflow) | updated: 2026-06-24
+> category: QAS | refines: QA-08 (Reliability-Workflow) | updated: 2026-06-24
 
 | 요소 | 내용 |
 |---|---|
@@ -13,5 +13,5 @@
 
 ## 비고
 - 설계 연결: DP-0004(A5/A8 invocation·단계 bulkhead), DP-0005(1안 로컬 캐시=오염 격리 / 2안 공유 캐시=무효화·읽기전용 계층화 필요).
-- 수치(1%·10%·0건)는 합격선 — ①②는 기존 건강 KPI 유지, ③④ 임계는 실환경 측정으로 확정. 상세는 QA-06 본문.
-- 경계: QA-02(복구)↔QA-06(격리) 분리. 쿼터 격리는 QA-01(rate-limit 헤드룸)과 공유 인프라.
+- 수치(1%·10%·0건)는 합격선 — ①②는 기존 건강 KPI 유지, ③④ 임계는 실환경 측정으로 확정. 상세는 QA-08 본문.
+- 경계: QA-02(복구)↔QA-08(격리) 분리. 쿼터 격리는 QA-01(rate-limit 헤드룸)과 공유 인프라.

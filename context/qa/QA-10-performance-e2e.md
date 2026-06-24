@@ -1,5 +1,5 @@
 ---
-id: QA-08
+id: QA-10
 category: QA
 importance: M
 difficulty: M
@@ -10,9 +10,12 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
     reason: "정의(E2E)↔KPI(전달5%) 불일치 복구 → E2E latency p50/p95·throughput 추가, 전달5%는 하위로 강등 (자세히 → ## 변경 이력)"
+  - date: 2026-06-24
+    by: 팀 결정 (OI-8)
+    reason: "재번호 QA-08 → QA-10 (NQA 정식 편입에 따른 +2 시프트, → changelog)"
 ---
 
-# QA-08 Performance — E2E 개발 시간
+# QA-10 Performance — E2E 개발 시간
 
 ## 정의 / Refinement
 모델 1건의 **E2E(처음부터 끝까지) 응답 시간·처리량 목표**를 충족한다. E2E 시간은 단계 compute + agent 루프 + 큐 대기 + 단계 간 handoff(artifact 전달)의 합이며, 이 중 **artifact 전달**은 overview의 "20GB 수동 공유 Loss" pain을 정조준한 하위 목표다(전부가 아니라 한 요소).
@@ -22,7 +25,7 @@ updates:
 - **이름이 약속한 E2E를 실제로 측정한다** — 기존 KPI는 정의(E2E 광의)와 달리 "artifact 전달 5%"(협의 하위지표) 하나뿐이라, **이름이 가리키는 것과 측정하는 것이 달랐다**. 진짜 top-line인 **모델당 E2E latency(p50/p95)·throughput**을 측정하고, 전달 5%는 그 하위 항목으로 둔다.
 - **handoff는 data-plane 설계 문제다** — 20GB를 노드마다 복사하지 말고 **오브젝트 스토어/로컬 볼륨에 두고 참조(포인터)로 전달**하며, 의존 단계는 data locality로 co-location한다. 이것이 "전달 오버헤드 5%"를 실제로 달성하는 아키텍처(DP-0004 A5 claim-check / A8 로컬, DP-0005 공유 캐시와 직결).
 
-> 이 QA는 "**모델 1건의 E2E 소요시간·전달 효율**"을 다룬다 — 노드 1건 속도는 QA-07, 단위 시간당 처리량(throughput)은 QA-01과 공유 축이다(Performance 3분할: QA-01 throughput / QA-07 per-node / QA-08 E2E). throughput KPI는 QA-01과 정렬해 중복을 피한다.
+> 이 QA는 "**모델 1건의 E2E 소요시간·전달 효율**"을 다룬다 — 노드 1건 속도는 QA-09, 단위 시간당 처리량(throughput)은 QA-01과 공유 축이다(Performance 3분할: QA-01 throughput / QA-09 per-node / QA-10 E2E). throughput KPI는 QA-01과 정렬해 중복을 피한다.
 
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `모델당 E2E latency(p50/p95)` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
@@ -75,9 +78,9 @@ updates:
 - E2E는 단계 compute + agent 루프 + 큐 대기가 지배 — artifact 전달은 한 요소일 뿐.
 
 **무엇을 바꿨나 (반영)**
-- **정의**: 이름·정의(E2E 광의) 유지 + handoff가 data-plane 설계 문제임을 명시. Performance 3분할 altitude로 QA-01(throughput)·QA-07(per-node)과 경계.
+- **정의**: 이름·정의(E2E 광의) 유지 + handoff가 data-plane 설계 문제임을 명시. Performance 3분할 altitude로 QA-01(throughput)·QA-09(per-node)과 경계.
 - **KPI 정렬**: 旧 `전달 5%` 단독 → ① `E2E latency/모델 ≤6시간(p50/p95)`(top-line) ② `throughput ≥50모델/일`(QA-01 정렬) ③ 전달 5%는 **하위 항목으로 강등** ④ `전달 성공률·무결성 100%`(신뢰성 보존).
-- 짝 시나리오 `QAS-08`의 대상·Response·Measure를 E2E latency·throughput·전달 무결성으로 동기화.
+- 짝 시나리오 `QAS-10`의 대상·Response·Measure를 E2E latency·throughput·전달 무결성으로 동기화.
 
 **남은 일 (이 라운드에서 미반영)**
 - **importance 상향 여지** — E2E top-line은 발표 가치 지표라 현재 M에서 상향 검토 가능(사람 결정).

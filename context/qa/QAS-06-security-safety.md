@@ -1,6 +1,6 @@
-# QAS-A 자율 에이전트 보안·안전 시나리오
+# QAS-06 자율 에이전트 보안·안전 시나리오
 
-> category: QAS | refines: NQA-A (Security/Safety) | source: discussion/qa/round-01 (신규) | updated: 2026-06-24
+> category: QAS | refines: QA-06 (Security/Safety) | source: discussion/qa/round-01 (신규) | updated: 2026-06-24
 > ISO/IEC 25010:2023: Security (+ Safety)
 
 ## 6-Part Quality Attribute Scenario
@@ -14,7 +14,7 @@
 | **응답 측정 (Measure)** | 권한 상승·범위 외 배포 **0건**(적대적 eval), HITL 통과율 **100%·우회 0**, artifact 서명·무결성 **100%**, prompt-injection 차단율 **≥95%**, secrets 노출(로그·trace) **0건** |
 
 ## 비고
-- ISO/IEC 25010:2023 Security(기밀성·무결성·부인방지·책임추적성·인증성) + Safety. 상세 매핑은 NQA-A 본문.
+- ISO/IEC 25010:2023 Security(기밀성·무결성·부인방지·책임추적성·인증성) + Safety. 상세 매핑은 QA-06 본문.
 - 설계 연결: DP-0003(1안 사전 권한 게이트 + 2안 격리), DP-0002(1안 HITL gate). 검증은 QA-03 PoC-C2와 공유 red-team 하네스([발표 서사]).
-- 경계: Controllability(QA-03) ⊂ Security(NQA-A). 감사 trace 100%는 QA-04와 교차.
+- 경계: Controllability(QA-03) ⊂ Security(QA-06). 감사 trace 100%는 QA-04와 교차.
 - 수치(0건·100%·95%)는 측정가능 KPI 예시값 — injection 차단율 등은 red-team 세트로 확정.

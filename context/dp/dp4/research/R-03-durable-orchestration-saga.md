@@ -20,7 +20,7 @@
 
 ## DP-0004에의 함의
 - 1·2안·A3·A5는 "노드를 어디서/어떻게 분배·실행하나"에 집중 → **A6는 "실행 상태가 죽지 않고 복구되나"** 를 구조적으로 보장.
-- FR-0001의 "노드 단위 재시도·복구"를 엔진 차원에서 1급으로 제공, 실패 노드만 보상·재실행 → QA-06(타 Workflow 무영향) 직접 강화.
+- FR-0001의 "노드 단위 재시도·복구"를 엔진 차원에서 1급으로 제공, 실패 노드만 보상·재실행 → QA-08(타 Workflow 무영향) 직접 강화.
 - ⚠️ 단 Orchestration 중심이라 **DP-0002(Agent Hierarchy)의 오케스트레이터 병목/SPOF 논의(TP-2)** 와 정합 필요. event sourcing이 SPOF를 완화하나 중앙 이벤트 스토어가 확장 한계점이 될 수 있음.
 
 → 도출 대안: **[A6] Durable Orchestration (Event-Sourced Workflow Engine)**.

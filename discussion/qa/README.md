@@ -3,7 +3,9 @@
 > `context/qa/`의 QA·KPI를 **반복 심의(라운드)**하며 완성도를 끌어올리는 작업의 색인.
 > 한 라운드 = red team 비평(review) + blue team 권고(counsel)의 한 묶음.
 > 공통 프로토콜·다른 영역(DP 등)은 상위 [`../README.md`](../README.md). 트리거: "QA 디스커션 돌리자".
-> updated: 2026-06-24 (round-02 review + counsel 완료)
+> updated: 2026-06-24 (round-02 완료 + OI-8 닫힘·QA 재번호)
+>
+> ⚠️ **2026-06-24 QA 재번호(OI-8 닫힘)**: 신규 QA 정식 편입 — `NQA-A→QA-06`(Security)·`NQA-B→QA-07`(Correctness) 6·7위 삽입, 기존 **QA-06~10 → QA-08~12**(+2), `NQA-C→QA-13`(Cost). **ASR = QA-01~07.** 아래 라운드 이력·verdict 추세표의 번호는 **각 라운드 당시(구 번호)** 기준이다 — 현재 번호 환산은 이 매핑 또는 `context/changelog.md`. (round-NN 폴더는 append-only라 미수정.)
 
 ## 관리 체계
 
@@ -52,6 +54,6 @@
 
 | 후보 | 제안 라운드 | round-01 counsel stance | round-02 review verdict | **round-02 counsel stance** | 상태 |
 |---|---|---|---|---|---|
-| NQA-A Security/Safety | round-01 | 신설·**강력권장** (우선순위 상위) | **○ / △ · Med** — 정식화 권장(ISO Security 앵커); KPI 4/5축 [발표 서사] | **정식 채택 권장(상위 진입)** — red-team 4축 실측 전환 + **QA-03 ② 공유 하네스 동반 닫힘**(C3); 보안 tactic DP 위임 | **반영(신설, 임시 ID)** — 정식 채택·번호 재정렬 OI-8 대기 |
-| NQA-B Correctness/Accuracy | round-01 | 신설·**권장** (QA-07/09 게이트 전제) | **○ / △ · High** — **세트 닫힘 병목**(QA-07·QA-09 ②-2 닫힘이 NQA-B 채택에 달림); eval/검증 DP 부재(OI-7) | **정식 채택 강력 권장(최우선)** — golden+judge 실측 전환 + judge↔인간 일치도 SLI 신설 → **QA-07·QA-09 ②-2 동반 닫힘 단일 트리거** | **반영(신설, 임시 ID)** — 정식 채택 OI-8 대기(최우선) |
-| NQA-C Cost-economy | round-01 | 신설·권장 (Med, QA-05/01 KPI 흡수) | **○ / △ · Med** — 정식화 권장; **미채택 시 QA-01/05 KPI 부유**(채택이 이양 닫힘 트리거) | **정식 채택 권장(Med)** — $/완료모델 분해 + baseline 가정 슬라이드 명시 → **QA-01 활용률·QA-05 top-line 부유 해소**(C2) | **반영(신설, 임시 ID)** — 정식 채택 OI-8 대기 |
+| NQA-A Security/Safety | round-01 | 신설·**강력권장** (우선순위 상위) | **○ / △ · Med** — 정식화 권장(ISO Security 앵커); KPI 4/5축 [발표 서사] | **정식 채택 권장(상위 진입)** — red-team 4축 실측 전환 + **QA-03 ② 공유 하네스 동반 닫힘**(C3); 보안 tactic DP 위임 | **정식 채택 → QA-06** (2026-06-24, OI-8 닫힘) |
+| NQA-B Correctness/Accuracy | round-01 | 신설·**권장** (QA-07/09 게이트 전제) | **○ / △ · High** — **세트 닫힘 병목**(QA-07·QA-09 ②-2 닫힘이 NQA-B 채택에 달림); eval/검증 DP 부재(OI-7) | **정식 채택 강력 권장(최우선)** — golden+judge 실측 전환 + judge↔인간 일치도 SLI 신설 → **QA-07·QA-09 ②-2 동반 닫힘 단일 트리거** | **정식 채택 → QA-07** (2026-06-24, OI-8 닫힘) |
+| NQA-C Cost-economy | round-01 | 신설·권장 (Med, QA-05/01 KPI 흡수) | **○ / △ · Med** — 정식화 권장; **미채택 시 QA-01/05 KPI 부유**(채택이 이양 닫힘 트리거) | **정식 채택 권장(Med)** — $/완료모델 분해 + baseline 가정 슬라이드 명시 → **QA-01 활용률·QA-05 top-line 부유 해소**(C2) | **정식 채택 → QA-13** (2026-06-24, OI-8 닫힘) |
