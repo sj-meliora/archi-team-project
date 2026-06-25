@@ -105,6 +105,38 @@ DP는 고립된 섬이 아니다. 각 DP는 다른 DP와의 관계를 본문에 
 
 ---
 
+## D. DP 산출물 계약 — 슬라이드 1장으로 수렴
+
+> 모든 DP는 최종적으로 **16:9 슬라이드 1장(많아야 2장)** 으로 표현된다(claude.ai/design 입력). 따라서 Council이 내는 DP 문서·산출물은 **처음부터 슬라이드-ready**로 구조화하고, 상세는 Appendix로 분리한다.
+
+### D.1 산출물 3종
+1. **대안별 SVG 도안** — 각 후보 대안의 구조/특징을 *한눈에*. **seats 1·3(도메인 전문가)이 WebSearch로 표준 아키텍처 다이어그램 관례**(orchestrator-workers · choreography/event-driven · active-passive failover · pipes-and-filters 등)를 참조해 그린다. 위치: DP를 **폴더로 승격**해 `context/dp/DP-0X/diagrams/<대안>.svg`.
+2. **대안 × ASR 통합 매트릭스** — 행=대안, 열=ASR, 셀=`★등급 (+ S/T/R/N)`. trade-off(별점·정도)와 traceability(ATAM 성격)를 **한 격자에 통합**. **선택안의 행이 세트 Traceability Matrix(Reviewer §5)로 graduate.**
+3. **슬라이드 요약 + Appendix** — 문서를 두 층으로(아래 D.3).
+
+### D.2 슬라이드 레이아웃 (대안별 column)
+슬라이드는 **대안마다 한 column**, 각 column은 위→아래로:
+- (a) **상단**: 그 대안의 **도안(SVG)**
+- (b) **중단**: **간단한 설명**(1–2줄)
+- (c) **하단**: 그 대안의 **별점**(행=ASR, *그 대안 column*의 ★) — 별점표는 **각 대안 column 하단에 정렬**(전체로 읽으면 행=ASR·열=대안).
+- + **권고 1줄**(선택안·드라이버).
+
+### D.3 문서 구조 (slide-ready)
+```
+context/dp/DP-0X/
+├── DP-0X-<slug>.md
+│   ├─ ## 용어 (비자명 표현)    ← 독자용 선행 설명(슬라이드 본문 아님)
+│   ├─ ## 슬라이드 요약 (1장)   ← 대안 column(도안+설명+별점) + 권고. 슬라이드 소스.
+│   └─ ## Appendix             ← 결정 드라이버 · 대안 전문 · 대안×ASR(★+S/T/R/N)
+│                                 · ATAM(SP/TP/R/N) · 대안 고도화(§C) · Cohesion(§B) · 별점 앵커 근거
+└── diagrams/ <대안>.svg
+```
+- **용어 먼저**: 비자명 용어(orchestration·choreography·SPOF·failover 등)는 슬라이드 요약 앞 `## 용어`에 한 줄씩(읽는 법·비유 포함) — 발표 청중·팀원 가독성. 슬라이드 본문이 아니라 독자용 선행 설명.
+- **슬라이드 요약은 Appendix와 모순 없어야**(coherence §B.2) — 요약의 별점·권고는 Appendix 근거에서 도출.
+- **1장 수렴이 원칙**; 2장은 대안 수·도안 복잡도가 클 때만 예외.
+
+---
+
 ## 1. 입력 (권고 전 반드시 읽을 것)
 
 - **해당 라운드 `round-NN/review/` 전체** — `report.md`(Traceability Matrix·orphan ASR·red 결론), `DP-0X-*.md`(렌즈별 지적·Stage 2 권고), `_new-dp-candidates.md`. **Reviewer 의견을 빠짐없이 읽는 것이 1번 의무.** (자문 모드면 해당 DP 원본 + 관련 review만.)
