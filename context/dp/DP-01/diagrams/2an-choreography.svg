@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" font-family="'Segoe UI',Roboto,sans-serif">
+  <defs>
+    <marker id="arr2" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#475569"/></marker>
+    <marker id="arrB" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2563eb"/></marker>
+  </defs>
+  <text x="240" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">2안 · 무오케 — Choreography + 엔진</text>
+
+  <!-- stages -->
+  <g font-size="11" font-weight="600" fill="#0f172a">
+    <rect x="20"  y="70" width="86" height="44" rx="7" fill="#dbeafe" stroke="#60a5fa"/><text x="63"  y="97" text-anchor="middle">IR Conv.</text>
+    <rect x="134" y="70" width="86" height="44" rx="7" fill="#dbeafe" stroke="#60a5fa"/><text x="177" y="97" text-anchor="middle">Graph Opt.</text>
+    <rect x="248" y="70" width="86" height="44" rx="7" fill="#dbeafe" stroke="#60a5fa"/><text x="291" y="97" text-anchor="middle">Quantizer</text>
+    <rect x="372" y="70" width="84" height="44" rx="7" fill="#dbeafe" stroke="#60a5fa"/><text x="414" y="97" text-anchor="middle">Compiler</text>
+  </g>
+
+  <!-- event/queue arrows between stages -->
+  <g stroke="#475569" stroke-width="1.6" marker-end="url(#arr2)" fill="none">
+    <line x1="106" y1="92" x2="134" y2="92"/>
+    <line x1="220" y1="92" x2="248" y2="92"/>
+    <line x1="334" y1="92" x2="372" y2="92"/>
+  </g>
+  <g font-size="8.5" fill="#64748b" text-anchor="middle">
+    <text x="120" y="86">evt</text><text x="234" y="86">evt</text><text x="353" y="86">evt</text>
+  </g>
+
+  <!-- gate (judge) after Quantizer + bounded loopback to Optimizer -->
+  <path d="M291 114 l14 14 l-14 14 l-14 -14 z" fill="#fde68a" stroke="#d97706"/>
+  <text x="291" y="132" text-anchor="middle" font-size="8" font-weight="700" fill="#92400e">gate</text>
+  <path d="M291 142 C 291 175, 177 175, 177 116" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)" stroke-dasharray="4 3"/>
+  <text x="234" y="172" text-anchor="middle" font-size="9" fill="#2563eb">bounded 회귀 (재최적화)</text>
+
+  <!-- workflow engine band -->
+  <rect x="20" y="214" width="436" height="44" rx="8" fill="#1e293b"/>
+  <text x="238" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#ffffff">Workflow Engine · durable execution</text>
+  <text x="238" y="250" text-anchor="middle" font-size="9.5" fill="#cbd5e1">순서 · 재시도 · 복구 · 순환 그래프 (중앙 감독자 없음)</text>
+  <g stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3 3">
+    <line x1="63" y1="114" x2="63" y2="214"/><line x1="177" y1="146" x2="177" y2="214"/>
+    <line x1="291" y1="142" x2="291" y2="214"/><line x1="414" y1="114" x2="414" y2="214"/>
+  </g>
+
+  <text x="240" y="195" text-anchor="middle" font-size="10" font-weight="700" fill="#16a34a">● SPOF 없음 · 직접 전달</text>
+</svg>
