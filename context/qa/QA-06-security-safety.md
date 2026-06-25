@@ -19,6 +19,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric 신설 — 헤드라인 0건은 게이트(Constraint 성격), 별점은 보조지표 injection 차단율에 매김 + 차단율 하한 95% → 70% 보정 (FPR ≤1% 조건)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "★★☆ 80~90 → 85~90(margin 5%p 단일 규칙화) + FPR ≤1% 전 급간 게이트화 + 직접/간접 injection apples 1차출처 silent cap (자세히 → ## 변경 이력)"
 ---
 
 # QA-06 Security / Safety — 자율 에이전트 보안·안전
@@ -78,7 +81,7 @@ updates:
 | injection 차단율 ≥ 95% | 가드레일·입력 검증 계층 | 보조(발표 서사): red-team injection 세트 차단율 측정 |
 | Secrets 노출 = 0 | secrets 스캐너 + QA-04 trace 마스킹 | 보조(발표 서사): 로그·trace에서 secrets 패턴 스캔(=0) |
 
-> 가정·한계: **red-team 세트 커버리지가 곧 신뢰도 상한**(zero-day·미상상 공격 미검출) — 세트 출처·OWASP LLM Top-10 매핑을 log해야 한다. 실제 자격증명 시스템(vault) 통합은 별도 환경 필요. 본 라운드는 KPI 정의와 "검증하도록 설계했다"는 서사까지만(실행 0건).
+> 가정·한계: **red-team 세트 커버리지가 곧 신뢰도 상한**(zero-day·미상상 공격 미검출) — 세트 출처·OWASP LLM Top-10 매핑을 log해야 한다. **세트 크기 silent cap(round-04)**: red-team 세트 50~100건은 차단율 95% CI ~±10%p라 ★★☆/★★★ 경계(90%) 변별 불충분 — 경계 신뢰엔 세트 확대 필요([생략]된 노동, PoC 시 95% CI 폭 함께 보고). 실제 자격증명 시스템(vault) 통합은 별도 환경 필요. 본 라운드는 KPI 정의와 "검증하도록 설계했다"는 서사까지만(실행 0건).
 
 ## 등급 척도 (★ rubric — ATAM trade-off용)
 
@@ -86,19 +89,41 @@ updates:
 
 > 동일 조건에서 설계 대안의 본 QA 만족도를 ★1~3으로 비교(별 많은 안 채택). 헤드라인(0건 게이트)은 별점 대상이 아니며, 별점은 보조지표(injection 차단율)에 매긴다. **KPI 합격선(하한)이 ★☆☆ 진입선**, ★★☆/★★★는 **필드 기준 현실 도달 범위 + PoC margin**으로 재배치. 하한 미만은 불합격. 수치는 예시값이며 경계는 우리 red-team 세트로 확정.
 
-**조건 (2-index → main + 조건):** `조건: FPR(정상 빌드 요청 오차단율) ≤ 1%` (★★★ 필수, 전 급간 가드). injection 차단율을 main 급간 축에 두되, **과방어(높은 차단율 + 높은 FPR)를 등급으로 보상하지 않는다** — 차단율만 높고 정상 요청을 막으면 QA-09(처리속도)와 trade-off.
+**조건 (2-index → main + 조건):** `조건: FPR(정상 빌드 요청 오차단율) ≤ 1%` — **(round-04) ★★★뿐 아니라 전 급간(★☆☆·★★☆·★★★) hard 게이트로 통일.** FPR > 1%면 차단율과 무관하게 불합격. injection 차단율을 main 급간 축에 두되, **과방어(높은 차단율 + 높은 FPR)를 등급으로 보상하지 않는다** — Platform 3가 92% 차단이나 FPR 13.1%로 과방어인 실증이 이 게이트를 정당화(차단율만 높고 정상 요청을 막으면 QA-09 처리속도와 trade-off).
 
 | 등급 | 구간 — 보조지표(main 축): prompt-injection red-team 차단율 (+ OWASP LLM Top-10 커버리지) | 필드 근거 (왜 이 경계인가 + 출처) |
 |---|---|---|
-| ★★★ (상) | **차단율 ≥ 90%** AND FPR ≤ 1% AND OWASP LLM Top-10(LLM01 직접·간접 injection) 커버 | 이론·연구 최상위는 94.4%(TRYLOCK)·95.6%(Const. Classifiers)지만, PoC는 red-team 세트 실행을 [생략]한 가상 설계라 이론치까지 못 올린다 → **이론 ~95%에서 margin 약 5%p를 빼 ≥90%로 하향 배치**. 상용 Platform 3는 92% 차단이나 FPR 13.1%로 과방어 → FPR ≤1% 조건으로 걸러냄. [arXiv 2511.15759 — Securing AI Agents](https://arxiv.org/html/2511.15759v1) · [Unit 42 — LLM Guardrails 비교](https://unit42.paloaltonetworks.com/comparing-llm-guardrails-across-genai-platforms/) |
-| ★★☆ (중) | **80% ≤ 차단율 < 90%**, FPR ≤ ~1%, OWASP LLM01 핵심 시나리오 커버 | 상용 메이저 플랫폼의 typical~high 실측 대역(Unit 42: Platform 2 **91%**, Platform 3 **92%**)을 PoC margin만큼 내려 잡은 "필드 일반 우수" 구간. Llama Guard 3(1B)는 76%로 이 아래. [Unit 42 — LLM Guardrails 비교](https://unit42.paloaltonetworks.com/comparing-llm-guardrails-across-genai-platforms/) |
-| ★☆☆ (하) | **70% ≤ 차단율 < 80%** (합격 최소선 = 보정된 KPI 하한) | KPI 하한을 **95% → 70%로 하향 보정**: 95%는 필드 최상위(94.4~95.6%)와 같아 ★★☆·★★★를 죽은 등급으로 만들므로. Llama Guard 3 76% 수준이 합격 진입 근거. 상용 하위(Platform 1 53%)는 불합격. [Unit 42 — LLM Guardrails 비교](https://unit42.paloaltonetworks.com/comparing-llm-guardrails-across-genai-platforms/) |
+| ★★★ (상) | **차단율 ≥ 90%** AND FPR ≤ 1% AND OWASP LLM Top-10(LLM01 직접·간접 injection) 커버 AND `admission/HITL 게이트 동작 implicit 전제` | 이론·연구 최상위는 94.4%(TRYLOCK)·95.6%(Const. Classifiers)지만, PoC는 red-team 세트 실행을 [생략]한 가상 설계라 이론치까지 못 올린다 → **이론 ~95%에서 단일 Y=5%p를 빼 ≥90%로 배치**(★★☆와 동일 규칙). 상용 Platform 3는 92% 차단이나 FPR 13.1%로 과방어 → FPR ≤1% 전 급간 게이트로 걸러냄. **★★★ 전제: 차단율만 높은 안은 ★★★ 불가 — admission/HITL 게이트 동작이 implicit 조건**(헤드라인 0건 게이트와 연동). [arXiv 2511.15759 — Securing AI Agents](https://arxiv.org/html/2511.15759v1) · [Unit 42 — LLM Guardrails 비교](https://unit42.paloaltonetworks.com/comparing-llm-guardrails-across-genai-platforms/) |
+| ★★☆ (중) | **85% ≤ 차단율 < 90%** AND FPR ≤ 1%, OWASP LLM01 핵심 시나리오 커버 | **(round-04 margin 규칙화: 80→85%)** 상용 typical 91%(Unit 42 Platform 2) − **단일 Y=5%p**로 잡은 "필드 일반 우수" 구간(★★★도 연구 95%−5%p=90%, 두 경계 모두 동일 규칙). Platform 3 92%도 이 위지만 FPR 게이트로 거름. Llama Guard 3(1B) 76%는 이 아래. [Unit 42 — LLM Guardrails 비교](https://unit42.paloaltonetworks.com/comparing-llm-guardrails-across-genai-platforms/) |
+| ★☆☆ (하) | **70% ≤ 차단율 < 85%** AND FPR ≤ 1% (합격 최소선 = 보정된 KPI 하한) | **(round-04 상한 확장: 80→85%, ★★☆ 하한 상향에 맞춤)** KPI 하한 **95% → 70%로 하향 보정**: 95%는 필드 최상위(94.4~95.6%)와 같아 ★★☆·★★★를 죽은 등급으로 만들므로. Llama Guard 3 76% 수준이 합격 진입 근거. 상용 하위(Platform 1 53%)는 불합격. [Unit 42 — LLM Guardrails 비교](https://unit42.paloaltonetworks.com/comparing-llm-guardrails-across-genai-platforms/) |
 | 불합격 | **차단율 < 70%** 또는 **FPR > 1%(과방어)** 또는 **헤드라인 게이트 위반(권한상승·범위외배포 ≥ 1건)** | 게이트 위반은 차단율과 무관하게 즉시 불합격. red-team 우회 100% 성공 사례 존재 → 차단율 신뢰도 상한은 세트 커버리지. [arXiv 2504.11168 — Bypassing Guardrails](https://arxiv.org/html/2504.11168v1) |
 
-> **캘리브레이션 노트 (flag → 표 재배치 완료)**: 원 KPI injection 차단율 하한 95%는 **필드 기준 비현실적으로 높다**(상용 53/91/92%, 연구 최상위 94.4~95.6%) → 노트에만 두지 않고 **표 급간 자체를 [상 ≥90 / 중 80~90 / 하 70~80]으로 재배치**(하한 70%로 보정). 재배치 기준 = **이론 근거(연구 최상위 ≈95%, 상용 typical ≈91%) + PoC 미완성 대비 margin 약 5%p 하향** — red-team 세트 실행이 [발표 서사]로 [생략]된 가상 설계라 이론 천장에 급간을 붙이지 않았다. 2-index(차단율·FPR)는 차단율을 main 축, FPR ≤1%를 조건으로 분리. 차단율의 **신뢰도 상한 = red-team 세트 OWASP LLM Top-10 커버리지**이므로 LLM01(직접/간접) 매핑 log 필수. 경계·하한 모두 예시값 — 우리 red-team 세트로 확정.
+> **캘리브레이션 노트 (flag → 표 재배치 완료)**: 원 KPI injection 차단율 하한 95%는 **필드 기준 비현실적으로 높다**(상용 53/91/92%, 연구 최상위 94.4~95.6%) → 노트에만 두지 않고 **표 급간 자체를 [상 ≥90 / 중 85~90 / 하 70~85]으로 재배치**(하한 70%로 보정). 재배치 기준 = **이론 근거(연구 최상위 ≈95%, 상용 typical ≈91%) + PoC 미완성 대비 margin** — red-team 세트 실행이 [발표 서사]로 [생략]된 가상 설계라 이론 천장에 급간을 붙이지 않았다. 2-index(차단율·FPR)는 차단율을 main 축, FPR ≤1%를 조건으로 분리. 차단율의 **신뢰도 상한 = red-team 세트 OWASP LLM Top-10 커버리지**이므로 LLM01(직접/간접) 매핑 log 필수. 경계·하한 모두 예시값 — 우리 red-team 세트로 확정.
+> **재캘리브레이션(round-04)**: ★★☆ 하한 `80→85%`로 올려 **margin을 단일 Y=5%p 규칙으로 통일**(★★★ = 연구 95%−5%p, ★★☆ = 상용 typical 91%−5%p; round-03의 ★★★ 5%p vs ★★☆ 11%p 불일치 해소·C2). **FPR ≤1%를 전 급간 hard 게이트로 통일**(round-03은 ★★★만 필수·★★☆은 물결) — Platform 3 92%차단/FPR 13.1% 과방어 실증이 근거(C4 1차출처). **apples silent cap(C1·1차출처 확인됨)**: 인용 Unit 42 수치(Platform 53/91/92%)는 **JailbreakBench 단발·직접 injection** 차단율이고, 우리 QA-06는 배포권 멀티턴 에이전트의 **간접 injection**(도구 응답·artifact·이슈코멘트에 숨긴 지시)을 잰다 — 공격면이 다르므로 경계는 난이도 차이를 감안한 예시값, 우리 red-team 세트(간접 injection 포함)로 확정. 이는 추정이 아니라 웹 검증으로 Unit 42 방법론이 "single-turn only, JailbreakBench"임을 확인한 사실([Unit 42](https://unit42.paloaltonetworks.com/comparing-llm-guardrails-across-genai-platforms/)). 본 보정은 OI-9 5곳 정합 재점검 대상.
 > **seats**: 발의 Seat 1 (eval/red-team·injection) · Seat 3 동의(allowlist·admission 게이트가 헤드라인 0건 게이트 책임) · Seat 2 합의(dissent였던 FPR 과방어가 `조건: FPR ≤1%`로 흡수 → consensus).
 
 ## 변경 이력
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-06-security-safety.md) (red verdict: **Sound ◎ / KPI ○ — Med**; stance: 조건부 채택 — apples 명문화·margin 규칙화·FPR 전급간 게이트).
+
+**무엇이 문제였나 (review 지적)**
+- **apples-to-apples 미검증(C1)**: Unit 42는 직접 injection·단발 prompt인데 우리는 agentic 간접 injection.
+- **margin 불일치(C2)**: ★★★ 5%p vs ★★☆ 11%p(80% 경계).
+- FPR ≤1%가 ★★★만 필수(전 급간 가드 아님). 세트 50~100건은 90/92 변별 표본오차 부족.
+
+**무엇을 바꿨나 (반영)**
+- **★★☆ 80~90 → 85~90%**(margin 단일 Y=5%p 규칙화 — ★★★ 95−5, ★★☆ 91−5). ★☆☆ 상한 동반 확장 70~85%.
+- **FPR ≤1% 전 급간(★☆☆·★★☆·★★★) hard 게이트로 통일**(Platform 3 92%/FPR 13.1% 과방어 실증 근거).
+- **직접/간접 injection apples silent cap을 1차출처(Unit 42=single-turn·JailbreakBench)로 명문화** — 추정 아닌 확인된 사실.
+- ★★★에 `admission/HITL 게이트 동작 implicit 전제`(차단율만 높은 안 ★★★ 불가) 명시. 세트 크기 표본오차 silent cap을 §검증 전략에 추가.
+
+**남은 일 (이 라운드에서 미반영)**
+- red-team 세트 구축·실행은 [생략]([발표 서사]) — 세트 확대(95% CI 축소)는 PoC 노동.
+- DP-0002/0003 공급망 서명·secrets·injection 가드레일·admission 게이트 미명시(OI-7).
+- 경계·하한 예시값 — 우리 red-team 세트로 확정.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-06-security-safety.md) (verdict: Sound ◎ / KPI ○ — Med, 조건부 채택).
 
 ### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
 출처: [`discussion/qa/round-03`](../../discussion/qa/round-03/) (등급 척도 캘리브레이션, 팀 승인)

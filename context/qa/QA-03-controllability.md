@@ -15,6 +15,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric 추가 — main 축=graceful stop+롤백 시간(역방향), ack≤5초·HITL100·runaway100·②-1은 게이트. KPI 합격선 ≤30초 → ★★☆ 흡수·★☆☆=>30초+hard-kill 폴백 재배치(규칙2) (자세히 → ## 변경 이력)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "★★★ 15초 근거 다양화(k8s grace 이등분+폴링 밀도 촘촘 가정·non-k8s Temporal heartbeat 15~20초 병기) + 롤백 외부 정합성을 별도 변수로 표에 한 줄 — 급간 수치 불변 (자세히 → ## 변경 이력)"
 ---
 
 # QA-03 Controllability — Agent 제어 용이성
@@ -85,8 +88,9 @@ Agent는 **최소권한·도구 allowlist(허용된 도구만 호출 가능한 �
 
 | 등급 | 구간 — 주 KPI(main 축): graceful stop + 롤백 완료 시간 (역방향, 낮을수록 상) | 필드 근거 (경계 이유 + URL) |
 |---|---|---|
-| ★★★ (상) | **≤ 15초** | k8s `terminationGracePeriodSeconds` 기본 30초 안에서 LB 드레인(5초)·in-flight 마무리를 빼면 실제 cleanup window는 ~15-25초 — 15초 내 안전 정지+롤백이면 우수 상단. Temporal heartbeat 전파도 aggressive 설정(5초 hb)에서 cancel이 15-20초에 도착하므로 그 하단인 ≤15초는 폴링 밀도를 촘촘히 둔 잘 설계된 control-plane의 도달선. PoC margin 고려해 이론 천장(즉시 전파)에 붙이지 않음. [k8s graceful](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-terminating-with-grace) · [Temporal cancel 전파](https://medium.com/@asakisakamoto02/how-to-cancel-on-heartbeat-timeout-in-temporal-framework-11afb4f9c708) |
+| ★★★ (상) | **≤ 15초** | **(round-04 근거 다양화)** `15초 = k8s grace 기본 30초의 이등분 + 폴링 밀도 촘촘 가정`. 단일 출처(k8s 30초)에서 15초·30초를 둘 다 파생하던 것을 명시하고, **non-k8s control-plane(Temporal heartbeat cancel 전파 15~20초, aggressive 5초 hb)** 을 보강 출처로 병기. ≤15초는 폴링 밀도를 촘촘히 둔 잘 설계된 control-plane의 도달선. PoC margin 고려해 이론 천장(즉시 전파)에 붙이지 않음. [k8s graceful](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-terminating-with-grace) · [Temporal cancel 전파](https://medium.com/@asakisakamoto02/how-to-cancel-on-heartbeat-timeout-in-temporal-framework-11afb4f9c708) |
 | ★★☆ (중) | **15초 초과 ~ 30초 이하** | 30초 = k8s 기본 grace period(SIGTERM→SIGKILL) 표준 상한. heartbeat 전파 지연(15-20초)+롤백 여유를 합치면 일반 우수 설계의 현실 대역. [k8s 30초 기본·SIGTERM 윈도](https://web-alert.io/blog/graceful-shutdown-sigterm-zero-downtime-deploys-guide) |
+| (전 급간 공통 — 표 한 줄) | **★ 급간은 인프라 grace(cancel 전파)는 반영하나 외부 시스템 롤백(부분 롤백 정합성)은 별도 변수 — silent cap** | 롤백 비용 큰 케이스(외부 상태 되돌림)는 인프라 grace와 무관하게 더 걸릴 수 있어 ★ 급간 밖 별도 변수로 분리(round-04). [Temporal cancel 전파](https://docs.temporal.io/activity-execution) |
 | ★☆☆ (하) | **30초 초과 (= 보정된 하한선·합격 최소). 단 hard-kill 폴백으로 상한 보장 필수** | KPI 정의 하한 `≤30초`를 ★☆☆ 진입선으로 두면 30초가 게이트가 되어 ★★☆가 죽으므로, 규칙2로 30초를 ★★☆/★★★ 변별 안에 흡수하고 ★☆☆는 "30초 초과지만 cancel→ack→hard-kill 폴백으로 유한 시간 내 정지 보장됨"으로 재배치. heartbeat 미설정 activity는 cancel을 못 받으므로(전파 0%) hard-kill 폴백 존재가 합격 최소 조건. [Temporal — hb 없으면 cancel 수신 불가](https://docs.temporal.io/activity-execution) |
 | 불합격 | ack > 5초(접수 자체 지연) / hard-kill 폴백 부재로 정지 시간 무한 / 아래 게이트 위반 | — |
 
@@ -96,6 +100,7 @@ Agent는 **최소권한·도구 allowlist(허용된 도구만 호출 가능한 �
 - **②-1 권한외 hard-invalid 차단율** — admission 게이트가 룰 판정 가능 위반을 차단. 별점 축 아닌 게이트(차단/안전정지 latency 분포는 ① PoC에 합산해 보조 그래프로만; gradable proxy이나 헤드라인 변별엔 미사용).
 
 > **캘리브레이션 노트**: 하한 `30초`는 k8s grace 기본값과 정합하나 그대로 ★☆☆ 게이트로 쓰면 ★★☆가 사실상 사문화 → 규칙2 재배치(30초를 ★★☆ 상한으로, ★★★는 ≤15초). `이론 근거 = 즉시 전파(heartbeat 폴링 밀도 무한)` / `PoC margin = heartbeat 전파 지연 15-20초 실측 관례를 흡수해 ★★★를 ≤15초로(0초에 붙이지 않음)`. silent cap: **deploy 중 부분 롤백의 외부 시스템 정합성**(외부 상태 되돌림)은 통합 환경 필요 → 미검증. 헤드라인 0건/100% 게이트의 신뢰 상한은 ②-2 적대적 풀세트 커버리지(OWASP LLM Top-10 매핑, OI-8 의존)이며 미상상 우회는 미검출.
+> **재캘리브레이션(round-04)**: ★★★ 15초 **근거 다양화** — 단일 출처(k8s 30초)에서 15초·30초를 둘 다 파생하던 것을 `15초 = k8s grace 이등분 + 폴링 밀도 촘촘 가정`으로 명시하고 **non-k8s control-plane(Temporal heartbeat cancel 전파 15~20초)** 을 보강 출처로 병기. **롤백 외부 정합성을 표에 한 줄**로 노출(인프라 grace는 반영하나 외부 시스템 부분 롤백은 별도 변수 — 이미 silent cap에 있던 것을 표에도). 인프라 grace 정합이라 C1 apples 우려 세트 최저(인용 출처 = 우리 control-plane과 동일 메커니즘). 급간 수치는 round-03 유지(본 라운드 근거 보강만 — OI-9 하한 보정 없음).
 > **seats**: 발의 Seat 3(Workflow Runner 인프라 — durable cancel 전파) · consensus (Seat 1: ack 고정·게이트 분리 동의 / Seat 2: 30초 재배치로 ★★☆ 부활 동의)
 
 ## 변경 이력
@@ -148,3 +153,20 @@ Agent는 **최소권한·도구 allowlist(허용된 도구만 호출 가능한 �
 - **게이트(규칙5, 0건/100% 절대형)**: HITL 통과율 100%·우회 0건 / runaway cap 100% / ②-1 권한외 hard-invalid 차단(admission). 별점 축 아님 — pass/fail.
 - **§측정 보정(구→신)**: graceful stop+롤백 합격선 구 `≤30초 = ★☆☆ 진입선` → 신 `≤30초를 ★★☆ 상한으로 흡수, ★☆☆ = 30초 초과 + hard-kill 폴백`(규칙2 재배치 — 30초를 ★☆☆ 게이트로 두면 ★★☆ 사문화). 보정 트레이스를 §측정 해당 KPI 줄 아래 보존.
 - silent cap: deploy 중 부분 롤백의 외부 시스템 정합성 미검증 / 0건·100% 게이트 신뢰 상한은 ②-2 풀세트 커버리지(OI-8 의존).
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-03-controllability.md) (red verdict: **Sound ◎ / KPI ○ — Low**; stance: 채택 권장 — 세트 모범, ★★★ 15초 근거 다양화·롤백 외부 정합성 한 줄).
+
+**무엇이 문제였나 (review 지적)**
+- ★★★ 15초가 k8s 30초 단일 출처에서 ★★★·★★☆ 둘 다 파생.
+- 롤백(외부 시스템 상태 되돌림) 시간이 인프라 grace와 무관하게 더 걸릴 수 있음(이미 silent cap).
+
+**무엇을 바꿨나 (반영 — 근거 보강만, 급간 수치 불변)**
+- **★★★ 15초 근거 다양화**: `15초 = k8s grace 이등분 + 폴링 밀도 촘촘 가정`, non-k8s Temporal heartbeat 15~20초 병기.
+- **롤백 외부 정합성을 ★ 급간 표에 한 줄**로 노출(별도 변수·silent cap).
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0002/0003 runaway cap·graceful stop tactic 미명시 + eval/검증 서브시스템 DP(②-2 하네스, OI-7). ②-2 ↔ QA-06 하네스(OI-8) 교차 의존 정상 트래킹.
+- 15초/30초 예시값 — 폴링 밀도 sweep로 확정.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-03-controllability.md) (verdict: Sound ◎ / KPI ○ — Low, 채택 권장).

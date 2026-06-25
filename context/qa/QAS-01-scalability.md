@@ -13,4 +13,4 @@
 
 ## 비고
 - 설계 연결: DP-0001(2안 동적 풀), DP-0004(1안 타입별 scale out).
-- (★ 급간은 QA-01 등급 척도)
+- (★ 급간은 QA-01 등급 척도; round-04 margin 차등·LLM-bound USL apples 근거 보강 — 급간 수치 불변)

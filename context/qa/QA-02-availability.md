@@ -12,6 +12,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric 추가 + 재기동 합격 하한 ≤1분 → ≤4분(★☆☆) 보정 (손실=0·멱등=100%는 게이트 불변) (자세히 → ## 변경 이력)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "★★★ main 축 정의 고정('재기동'=lease 만료→체크포인트 재개 완료; 0.5초 재스케줄과 10초 cold 재기동 분리) + 외부 LLM outage 길이 silent cap + lease trade-off 명시 — 급간 수치 불변 (자세히 → ## 변경 이력)"
 ---
 
 # QA-02 Availability — 운영 안정성
@@ -77,15 +80,34 @@ updates:
 
 | 등급 | 구간 — 주 KPI(main 축): 장애 단위 재기동/failover 시간 (손실=0 게이트 통과 전제) | 필드 근거 (경계 이유 + URL) |
 |---|---|---|
-| ★★★ (상) | 재기동 ≤ 10초 (보조: 워크플로우 성공률 ≥ 99.95%) | healthy dispatcher 잔존 시 재스케줄 ~0.5초, 컨테이너 재기동 ~10초, job manager 교체 ~10초/항상 <20초가 durable execution 관측 대역 — 이론 frontier에 PoC margin 두고 10초로 [Temporal recover-vs-restart](https://www.xgrid.co/resources/temporal-recover-instead-of-restart/) · [geo-distributed job recovery](https://arxiv.org/pdf/1802.00245) · 99.95% = 자동 failover·무손실 redundancy 대역 [Axel Springer SLA](https://medium.com/axel-springer-tech/whats-the-difference-between-99-9-and-99-99-sla-uptime-489e201a3c7b) |
+| ★★★ (상) | 재기동 ≤ 10초 (보조: 워크플로우 성공률 ≥ 99.95%) | **(round-04 정의 고정)** "재기동" = `lease 만료 후 다른 worker가 체크포인트부터 재개 완료까지`(0.5초 재스케줄·10초 cold 재기동을 OR로 섞지 않고 cold 재기동 단위로 고정). 컨테이너 재기동 ~10초/항상 <20초가 durable execution 관측 대역 — 이론 frontier에 PoC margin 두고 10초로 [Temporal recover-vs-restart](https://www.xgrid.co/resources/temporal-recover-instead-of-restart/) · [geo-distributed job recovery](https://arxiv.org/pdf/1802.00245) · 99.95% = 자동 failover·무손실 redundancy 대역 [Axel Springer SLA](https://medium.com/axel-springer-tech/whats-the-difference-between-99-9-and-99-99-sla-uptime-489e201a3c7b) |
 | ★★☆ (중) | 10초 < 재기동 ≤ 1분 (보조: 99.5% ≤ 성공률 < 99.95%) | lease timeout + 재스케줄이 분 단위 내로 수렴하는 일반 우수 대역. DORA elite MTTR <1hr는 인시던트 단위라 worker-restart 단위(훨씬 짧음)와 별개 [AWS Reducing MTTR](https://docs.aws.amazon.com/whitepapers/latest/availability-and-beyond-improving-resilience/reducing-mttr.html) |
 | ★☆☆ (하) | 1분 < 재기동 ≤ 4분 — 합격 최소선=(보정된) KPI 하한 (보조: 성공률 ≥ 99.5%) | KPI 원본 하한 `≤1분`은 durable runner 기준 비현실적으로 빡빡 → 재배치. 중복 redundancy 라우팅 "최대 3~4분"이 필드 관례라 합격 진입선을 4분으로 완화 [Temporal recover-vs-restart](https://www.xgrid.co/resources/temporal-recover-instead-of-restart/) |
 | 불합격 | 재기동 > 4분 / 또는 손실=0·멱등=100% 게이트 위반 / 성공률 < 99.5% | 게이트 위반은 시간 무관 즉시 탈락 — |
 
 > **캘리브레이션 노트**: KPI 원본 하한 `재기동 ≤1분`은 *stateless agent*엔 현실적이나, half-done 20GB 산출물을 가진 *stateful 워크플로우* 종단 재개에는 빡빡함(정의 §의 "1분에 묶으면 비현실" 자인). 표 급간을 현실 대역으로 재배치 → ★☆☆ 진입선을 1분 → **4분**으로 완화(중복 redundancy 라우팅 "최대 3~4분" 근거). 이론 근거 = durable execution 0.5~20초 관측, PoC margin = 우리 chaos 모델은 가정 파라미터(failover·lease timeout·서비스시간) 기반이라 이론 frontier(10초)보다 ★★★를 넓게. 하한 보정은 `open-issues.md` 등록 대상(KPI 정의 `≤1분`과 정합 재확인 — 손실=0 게이트는 불변). silent cap: control-plane split-brain·외부 시스템(Jira/빌드서버)의 멱등키 실존중은 통합환경 미검증 — 게이트 통과는 mock 기준.
+> **재캘리브레이션(round-04)**: ★★★ main 축 **"재기동" 정의를 고정** — `lease 만료 후 다른 worker가 체크포인트부터 재개 완료까지`(round-03이 "재스케줄 ~0.5초 vs 컨테이너 재기동 ~10초"를 OR로 섞어 단위 혼동했던 것을 cold 재기동 단위로 분리·명확화). **외부 LLM outage silent cap(C1)**: ★ 급간(내 노드 재기동 시간)은 외부 LLM outage 길이(분~시간)를 안 잰다 — 외부 장애는 자동 재개율(≥95%) 보조 KPI로만 다룸. ★★★(≤10초)를 받아도 외부 LLM 30분 outage면 가용성 무너짐(durable execution 0.5~20초 = Temporal event history 단위, DORA elite MTTR <1hr = 인시던트 단위 — 서로 다른 단위). **lease trade-off**: 빠른 lease(10초)가 손실 게이트(손실=0)와 trade-off일 수 있음 → ★ 급간이 lease 값 선택을 보상하지 않도록 손실률 독립 확인. 급간 수치는 round-03 유지(본 라운드 근거 보강만 — OI-9 하한 보정 없음).
 > **seats**: 발의 Seat 3(durable execution·failover) · consensus (Seat 2가 성공률 SLO 보조 병기로 SLI 형식 보강 — main=시간/게이트=손실 구조에 합의)
 
 ## 변경 이력
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-02-availability.md) (red verdict: **Sound ◎ / KPI ○ — Low**; stance: 조건부 채택 — main 축 정의 고정·외부 outage silent cap·lease trade-off).
+
+**무엇이 문제였나 (review 지적)**
+- ★★★ 10초가 "재스케줄 ~0.5초"와 "컨테이너 재기동 ~10초"를 OR로 섞은 단위 혼동.
+- 외부 LLM outage 길이(분~시간)가 ★ 급간에 미반영. lease 파라미터가 ★를 좌우.
+
+**무엇을 바꿨나 (반영 — 근거 보강만, 급간 수치 불변)**
+- **"재기동" 정의 고정**: lease 만료 후 다른 worker가 체크포인트부터 재개 완료까지(0.5초 재스케줄·10초 cold 재기동 분리).
+- **외부 LLM outage silent cap**: ★ 급간은 내 노드 재기동만 잼·외부 장애는 자동 재개율(≥95%) 보조 KPI.
+- **lease trade-off** 명시(빠른 lease가 손실 게이트와 trade-off일 수 있음 → 손실률 독립 확인).
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0002/0003 외부 LLM degradation(backoff·폴백) 미명시(OI-7).
+- 재기동 10초/1분/4분·성공률·재개율 예시값 — chaos 주입으로 확정.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-02-availability.md) (verdict: Sound ◎ / KPI ○ — Low, 조건부 채택).
 
 ### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
 출처: discussion/qa/round-03 (등급 척도 캘리브레이션 — Council blue team, 팀 검토·승인). main 급간 축 = **장애 단위 재기동/failover 시간**(역방향, 낮을수록 ★ 높음).

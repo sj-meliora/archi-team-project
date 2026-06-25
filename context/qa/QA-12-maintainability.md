@@ -19,6 +19,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric 추가 — CIS p95 역방향 급간(★★★=p95≤1 … ★☆☆=p95≤3 유지, 재배치 불요) + 컴포넌트 경계 정의 조건 (자세히 → ## 변경 이력)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "CIS 정수 입도(=1/=2/=3) → 구간화(≤1 / 1<p95≤2 / 2<p95≤3; 분수 p95·동률 변별) + prompt/tool-def 수정 수 보조 별점 축(정의↔별점 축 정합 복구) + 경계 종속 silent cap (자세히 → ## 변경 이력)"
 ---
 
 # QA-12 Maintainability — 모듈 교체 용이성
@@ -76,18 +79,27 @@ updates:
 
 > 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정.
 
-주 KPI `CIS p95 ≤3개`는 **역방향(낮을수록 좋음)** — **★★★가 가장 낮은 값**(p95≤1). gradable(CIS 정수 분포)이라 그대로 별점화. 측정 전제로 컴포넌트 경계 정의 선결이 걸리므로 규칙4의 `조건:`으로 고정. 모델교체 무중단·온보딩 ≤1일은 보조 게이트(별점 미적용).
+주 KPI `CIS p95 ≤3개`는 **역방향(낮을수록 좋음)** — **★★★가 가장 낮은 값**(p95≤1). gradable이라 별점화하되, p95는 백분위 보간으로 **분수값이 나올 수 있어 구간(≤1 / 1<p95≤2 / 2<p95≤3)으로 표기**(정수 단일값 =1/=2/=3은 p95=2.4 같은 보간값·동률 변별 불가 — round-04 교정). 측정 전제로 컴포넌트 경계 정의 선결이 걸리므로 규칙4의 `조건:`으로 고정. **agentic 지배 비용(prompt/tool-def 수정 수)을 보조 별점 축으로 병기**(정의↔별점 정합). 모델교체 무중단·온보딩 ≤1일은 보조 게이트(별점 미적용).
 
 **조건 (측정 전제):** `조건: 컴포넌트 경계 정의 고정(무엇을 1개 컴포넌트로 세는가)` — 경계가 모호하면 동일 변경도 CIS가 들쭉날쭉해 두 설계 비교 불가(QA 본문 silent cap). 동일 경계 정의 하에서만 CIS p95 비교. 보조 게이트: 모델 교체 중 in-flight WF 무중단(pass/fail).
 
 | 등급 | 구간 — 주 KPI(main 축): CIS p95 (영향받은 컴포넌트 수, **낮을수록 좋음**) | 필드 근거 (경계 이유 + URL) |
 |---|---|---|
-| ★★★ (상) | p95 ≤ 1개 | 큐/계약 완전 분리 시 한 노드 교체가 인접 노드 미간섭(이상적 모듈성). Temporal activity 교체·계약 분리 천장 −margin ([Temporal versioning](https://docs.temporal.io/temporal)) |
-| ★★☆ (중) | p95 = 2개 | 노드+인접 계약 1개 동반 수정의 일반 우수 구간(낮은 결합 달성 시 현실값) ([결합도/영향분석](https://www.researchgate.net/publication/289063786_Identifying_coupling_metrics_and_impact_on_software_quality)) |
-| ★☆☆ (하) | p95 = 3개 — 합격 최소선=KPI 하한 | tail 3개까지 허용 — 결합 분리 설계의 합격 진입선. p95(상위 5% 제외) 기준 ([p50/p95/p99](https://oneuptime.com/blog/post/2025-09-15-p50-vs-p95-vs-p99-latency-percentiles/view)) |
-| 불합격 | p95 ≥ 4개, 또는 컴포넌트 경계 정의 미고정 / 모델교체 무중단 실패(게이트) | tail 4+면 변경 국소성 붕괴; 경계 미정이면 측정 무의미 |
+| ★★★ (상) | p95 ≤ 1 | **(round-04 구간화: =1 → ≤1)** 큐/계약 완전 분리 시 한 노드 교체가 인접 노드 미간섭(이상적 모듈성). Temporal activity 교체·계약 분리 천장 −margin ([Temporal versioning](https://docs.temporal.io/temporal)) |
+| ★★☆ (중) | 1 < p95 ≤ 2 | **(round-04 구간화: =2 → 1<p95≤2; 분수 p95 수용·동률 변별)** 노드+인접 계약 1개 동반 수정의 일반 우수 구간(낮은 결합 달성 시 현실값; p95=1.5는 ★★☆) ([결합도/영향분석](https://www.researchgate.net/publication/289063786_Identifying_coupling_metrics_and_impact_on_software_quality)) |
+| ★☆☆ (하) | 2 < p95 ≤ 3 — 합격 최소선=KPI 하한 | **(round-04 구간화: =3 → 2<p95≤3; p95=2.4는 ★☆☆)** tail 3개까지 허용 — 결합 분리 설계의 합격 진입선. p95(상위 5% 제외) 기준 ([p50/p95/p99](https://oneuptime.com/blog/post/2025-09-15-p50-vs-p95-vs-p99-latency-percentiles/view)) |
+| 불합격 | p95 > 3, 또는 컴포넌트 경계 정의 미고정 / 모델교체 무중단 실패(게이트) | tail 3 초과면 변경 국소성 붕괴; 경계 미정이면 측정 무의미 |
+
+**보조 별점 축 (정의↔별점 정합 — round-04 C3):** main 축 CIS p95는 전통 SW 결합도 지표인데, agentic 유지보수의 **지배 비용은 prompt·tool-def·모델 교체**(정의 강조점)라 보조 게이트로 밀려 있었다 → `SDK 툴체인 변경 시 prompt/tool-def 수정 수`를 보조 별점 축으로 병기(CIS와 이중 축). 역방향(낮을수록 ★ 높음). ATAM 비교 시 CIS 동률이면 agentic 축으로 변별(정의↔별점 축 정합 복구).
+
+| 보조 등급 | 구간 — prompt/tool-def 수정 수 (낮을수록 좋음) | 근거 |
+|---|---|---|
+| ★★★ (상) | ≤ 1 | 큐/계약 분리로 prompt·tool 정의를 컴포넌트 경계 안에 격리 — 1곳만 수정 |
+| ★★☆ (중) | = 2 | §측정 보조 KPI 하한(≤2)이 일반 우수 |
+| ★☆☆ (하) | = 3 — 합격 진입선 | 3곳 수정까지 허용(그 이상은 prompt 결합 과다) |
 
 > **캘리브레이션 노트**: 하한 p95≤3은 필드 현실적(잘 분리된 모듈의 ripple 상단) — 비현실 하한 아님, **규칙2 재배치 불요**. **이론 근거: 결합도 기반 영향분석(ISM/CBO)·tail SLI 관행·Temporal 계약분리 버저닝(ResearchGate/Lehnert/Temporal) + PoC margin: mock 파이프라인은 결합도가 실시스템보다 낮아 CIS 낙관 편향 가능 → 천장 ★★★를 p95≤1로만 두고 ★★☆/★☆☆를 2·3으로 넓게**. 신뢰도 상한(silent cap): CIS는 컴포넌트 경계 정의 민감(조건 위반 시 게이트); mock 낙관 편향 명시. 보조 — 모델교체 비용은 필드상 막대(2 eng × 2주 ≈ $16k, 5개월 마이그레이션, [VentureBeat](https://venturebeat.com/ai/swapping-llms-isnt-plug-and-play-inside-the-hidden-cost-of-model-migration)·[TianPan](https://tianpan.co/blog/2026-04-10-model-migration-playbook-swap-llm-production))라 무중단·온보딩 ≤1일은 보조 게이트로 보존(별점 미부여).
+> **재캘리브레이션(round-04)**: CIS 정수 입도(=1/=2/=3) → **구간화(≤1 / 1<p95≤2 / 2<p95≤3)** — p95는 백분위 보간이라 분수값(p95=2.4) 미상정·동률 변별 불가였음. 수치 하한(p95≤3) 불변이라 OI-9 §측정 하한 보정은 없음(입도만 정밀화). **prompt/tool-def 수정 수를 보조 별점 축(≤1/=2/=3)으로 병기** — CIS(전통 결합도)와 정의 강조 지배 비용(prompt/모델 교체)이 어긋나 agentic 축이 보조 게이트로 밀려 있던 것을 별점 축으로 끌어올려 정합 복구(C3). **경계 종속 silent cap(C3 보강)**: ★ 급간은 컴포넌트 경계 굵기 선택의 함수 — 경계 굵게 잡으면 CIS↓(★↑), 잘게 잡으면 CIS↑(★↓). 경계 정의 조건으로 고정하나 본질적 종속 명시.
 > **seats**: 발의 Seat 2(수석 아키텍트 — taxonomy/SLI) · consensus (Seat 3 경계 정의 고정 조건이 durable-WF 버저닝과 정합 동의)
 
 ## 변경 이력
@@ -130,3 +142,22 @@ updates:
 - **재배치 불요**: 하한 p95≤3은 필드 현실적이라 규칙2 재배치 없음. §측정 수치 보정 없음(CIS p95≤3 유지).
 - **규칙4(측정 전제 조건)**: `컴포넌트 경계 정의 고정`을 조건으로 명시 — 동일 경계에서만 CIS p95 비교. 모델교체 무중단·온보딩 ≤1일은 보조 게이트(별점 미부여).
 - 근거 출처: [p50/p95/p99 tail SLI](https://oneuptime.com/blog/post/2025-09-15-p50-vs-p95-vs-p99-latency-percentiles/view), [결합도/영향분석(ISM/CBO)](https://www.researchgate.net/publication/289063786_Identifying_coupling_metrics_and_impact_on_software_quality), [Temporal versioning](https://docs.temporal.io/temporal), 모델 마이그레이션 비용([VentureBeat](https://venturebeat.com/ai/swapping-llms-isnt-plug-and-play-inside-the-hidden-cost-of-model-migration)).
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-12-maintainability.md) (red verdict: **Sound ◎ / KPI ○ — Low**; stance: 채택 권장 — 정수 입도 구간화·agentic 축 보조 별점 축·경계 종속 silent cap).
+
+**무엇이 문제였나 (review 지적)**
+- CIS p95가 정수 1/2/3이라 변별 거침 + 보간 p95(비정수) 미상정 + 동률 변별 불가.
+- 별점 축(CIS)과 정의 강조 지배 비용(prompt/모델 교체)이 어긋남 — agentic 축이 보조 게이트로 밀림(C3).
+- ★ 급간이 컴포넌트 경계 굵기 선택의 함수.
+
+**무엇을 바꿨나 (반영)**
+- **CIS 정수 입도 → 구간화 `≤1 / 1<p95≤2 / 2<p95≤3`**(분수 p95·동률 변별). 수치 하한(p95≤3) 불변.
+- **prompt/tool-def 수정 수 보조 별점 축 병기**(≤1/=2/=3) — CIS 동률이면 agentic 축으로 변별(정의↔별점 정합 복구).
+- **경계 종속 silent cap** 명시(CIS는 경계 굵기 함수).
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0004/0005 버저닝·계약분리·blue-green + FR-0003 영향범위 자동분석의 CIS 데이터 공급(OI-7).
+- CIS p95 3개·prompt/tool 수정 수·온보딩 1일 예시값 — 변경 시나리오 측정으로 확정.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-12-maintainability.md) (verdict: Sound ◎ / KPI ○ — Low, 채택 권장).

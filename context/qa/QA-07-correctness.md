@@ -19,6 +19,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric 추가 — main 축=golden 정답률(정방향). 100% 통과=난이도 부족 상한 캡(★★★ 92~98%) + judge↔인간 일치도(κ≥0.8) 조건 신설 — 구 ≥90% → 신 90~98%(만점 캡)+judge κ 조건 (자세히 → ## 변경 이력)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "★★★ 92~99% / ★★☆ 90~93% / 100%만 불합격((98,100) 공백 제거·★★☆ 확장) + 경계 구간화([90,91)/[91,93)/[93,99]) + judge κ 도메인 재측정 단서 + rework율 보조 별점 축 (자세히 → ## 변경 이력)"
 ---
 
 # QA-07 Correctness / Accuracy — 산출물 정확성
@@ -78,18 +81,27 @@ updates:
 
 > 동일 조건 설계 대안의 본 QA 만족도를 ★1~3 비교(별 많은 안 채택). KPI 합격선(하한)=★☆☆ 진입선, ★★☆/★★★는 필드 현실 도달 범위+PoC margin. 하한 미만 불합격. 예시값이며 경계는 PoC로 확정.
 
-> 헤드라인 `golden-set 정답률 ≥90%`. **⚠️ 100% 통과 = golden 난이도 부족 신호** → ★★★를 무작정 ≥99%로 두지 않고 **"충분히 높되 만점 아님" + 적정 난이도 + judge↔인간 일치도 조건**으로 처리(규칙4). main = 단계별 golden 정답률(정방향). single-axis라 규칙5 분기 불요.
+> 헤드라인 `golden-set 정답률 ≥90%`. **⚠️ 100% 통과 = golden 난이도 부족 신호** → ★★★를 **[93,99]**(만점 아닌 고득점, 100%만 불합격)로 두고 **적정 난이도 + judge↔인간 일치도 조건**으로 처리(규칙4). main = 단계별 golden 정답률(정방향). 경계는 ≥/> 모호 제거 위해 구간([90,91)/[91,93)/[93,99])으로 표기(QA-04와 동형). main 축이 [발표 서사]라 **rework율을 보조 별점 축**으로 병기(round-04 C3).
 
-**조건 (규칙4, 신뢰 전제):** `조건: LLM-as-judge ↔ 인간 일치도 Cohen's κ ≥ 0.8 (또는 동의율 ≥80%) 선검증` — judge가 틀리면 정답률 자체가 왜곡되므로, 별점을 매기기 전에 채점기(judge)의 인간 일치도를 먼저 검증한다. 미검증 시 정답률은 신뢰 불가(불합격 아닌 "측정 무효"). 추가 조건: `golden 난이도 적정(과쉬움 페널티)` — 100% 통과 세트는 난이도 부족으로 ★ 부여 보류.
+**조건 (규칙4, 신뢰 전제):** `조건: LLM-as-judge ↔ 인간 일치도 Cohen's κ ≥ 0.8 (또는 동의율 ≥80%) 선검증` — judge가 틀리면 정답률 자체가 왜곡되므로, 별점을 매기기 전에 채점기(judge)의 인간 일치도를 먼저 검증한다. 미검증 시 정답률은 신뢰 불가(불합격 아닌 "측정 무효"). **(round-04 C1) κ는 우리 단계별 quantize golden으로 재측정 — 일반 벤치 κ 복제 아님**(인용 κ는 일반 QA frontier judge라 도메인 특화 정답성 판정에서 더 낮을 수 있음·silent cap). 추가 조건: `golden 난이도 적정(과쉬움 페널티)` — 100% 통과 세트는 난이도 부족으로 ★ 부여 보류.
 
 | 등급 | 구간 — 주 KPI(main 축): 단계별 golden 정답률 % (정방향, 단 100% 만점 아님) | 필드 근거 (경계 이유 + URL) |
 |---|---|---|
-| ★★★ (상) | **92% ~ 98% (만점 아닌 충분 고득점) + judge κ ≥ 0.8** | 적정 난이도 golden(앵커 50~100, contamination 차단)에서 92-98%는 "어려운 문제를 거의 다 맞힘". 100%는 난이도 부족 신호라 상한 캡(과쉬움 페널티). frontier judge가 인간과 κ 0.81-0.87(o4-mini 0.873/GPT-5-mini 0.870/GPT-4.1 0.811) 달성하므로 κ≥0.8 동반 조건이 현실적. [LLM-as-judge κ 0.8+ 사례](https://futureagi.com/blog/llm-as-judge-best-practices-2026) · [MMLU 90%+는 변별력 상실(난이도 부족)](https://medium.com/@federicomoreno613/golden-datasets-the-foundation-of-reliable-ai-evaluation-486ce97ce89d) |
-| ★★☆ (중) | **90% 초과 ~ 92% 미만 + judge κ ≥ 0.6** | 단계별 90% 초중반대 = 일반 우수. judge 일치도는 production 허용선 κ≥0.6(acceptable)로 완화. 인간 전문가 task success도 ~90%(DigiData 90.1%) 대역이라 90%대 초반이 강한 자동화 신뢰선. [judge κ≥0.6 acceptable](https://futureagi.com/blog/llm-as-judge-best-practices-2026) · [인간 전문가 ~90%](https://arxiv.org/pdf/2511.07413) |
-| ★☆☆ (하) | **≥ 90% (= KPI 하한·합격 최소선) + judge 일치도 검증 완료** | KPI 정의 하한 `≥90%`가 ★☆☆ 진입선. golden 90%는 frontier 모델 MMLU 수준이자 자율 신뢰의 현실 진입선이라 비현실적으로 높지 않음 → 규칙2 재배치 불요. 단 judge 일치도 미검증이면 측정 무효. [golden 90% 진입선](https://www.getmaxim.ai/articles/building-a-golden-dataset-for-ai-evaluation-a-step-by-step-guide/) |
-| 불합격 | 정답률 < 90% / golden 100% 통과(난이도 부족→재설계) / judge 인간 일치도 미검증 또는 κ < 0.6 | — |
+| ★★★ (상) | **[93, 99] (만점 아닌 충분 고득점) + judge κ ≥ 0.8** | **(round-04: 상한 98→99로 넓혀 (98,100) 공백 제거)** 적정 난이도 golden(앵커 50~100, contamination 차단)에서 93-99%는 "어려운 문제를 거의 다 맞힘". 100%만 난이도 부족 신호라 불합격(상한 캡=99%). frontier judge가 인간과 κ 0.81-0.87(o4-mini 0.873/GPT-5-mini 0.870/GPT-4.1 0.811) 달성하므로 κ≥0.8 동반 조건이 현실적. [LLM-as-judge κ 0.8+ 사례](https://futureagi.com/blog/llm-as-judge-best-practices-2026) · [MMLU 90%+는 변별력 상실(난이도 부족)](https://medium.com/@federicomoreno613/golden-datasets-the-foundation-of-reliable-ai-evaluation-486ce97ce89d) |
+| ★★☆ (중) | **[91, 93) + judge κ ≥ 0.6** | **(round-04: 90~92 2%p → [91,93) 확장, ≥/> 모호 제거)** 단계별 91~93% = 일반 우수. judge 일치도는 production 허용선 κ≥0.6(acceptable)로 완화. 인간 전문가 task success도 ~90%(DigiData 90.1%) 대역이라 90%대 초반이 강한 자동화 신뢰선. [judge κ≥0.6 acceptable](https://futureagi.com/blog/llm-as-judge-best-practices-2026) · [인간 전문가 ~90%](https://arxiv.org/pdf/2511.07413) |
+| ★☆☆ (하) | **[90, 91) (= KPI 하한·합격 최소선) + judge 일치도 검증 완료** | KPI 정의 하한 `≥90%`가 ★☆☆ 진입선. golden 90%는 frontier 모델 MMLU 수준이자 자율 신뢰의 현실 진입선이라 비현실적으로 높지 않음 → 규칙2 재배치 불요. 단 judge 일치도 미검증이면 측정 무효. [golden 90% 진입선](https://www.getmaxim.ai/articles/building-a-golden-dataset-for-ai-evaluation-a-step-by-step-guide/) |
+| 불합격 | 정답률 < 90% / **= 100%(난이도 부족→재설계)** / judge 인간 일치도 미검증 또는 κ < 0.6 | (98,100) 공백 제거 — 100%만 불합격, 99%까지 ★★★ |
 
-> **캘리브레이션 노트**: 하한 `90%`는 필드 진입선으로 적정 → 규칙2 재배치 불요. **상한 처리가 핵심** — golden 100% 통과는 난이도 부족 신호이므로 ★★★를 ≥99%가 아닌 **92~98%(만점 직전 캡)**로 두고 "과쉬움 페널티"를 명시(100% = 불합격 처리). `이론 근거 = frontier judge κ 0.81-0.87 도달` / `PoC margin = 우리 golden은 가상 설계·실행 미수행([발표 서사])이라 judge 일치도·난이도 적정을 PoC로 확정해야 함 → κ 조건을 ★ 등급에 동반`. silent cap: **golden 커버리지 = 정확성 신뢰 상한**(미포함 케이스 미검출) + **judge 자체 편향**(judge 틀리면 정답률 왜곡, 그래서 일치도 선검증이 전제) + **quantize "정답" 정의**(정확도/지연 trade-off) 합의가 선결. eval/검증 서브시스템은 모듈 박스로만 존치(실측 0건, OI-7 DP 신설 의존).
+**보조 별점 축 (실측 가능 — round-04 C3):** main 축 golden 정답률이 [발표 서사](golden·judge 미구축)라 모델 추정 → `rework율(자동 산출물이 후속 단계/재시도로 되돌아오는 비율, 파이프라인 로그에서 golden 없이 산출)`을 보조 별점 축으로 병기. 역방향(낮을수록 ★ 높음). ATAM 비교 시 정답률이 미실측이면 rework율로 변별(QA-11 ②-1과 동형).
+
+| 보조 등급 | 구간 — rework율 (낮을수록 좋음) | 근거 |
+|---|---|---|
+| ★★★ (상) | rework율 ≤ 5% | 자동 산출물이 거의 되돌아오지 않음 — golden 없이 파이프라인 로그에서 실측 |
+| ★★☆ (중) | 5% < rework율 ≤ 15% | 일반 우수 — 가끔 재작업 |
+| ★☆☆ (하) | 15% < rework율 ≤ 30% — 합격 진입선 | §측정 rework율 보조 KPI(≤10%)와 정합 대역(상한 30%까지 합격) |
+
+> **캘리브레이션 노트**: 하한 `90%`는 필드 진입선으로 적정 → 규칙2 재배치 불요. **상한 처리가 핵심** — golden 100% 통과는 난이도 부족 신호이므로 ★★★를 만점 직전으로 캡하고 "과쉬움 페널티"를 명시(100% = 불합격 처리). `이론 근거 = frontier judge κ 0.81-0.87 도달` / `PoC margin = 우리 golden은 가상 설계·실행 미수행([발표 서사])이라 judge 일치도·난이도 적정을 PoC로 확정해야 함 → κ 조건을 ★ 등급에 동반`. silent cap: **golden 커버리지 = 정확성 신뢰 상한**(미포함 케이스 미검출) + **judge 자체 편향**(judge 틀리면 정답률 왜곡, 그래서 일치도 선검증이 전제) + **quantize "정답" 정의**(정확도/지연 trade-off) 합의가 선결. eval/검증 서브시스템은 모듈 박스로만 존치(실측 0건, OI-7 DP 신설 의존).
+> **재캘리브레이션(round-04)**: ★★★ 상한 `98→99`로 넓혀 **(98,100) 무등급 공백 제거**(100%만 불합격 유지), ★★☆ `90~92(2%p) → [91,93)`로 확장, ★☆☆ `[90,91)`. 경계 ≥/> 모호를 **구간 표기**([90,91)/[91,93)/[93,99])로 제거(QA-04와 동형). **judge κ 도메인 재측정 단서(C1)**: 인용 κ(o4-mini 0.873 등)는 일반 벤치 LLM-as-judge라 quantize 도메인과 apples 아님 → κ는 우리 단계별 quantize golden으로 재측정(복제 아님), 도메인 특화 판정에서 더 낮을 수 있음(silent cap). **rework율 보조 별점 축(C3)**: main 정답률이 [발표 서사]라 모델 추정 → rework율(파이프라인 로그·golden 불요)을 보조 별점 축 병기(≤5/15/30%). golden·judge 미구축으로 정답률 main 축·κ는 순환(정답률←golden←judge κ←인간라벨←미수행). 본 보정은 OI-9 등급표↔변경이력↔짝 QAS 동기화 대상.
 > **seats**: 발의 Seat 1(eval 하네스·LLM-as-judge·100% 난이도 신호) · consensus (Seat 2: ★★★ 만점 캡·과쉬움 페널티 형식화 동의 / Seat 3: judge 일치도 조건을 ★ 등급에 동반시키는 구조 동의)
 
 ## 변경 이력
@@ -134,3 +146,24 @@ updates:
 - **조건(규칙4)**: `LLM-as-judge ↔ 인간 일치도 κ≥0.8(또는 동의율 ≥80%) 선검증` — 미검증 시 정답률 측정 무효. + golden 난이도 적정(과쉬움 페널티).
 - **§측정 보정(구→신)**: 구 `≥90%`(상한·채점기 검증 무제약) → 신 `≥90% 유지 + 상한 캡 90~98%(100% 통과 = 난이도 부족 → 불합격) + judge κ 조건`. 새 제약이라 보정 트레이스를 §측정 해당 KPI 줄 아래 보존.
 - silent cap: golden 커버리지 = 정확성 신뢰 상한 / judge 자체 편향(일치도 선검증 전제) / quantize "정답" 정의 합의 선결. eval/검증 서브시스템은 모듈 박스 존치(실측 0건, OI-7 의존).
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-07-correctness.md) (red verdict: **Sound ◎ / KPI ○ — Med**; stance: 조건부 채택 — 대역+공백 정리·judge κ 도메인·rework율 보조축).
+
+**무엇이 문제였나 (review 지적)**
+- **★★☆ (90,92) 2%p 좁음 + (98,100) 무등급 공백.**
+- **judge κ는 도메인 의존** — 인용 κ(o4-mini 0.873 등)는 일반 벤치라 quantize 도메인과 apples 아님(C1).
+- main 축(golden 정답률)이 [발표 서사]라 실측 불가 → 모델 추정 별점·순환(C3).
+
+**무엇을 바꿨나 (반영)**
+- **★ 급간: ★★★ [93,99] / ★★☆ [91,93) / ★☆☆ [90,91) / 100%만 불합격** — (98,100) 공백 제거(상한 98→99)·★★☆ 2%p→2%p 명확화. 경계 ≥/> 모호를 구간 표기로 제거(QA-04와 동형).
+- **judge κ 도메인 재측정 단서**: 우리 단계별 quantize golden으로 κ 재측정(일반 벤치 κ 복제 아님), 도메인 특화 판정에서 더 낮을 수 있음(silent cap).
+- **rework율 보조 별점 축 병기**(≤5/15/30%) — golden 없이 파이프라인 로그 산출, main이 미실측이면 변별.
+
+**남은 일 (이 라운드에서 미반영)**
+- golden·judge 구축 [생략]([발표 서사]) — 정답률 main 축·κ는 순환(미수행).
+- eval/검증 서브시스템 신규 DP(related-dp 빈 상태, OI-7 1순위) — QA-03/06 red-team 하네스와 공유.
+- QA-09 first-pass·QA-11 ②-2가 QA-07 golden 의존 → QA-07 닫힘이 교차 의존 해소 키.
+- 경계(93/99·91/93·rework 5/15/30%)는 예시값 — golden set으로 확정.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-07-correctness.md) (verdict: Sound ◎ / KPI ○ — Med, 조건부 채택).

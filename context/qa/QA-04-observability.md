@@ -12,6 +12,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric 추가 — main 축=일반 액션 trace 완전성(정방향), 안전100·event-history100은 게이트. ★★★ 상한 100% 미만(≥98%) 캡(CoT 비공개 한계) (자세히 → ## 변경 이력)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "경계 표기 구간화([95,97)/[97,98)/[98,100), ≥/> 모호 제거) + 완전성 정의 강화(span 존재 AND 비-truncation) (자세히 → ## 변경 이력)"
 ---
 
 # QA-04 Observability — Agent 작업 추적 용이성
@@ -29,8 +32,8 @@ Agent loop 전구간(**prompt·입력 context·tool 호출/결과·model 버전�
 ## 측정 (KPI)
 > **주 KPI(헤드라인·PoC 대상)는 `trace 완전성` 1개.** 나머지는 보조(가드레일) — 정의엔 남기되 시연 대상이 아니다.
 
-- **trace 완전성: 안전관련 액션 100% / 일반 액션 ≥ 95%** `[주 KPI · PoC 대상]` — span = prompt+context+tool I/O+model ver+token+ts
-  - 쉽게: 한 결정을 되짚는 데 필요한 정보(어떤 프롬프트로·무슨 입력에·어떤 도구를 써서·어떤 모델이·토큰 얼마로·언제)가 다 남아 있어야 한다. 배포·권한 같은 위험한 행동은 100%, 일반 행동은 95% 이상. *span = 한 동작의 추적 기록 단위.*
+- **trace 완전성: 안전관련 액션 100% / 일반 액션 ≥ 95%** `[주 KPI · PoC 대상]` — span = prompt+context+tool I/O+model ver+token+ts. **완전성 = span 존재 AND 비-truncation(prompt/context 잘림 없음)** (round-04)
+  - 쉽게: 한 결정을 되짚는 데 필요한 정보(어떤 프롬프트로·무슨 입력에·어떤 도구를 써서·어떤 모델이·토큰 얼마로·언제)가 다 남아 있어야 한다. 배포·권한 같은 위험한 행동은 100%, 일반 행동은 95% 이상. **단순히 span이 "존재"하는 것만이 아니라 prompt/context가 잘리지 않고(non-truncation) 온전히 남아야 완전한 것으로 센다** — 존재하나 잘린 span을 과대 카운트하지 않기 위함. *span = 한 동작의 추적 기록 단위.*
   - > 보정(2026-06-24, 등급 척도 캘리브레이션 round-03): 일반 액션 합격 하한 `≥95%` 유지(재배치 불요). 단 **★★★ 상한을 100% 미만(≥98%)으로 캡** — LLM 내부 CoT 비공개·비결정 구간은 prompt/seed 근사로만 메우므로 일반 액션 trace 완전성 100% 단정은 과대주장. 안전관련 액션 100%·event-history 100%는 게이트(불변). ★ 급간은 ## 등급 척도 참조.
 - **event-history 완전성 = 100%** — 워크플로우 골격 재생(durable 엔진 기준)
   - 쉽게: 워크플로우가 거쳐 간 모든 단계 전이가 이벤트로 빠짐없이 남아, 골격은 100% 그대로 재생(replay)할 수 있어야 한다. LLM의 비결정적 부분만 prompt/seed로 따로 보강. *event-history = 모든 상태 변화를 순서대로 적은 기록, replay = 그 기록으로 실행을 그대로 되돌려 재생.*
@@ -77,9 +80,9 @@ Agent loop 전구간(**prompt·입력 context·tool 호출/결과·model 버전�
 
 | 등급 | 구간 — 주 KPI(main 축): 일반 액션 trace 완전성 % (정방향, 높을수록 상) | 필드 근거 (경계 이유 + URL) |
 |---|---|---|
-| ★★★ (상) | **≥ 98% (단 100% 미만 허용)** | OTel GenAI semconv(1.37+)는 `invoke_agent`/`chat`/`execute_tool` span 자동계측으로 reasoning chain 전체를 child span으로 남겨 완전성 상단이 매우 높음. 다만 LLM 내부 CoT 비공개·일부 비결정 구간은 prompt/seed 근사로만 메우므로 100% 단정은 과대주장 → ★★★ 상한을 100% 직전(≥98%)으로 두고 margin. [OTel GenAI semconv — full span tree](https://opentelemetry.io/blog/2026/genai-observability/) · [Uptrace — AI agent OTel](https://uptrace.dev/blog/opentelemetry-ai-systems) |
-| ★★☆ (중) | **95% 초과 ~ 98% 미만** | auto-instrumentation(OpenAI/Anthropic/LangChain)로 표준 span은 거의 다 잡히나 커스텀 tool·외부 호출 누락이 남는 일반 우수 대역. [Datadog OTel GenAI semconv 지원](https://www.datadoghq.com/blog/llm-otel-semantic-convention/) |
-| ★☆☆ (하) | **≥ 95% (= KPI 하한·합격 최소선)** | KPI 정의 하한 `일반 ≥95%`가 ★☆☆ 진입선. OTel GenAI semconv가 output 평가·content 품질은 안 덮으므로(span 완전성 ≠ 의미 완전성) 95%가 "재구성 가능"의 현실 진입선으로 타당 — 비현실적으로 높지 않아 재배치 불요. [Fiddler — OTel가 덮지 못하는 것](https://www.fiddler.ai/blog/opentelemetry-ai-observability-guide) |
+| ★★★ (상) | **[98, 100) (100% 미만 허용)** | **(round-04 구간화: ≥98% → [98,100), ≥/> 모호 제거)** OTel GenAI semconv(1.37+)는 `invoke_agent`/`chat`/`execute_tool` span 자동계측으로 reasoning chain 전체를 child span으로 남겨 완전성 상단이 매우 높음. 다만 LLM 내부 CoT 비공개·일부 비결정 구간은 prompt/seed 근사로만 메우므로 100% 단정은 과대주장 → ★★★ 상한을 100% 직전으로 두고 margin. [OTel GenAI semconv — full span tree](https://opentelemetry.io/blog/2026/genai-observability/) · [Uptrace — AI agent OTel](https://uptrace.dev/blog/opentelemetry-ai-systems) |
+| ★★☆ (중) | **[97, 98)** | **(round-04 구간화: 95~98 → [97,98), auto-instrumentation 몰림 대역을 좁고 명확하게)** auto-instrumentation(OpenAI/Anthropic/LangChain)로 표준 span은 거의 다 잡히나 커스텀 tool·외부 호출 누락이 남는 일반 우수 대역. [Datadog OTel GenAI semconv 지원](https://www.datadoghq.com/blog/llm-otel-semantic-convention/) |
+| ★☆☆ (하) | **[95, 97) (= KPI 하한·합격 최소선)** | KPI 정의 하한 `일반 ≥95%`가 ★☆☆ 진입선. OTel GenAI semconv가 output 평가·content 품질은 안 덮으므로(span 완전성 ≠ 의미 완전성) 95%가 "재구성 가능"의 현실 진입선으로 타당 — 비현실적으로 높지 않아 재배치 불요. [Fiddler — OTel가 덮지 못하는 것](https://www.fiddler.ai/blog/opentelemetry-ai-observability-guide) |
 | 불합격 | 일반 완전성 < 95% / 안전 액션 < 100%(게이트 위반) / event-history 완전성 < 100% | — |
 
 **게이트 (별점과 AND, 규칙5):**
@@ -88,6 +91,7 @@ Agent loop 전구간(**prompt·입력 context·tool 호출/결과·model 버전�
 - (보조 metrics: MTTD ≤5분, 결정당 비용/토큰 기록 100% — 별점 미사용.)
 
 > **캘리브레이션 노트**: 하한 `95%`는 필드 기준 비현실적으로 높지 않음(span 완전성 ≠ 결정 의미 재현) → 규칙2 재배치 불요. `이론 근거 = OTel GenAI 자동계측 full span tree(천장 ~100%)` / `PoC margin = CoT 비공개·비결정 구간 prompt/seed 근사 한계를 반영해 ★★★를 ≥98%로(100%에 붙이지 않음)`. silent cap: **"재구성됨" 판정 자동화 한계**(감사자 판단 개입 여지) + **LLM 내부 추론(CoT) 비공개**는 prompt/출력으로만 근사 → 완전성 %가 "span 존재율"이지 "의미 재현율"을 100% 보장하지 않음.
+> **재캘리브레이션(round-04)**: 경계를 **구간 표기 `[95,97)/[97,98)/[98,100)`** 로 명확화(round-03 `≥95 / 95~98 / ≥98`의 ≥/> 모호 — 95.0%·98.0%가 어디인지 — 제거; auto-instrumentation이 95~98%에 몰리는 현실 반영해 ★★☆를 [97,98) 1%p로 좁게). **완전성 정의 강화**: `완전성 = span 존재 AND 비-truncation(prompt/context 잘림 없음)` — 존재하나 잘린 span 과대 카운트 방지(C 보강). 수치 하한(95%)·천장 캡(<100%)은 불변이라 OI-9 §측정 하한 보정은 없음(표기·정의만 정밀화) — 등급표↔변경이력 동기화만.
 > **seats**: 발의 Seat 2(KPI 측정가능성·SLI 형식 — 안전/일반 2-index 분리) · consensus (Seat 1: CoT 비공개로 ★★★ 100% 미만 캡 동의 / Seat 3: event-history 100%는 durable 엔진 결정론적 replay라 게이트로 동의)
 
 ## 변경 이력
@@ -119,3 +123,20 @@ Agent loop 전구간(**prompt·입력 context·tool 호출/결과·model 버전�
 - **게이트(규칙5, 100% 절대형)**: 안전관련 액션 span 완전성 100% / event-history 완전성 100%(durable 결정론적 replay). 별점 축 아님.
 - **§측정 보정**: 일반 액션 합격 하한 `≥95%`는 유지(재배치 불요). 단 **★★★ 상한을 100% 미만(≥98%)으로 캡** — LLM CoT 비공개·비결정 구간 prompt/seed 근사 한계로 100% 단정은 과대주장. 캡 사실을 §측정 해당 KPI 줄 아래 1줄 반영.
 - silent cap: "재구성됨" 판정 자동화 한계(감사자 개입 여지) / CoT 비공개 — 완전성 %는 "span 존재율"이지 "의미 재현율" 100% 보장 아님.
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-04-observability.md) (red verdict: **Sound ◎ / KPI ○ — Low**; stance: 채택 권장 — 경계 표기 명확화·완전성 정의 강화).
+
+**무엇이 문제였나 (review 지적)**
+- ★★☆ (95,98) 3%p 좁음 + ★☆☆ ≥95% vs ★★☆ >95% 경계 모호.
+- "완전성 %"가 span 존재율이지 충실도(truncation) 미반영.
+
+**무엇을 바꿨나 (반영)**
+- **경계 구간화 `[95,97)/[97,98)/[98,100)`** (≥/> 모호 제거, QA-07과 동형). 하한 95%·천장 캡 <100% 불변.
+- **완전성 = span 존재 AND 비-truncation** 정의 강화(§측정·검증 전략) — 잘린 span 과대 카운트 방지.
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0003이 span 수준 trace 보장하는지 역검토(OI-7).
+- MTTD 5분·일반 trace 95% 예시값 — 실환경 측정으로 확정.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-04-observability.md) (verdict: Sound ◎ / KPI ○ — Low, 채택 권장).

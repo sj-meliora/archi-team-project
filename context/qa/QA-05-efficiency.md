@@ -15,6 +15,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric 정식화(기존 4k/6k/8k tier) — 합격 하한 신규토큰 ≤6k(헤드라인)→8k(★☆☆ 복합노드) 표현 정합, 캐시 적중률 ≥85%는 조건 (자세히 → ## 변경 이력)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "적중률 ≥85% 조건이 신규토큰 변별폭 좁힘 silent cap(공정성↔변별력 trade-off) + tier 2k 등간격=난이도(단일/일반/복합) 매핑 margin 근거화 + Requesty 단일출처(코딩 도메인) 다양화 silent cap — 급간 수치 불변 (자세히 → ## 변경 이력)"
 ---
 
 # QA-05 Efficiency — Agent 토큰·자원 효율
@@ -86,6 +89,7 @@ updates:
 | 불합격 | 신규 토큰 > 8k, 또는 캐시 적중률 < 85%(게이트 위반) / 신규·캐시 미분리집계 | 분리집계 안 하면 캐싱 역페널티로 측정 무의미 |
 
 > **캘리브레이션 노트**: 하한 8k는 필드 현실적(고적중 시 대입력도 신규분은 한 자릿수 k대) — 비현실 하한 아님, 규칙2 재배치 불요. **이론 근거: 캐시 read=base의 10% · 코딩에이전트 input 60~95k이나 플랫폼 적중 86%로 신규분 1/7(Requesty/Anthropic) + PoC margin: mock 파이프라인은 캐시 워밍·적중률이 실운영보다 낮을 수 있어 신규 토큰 대역을 4k/6k/8k로 다소 넓게 유지 Y**. 신뢰도 상한(silent cap): 적중률은 워크로드 유사성 의존 — 다양성 높은 실운영에선 신규 토큰 상향·★ 하향 가능(조건 위반 시 게이트). compute 효율(worker 가동률)은 보조로 별점 미적용.
+> **재캘리브레이션(round-04)**: **적중률 조건 silent cap(C1·권고1)**: `조건: 적중률 ≥85% 고정`이 신규 토큰(=적중률의 직접 함수) 변별 폭을 스스로 좁힘 — 공정 비교(동일 적중률) 의도이나 ★가 잴 수 있는 건 출력 토큰·cache-miss 잔차뿐(공정성↔변별력 trade-off). **tier margin 근거화(C2)**: `4k/6k/8k 2k 등간격 = 작업 난이도(단일/일반/복합) tier 매핑`(4k=Requesty 92% 적중 대역, 6k=일반, 8k=대입력 복합) — 등간격이 자의가 아니라 난이도 매핑. **단일 출처 다양화(C1)**: Requesty는 코딩 에이전트(86~92% 적중)이고 우리는 SDK 빌드 노드(빌드로그·config diff)라 워크로드 유사성 가정 — 빌드 파이프라인 도메인 적중률은 우리 PoC로 확정. 급간 수치는 round-03 유지(본 라운드 근거 보강만 — OI-9 하한 보정 없음).
 > **seats**: 발의 Seat 1(Agentic Workflow — 토큰 경제) · consensus (Seat 3 적중률 게이트화로 인프라 변동 흡수 동의)
 
 ## 변경 이력
@@ -130,3 +134,22 @@ updates:
 - **규칙4(2-index → main+조건)**: `캐시 적중률 ≥85% 고정`을 조건으로 명시 — 적중률이 신규 토큰을 좌우하므로 동일 적중률에서만 비교. 신규/캐시 분리집계·적중률 미달은 게이트.
 - **§측정 정합 보정**: 헤드라인 합격 하한 구 `신규 토큰 ≤6k` → 신 `≤6k 일반 / ≤8k 복합 추론 노드`(★☆☆=8k). 규칙2 재배치는 불요(8k는 필드 현실적). §측정에 구→신 트레이스 남김.
 - 근거 출처: [Requesty Coding Agent Economy](https://www.requesty.ai/coding-agent-economy)(input 60~95k·적중 46~92%·플랫폼 86%), [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)(cache read=base 10%).
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-05-efficiency.md) (red verdict: **Sound ◎ / KPI ○ — Low**; stance: 채택 권장 — tier 정식화 모범, 적중률 조건·tier margin·단일 출처 보강).
+
+**무엇이 문제였나 (review 지적)**
+- ★ 전 경계가 Requesty 단일 출처(코딩 에이전트) — 우리는 SDK 빌드 노드(C1).
+- 적중률 ≥85% 조건이 신규 토큰(cache-miss) 변별 폭을 스스로 좁힘.
+- 4k/6k/8k 2k 등간격 margin 미명시(C2).
+
+**무엇을 바꿨나 (반영 — 근거 보강만, 급간 수치 불변)**
+- **적중률 조건 silent cap**: 공정성(동일 적중률)↔변별력 trade-off 명시(★가 잴 건 출력·cache-miss 잔차뿐).
+- **tier margin 근거화**: 2k 등간격 = 난이도(단일/일반/복합) 매핑(4k=92%적중·6k=일반·8k=대입력 복합).
+- **단일 출처 다양화 silent cap**: Requesty=코딩 도메인·우리=빌드 노드 워크로드 유사성 가정, 우리 PoC로 확정.
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0001 2안 라우팅 토큰 vs 비용 기준(OI-7). `$/완료모델` QA-13 이양 정합.
+- tier 4k/6k/8k·적중률 85% 예시값 — caching A/B로 확정.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-05-efficiency.md) (verdict: Sound ◎ / KPI ○ — Low, 채택 권장).

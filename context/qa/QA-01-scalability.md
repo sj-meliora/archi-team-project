@@ -15,6 +15,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric(ATAM trade-off) 신설 + scaling efficiency 합격 하한 0.8 → 0.70 보정 (필드 USL 근거 + PoC margin, 헤드룸≥20% 고정 조건 하)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "margin 차등 근거화(천장 거리 비례 — ★☆☆ 0.02·★★★ 0.05) + LLM-bound USL apples silent cap(SPARCcenter CPU vs LLM worker) — 급간 수치 불변 (자세히 → ## 변경 이력)"
 ---
 
 # QA-01 Scalability — 시스템 확장성
@@ -84,6 +87,7 @@ updates:
 | 불합격 | **efficiency < 0.70** | coherency(β)·contention(α)이 지배해 자원 추가가 처리량으로 이어지지 않는 영역. [WSO2 — USL](https://wso2.com/blog/research/measuring-software-scalability-using-universal-scalability-law/) |
 
 > **캘리브레이션 노트**: 원 KPI 하한 0.8은 HPC 일반 기준(Good=75% 위)으론 현실적이나, **LLM rate-limited 워크로드 + 가상 PoC에는 낙관적**이다. 실제 USL 회귀 사례는 우수 구성도 **이론 근거 ~0.72**에서 멈췄고, PoC는 가정 파라미터 기반 큐잉 시뮬이라 이론 완성도 미달이 예상된다 → **이론 근거 0.72 + PoC 미완성 대비 margin ≈0.02~0.05 반영해 전 급간을 하향**([상 ≥0.85 / 중 0.75~0.85 / 하 0.70~0.75]). rate-limit 포화로 등급이 깎이는 문제는 표 밖 `측정 조건`(헤드룸 ≥20% 고정)으로 흡수. 경계 수치는 모두 예시값 — PoC 큐잉 시뮬(공유 풀 vs 고정배치)로 확정.
+> **margin 차등 근거화(round-04 C2)**: ★★★ 0.05 vs ★☆☆ 0.02 margin 차이는 임의가 아니라 **"천장과의 거리에 비례"** — ★☆☆은 필드 우수(0.72) 바로 아래라 margin 최소(0.02), ★★★는 이론 천장(0.90)이라 PoC margin 크게(0.05). (QA-06의 단일 Y 규칙과 다른 차등 근거 — 천장 종류가 다르므로.) **LLM-bound USL apples silent cap(C1)**: 인용 USL 0.72는 SPARCcenter SPEC SDM91(1990s CPU 벤치)에서 빌려옴 — 우리 병목은 외부 LLM 전역 TPM/RPM이라 contention(α)·coherency(β) 구조가 다름(0.72가 우리 천장 대표 보장 없음). `측정 조건`(헤드룸 ≥20%)으로 rate-limit 포화를 배제한 순수 큐잉 효율임을 명시. ★☆☆ [0.70,0.75) 0.05폭은 좁아 변별 빈약이나, 하한 0.68 하향은 USL 우수도와 더 벌어져 미채택(좁은 채 유지). 급간 수치는 round-03 유지(본 라운드는 근거 보강만 — OI-9 하한 보정 없음).
 > **seats**: 발의 Seat 3 (인프라·USL·rate-limit) · Seat 2 동의(SLI 형식) · Seat 1 합의(dissent였던 "rate-limit 조건부 efficiency"가 `측정 조건` 줄로 흡수 → consensus).
 
 ## 변경 이력
@@ -126,3 +130,19 @@ updates:
 - 활용률 QA-13 이양은 **QA-13 정식 채택(OI-8)** 동반 — 미채택 시 부유(C2). 사람 결정.
 - rate-limit headroom·admission control·bounded queue tactic이 DP-0001/0004에 미명시(OI-7) → DP 디스커션 위임. bounded queue 없으면 `큐 p95 ≤5분`이 폭주 시 깨짐.
 - 부하 단위(정규화 동시 WF 수 또는 토큰 처리량)·예시값은 실환경 측정으로 확정.
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-01-scalability.md) (red verdict: **Sound ◎ / KPI ○ — Low**; stance: 조건부 채택 — margin 규칙화·LLM-bound USL silent cap).
+
+**무엇이 문제였나 (review 지적)**
+- margin 0.02~0.05 흔들림(★★★ 0.05 vs ★☆☆ 0.02·C2). SPARCcenter CPU USL vs LLM-bound worker apples(C1). ★☆☆ [0.70,0.75) 좁음.
+
+**무엇을 바꿨나 (반영 — 근거 보강만, 급간 수치 불변)**
+- **margin 차등을 "천장과의 거리에 비례"로 근거화**(★☆☆ 필드우수 0.72 바로 아래라 0.02·★★★ 이론천장 0.90이라 0.05).
+- **LLM-bound USL apples silent cap**: SPARCcenter 1990s CPU 벤치라 contention/coherency 구조 다름 — 측정 조건(헤드룸 ≥20%)으로 rate-limit 포화 배제한 순수 큐잉 효율 명시.
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0001/0004 rate-limit headroom·admission control·bounded queue 미명시(OI-7).
+- LLM-bound worker USL 회귀는 미발견 — 우리 PoC로 직접 측정. 경계는 예시값.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-01-scalability.md) (verdict: Sound ◎ / KPI ○ — Low, 조건부 채택).

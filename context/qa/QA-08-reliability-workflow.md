@@ -18,6 +18,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric 추가 + 타 WF latency 증가 합격 하한 ≤10% → ≤25%(★☆☆, 10%는 ★★☆) 보정 (중단율 ≤1%·쿼터침범 0은 조건/게이트 불변) (자세히 → ## 변경 이력)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "★★★ ≤5% margin 근거화(tail 안정화+폭주 강도 흡수) + arXiv 2604.03145 미래형 ID 검증결과·noisy-neighbor 도메인 apples silent cap + 쿼터 0건은 절대형이라 Constraint 유지(별점화 불가) — 급간 수치 불변 (자세히 → ## 변경 이력)"
 ---
 
 # QA-08 Reliability — Workflow 간 독립성 보장
@@ -79,12 +82,13 @@ updates:
 
 | 등급 | 구간 — 주 KPI(main 축): 폭주 주입 하 타 WF latency(p95) 증가율 (중단율 ≤1% 고정) | 필드 근거 (경계 이유 + URL) |
 |---|---|---|
-| ★★★ (상) | latency 증가 ≤ 5% | 적절한 격리 시 "unrelated workload가 더 이상 간섭 못 해 tail latency 안정화"가 필드 최상위 — 무간섭 이상에 PoC margin 두고 5%로 [HorizonIQ noisy neighbor](https://www.horizoniq.com/blog/what-are-noisy-neighbors-in-cloud-computing/) · [TiDB noisy-neighbor playbook](https://www.pingcap.com/playbook-noisy-neighbor-multi-tenant-mysql/) |
+| ★★★ (상) | latency 증가 ≤ 5% | **(round-04 margin 근거화)** ≤5% = 무간섭 이상 + 격리 시 tail 안정화 관측 대역 하단 + **폭주 강도 가정 흡수 ≈5%**(임의값 아님 — "tail 안정화 + 폭주 강도 흡수"가 근거). 적절한 격리 시 "unrelated workload가 더 이상 간섭 못 해 tail latency 안정화"가 필드 최상위 — 무격리 바닥(+100%)·★☆☆ 25% 대비 충분 간격. [HorizonIQ noisy neighbor](https://www.horizoniq.com/blog/what-are-noisy-neighbors-in-cloud-computing/) · [TiDB noisy-neighbor playbook](https://www.pingcap.com/playbook-noisy-neighbor-multi-tenant-mysql/) |
 | ★★☆ (중) | 5% < latency 증가 ≤ 10% | KPI 원본 하한(10%)이 이 대역. bulkhead·큐별 동시성으로 간섭을 한 자릿수%로 묶는 일반 우수 격리 [KEDA](https://keda.sh/) · [Google SRE Workbook](https://sre.google/workbook/implementing-slos/) |
 | ★☆☆ (하) | 10% < latency 증가 ≤ 25% — 합격 최소선 (옛 하한 10%를 ★★☆로 올리고 합격 하한 재배치) | 격리는 작동하나 여유가 빠듯한 대역. 무격리 시 p99 doubling(+100%)·CPU 56% degradation이 필드 관측 바닥이므로 그 한참 위인 25%를 합격 하한으로 [noisy-neighbor causal inference](https://arxiv.org/html/2604.03145v1) · [simplyblock p99](https://simplyblock.io/glossary/p99-storage-latency/) |
 | 불합격 | latency 증가 > 25% / 또는 중단율 > 1% / 쿼터 침범 > 0건 | 무격리(p99 2배·56% 저하)에 근접 — |
 
 > **캘리브레이션 노트**: KPI 원본 하한 `≤10%`는 필드 기준 건강한 합격선(이 세트에서 드물게 건강 — round-01 verdict)이라 비현실 재배치는 불요. 다만 ★1~3을 띄우려고 하한(10%)을 ★★☆로 올리고 ★☆☆ 합격 하한을 25%로 한 칸 내려 급간 확보(무격리 +100% 바닥과 충분한 간격). 이론 근거 = 무격리 56% degradation/p99 doubling 관측, PoC margin = noisy-neighbor 주입 모델의 폭주 강도·WF 수·token-bucket 파라미터가 가정값이라 ★★★(≤5%)를 무간섭 이상보다 다소 넓게. silent cap: 외부 LLM 제공자 rate-limit은 **계정 전역**이라 token-bucket은 client-side 분배만 보장(전역 풀 마르면 전 WF 동반 저하 — 쿼터 침범 0 게이트는 내부 분배 기준; QA-01 헤드룸과 같은 천장).
+> **재캘리브레이션(round-04)**: ★★★ ≤5% margin을 `무간섭 이상 + 격리 시 tail 안정화 관측 대역 하단 + 폭주 강도 흡수 ≈5%`로 **근거화**(C2 — 임의값 탈출). **arXiv 미래형 ID 검증결과(C4)**: 2604.03145는 2026-04 ID로 현재(2026-06) 유효 과거 ID 형식이나 본 검증에서 직접 대조 미완 → "출처 형식 유효, 인용 수치(p99 doubling·CPU 56%) 복제 아님 — **스토리지/CPU noisy-neighbor 사례라 LLM 토큰 쿼터 간섭과 apples 다름**(simplyblock)" silent cap, 인용 정확성은 "확인 불가"로 정직 표기. **쿼터 보조축 검토(C3)**: agentic 진짜 공유 장애 = 토큰 쿼터 독점이나 쿼터침범 0건은 **0건 절대형**이라 gradable proxy 부재 → 별점화 불가, Constraint(게이트) 유지(폭주 강도별 타 WF 쿼터 확보율 같은 gradable proxy를 만들면 별점화 가능하나 본 라운드 범위 밖). 급간 수치는 round-03 유지(본 라운드 근거 보강만 — OI-9 하한 보정 없음).
 > **seats**: 발의 Seat 3(격리·멀티테넌시) · consensus (Seat 1이 runaway 폭주 차단=QA-03 cap 연동을 폭주 주입 조건의 전제로 확인 — 2-index를 main=latency/조건=중단율+쿼터로 흡수)
 
 ## 변경 이력
@@ -127,3 +131,20 @@ updates:
 
 **남은 일 (이 라운드에서 미반영)**
 - DP-0004/0005 격리 역검토(OI-7) — 특히 **DP-0005 2안 공유 캐시 채택 시 ④(오염 전파 0)가 R-1 위험과 충돌** → 무효화·읽기전용 계층화 명시 필요. DP 디스커션 위임.
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-08-reliability-workflow.md) (red verdict: **Sound ◎ / KPI ○ — Low**; stance: 채택 권장 — ★★★ 5% margin 근거화·arXiv 검증·쿼터 보조축 검토).
+
+**무엇이 문제였나 (review 지적)**
+- ★★★ 5% margin 근거 없음(C2). arXiv 2604.03145 미래형 ID 검증 필요(C4). 쿼터(진짜 공유 장애)가 ★에서 빠지고 게이트로만(C3). 인용 p99 doubling·CPU 56%는 스토리지/CPU사례지 LLM 토큰 쿼터 간섭 아님(C1).
+
+**무엇을 바꿨나 (반영 — 근거 보강만, 급간 수치 불변)**
+- **★★★ ≤5% margin을 "tail 안정화 + 폭주 강도 흡수 ≈5%"로 근거화**.
+- **arXiv 2604.03145 검증결과**: 유효 과거 ID 형식이나 직접 대조 미완 → "확인 불가, 스토리지/CPU noisy-neighbor라 LLM 토큰 쿼터와 apples 다름" silent cap.
+- **쿼터 보조축 검토 → Constraint 유지**: 쿼터침범 0건은 0건 절대형이라 별점화 불가(gradable proxy 부재).
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0004/0005 격리 역검토·DP-0005 2안 ④↔R-1 충돌(OI-7).
+- 폭주 강도별 타 WF 쿼터 확보율 같은 gradable proxy 별점화는 범위 밖. 경계 예시값.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-08-reliability-workflow.md) (verdict: Sound ◎ / KPI ○ — Low, 채택 권장).

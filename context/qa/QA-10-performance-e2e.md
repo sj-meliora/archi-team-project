@@ -16,6 +16,9 @@ updates:
   - date: 2026-06-24
     by: discussion/qa/round-03 (등급 척도 캘리브레이션)
     reason: "★ rubric(ATAM trade-off) 추가 + E2E latency 합격 하한 재배치(구 ≤6h → 신 p95 ≤24h ★☆☆, 6h는 ★★☆). throughput≥50/일·전달무결성100%는 조건/게이트 (→ ## 변경 이력)"
+  - date: 2026-06-25
+    by: discussion/qa/round-04 (★ 등급 척도 근거 보강)
+    reason: "★★★ 2h margin 근거화(compute critical path 하한 — '6h의 1/3'이 아니라 Quantize/Compile compute 흡수 ≈2h) + agentic E2E = 배치 ML + LLM 호출 큐잉·rate-limit 지연 가산 명시 — 급간 수치 불변 (자세히 → ## 변경 이력)"
 ---
 
 # QA-10 Performance — E2E 개발 시간
@@ -81,15 +84,32 @@ updates:
 
 | 등급 | 구간 — 주 KPI(main 축): 모델당 E2E latency p50/p95 (throughput ≥50모델/일 부하 하) | 필드 근거 (경계 이유 + URL) |
 |---|---|---|
-| ★★★ (상) | p95 ≤ 2시간 | 배치 ML 파이프라인 필드 상단. 업계 배치 표준 하한(6–24h)의 1/3 수준으로, 완전자율·병렬 파이프라인이 도달 가능한 우수치 — 이론적으로 더 낮출 수 있으나 실제 Quantize/Compile compute가 critical path라 PoC margin으로 2h를 ★★★ 진입선에 둠. https://www.domo.com/glossary/ml-pipeline-orchestration |
+| ★★★ (상) | p95 ≤ 2시간 | **(round-04 margin 근거화)** ≤2h = **완전자율 병렬 파이프라인 도달 대역 + Quantize/Compile compute가 critical path라 그 이하 불가 → critical path 흡수 ≈2h**(임의의 "6h의 1/3"이 아니라 compute 하한이 근거). 이론적으로 더 낮출 수 있으나 compute critical path가 천장. https://www.domo.com/glossary/ml-pipeline-orchestration |
 | ★★☆ (중) | 2시간 < p95 ≤ 6시간 (p50 ≤ 6시간 동시 충족) | 배치 ML 파이프라인 "일반 우수" 대역. 업계는 배치 SLA를 6–24h로 보는데, 그 하단(6h)을 우수 대역 경계로 — 6h는 사람 수동 파이프라인 대비 유의미 단축이면서 배치 관례 내. p50/p95 dual-threshold는 SRE 표준(p50=전형, p95=tail). https://datadef.io/guides/en/ml-pipeline-architecture · https://oneuptime.com/blog/post/2025-09-15-p50-vs-p95-vs-p99-latency-percentiles/view |
 | ★☆☆ (하) | 6시간 < p95 ≤ 24시간 (= 합격 하한) | 합격 진입선. 배치 ML 파이프라인 업계 허용 상한(24h, "nightly 턴어라운드")까지는 합격으로 인정 — 24h 초과면 자동화의 E2E 가치가 사라짐(수동 수일과 차별성 약화). https://www.domo.com/glossary/ml-pipeline-orchestration |
 | 불합격 | p95 > 24시간 / 조건 C 미달(throughput < 50모델/일) / 조건 D 위반(전달 무결성 < 100%) | 게이트 위반 — 별점 없음 |
 
 > **캘리브레이션 노트**: 원 KPI 하한 `≤6시간(p50/p95)`은 필드 기준 **오히려 보수적(낮춰 잡힌 천장에 가까움)**으로 판정. 업계 배치 ML 파이프라인 허용 SLA는 6–24h이며 6h는 그 하단 — 즉 `≤6h`를 합격 하한으로 쓰면 ★☆☆가 사실상 죽고 ★★☆/★★★만 남는다(규칙2 trigger). 따라서 표를 현실 대역으로 **재배치**: 합격 하한을 `p95 ≤ 24h`(배치 관례 상한)로 완화하고 `≤6h`는 ★★☆ 경계로, `≤2h`를 ★★★로 올렸다(KPI 하한 사실상 6h→24h 하향 보정 → **open-issues 등록 권고**, KPI 정의 §측정의 합격 하한과 정합 확인 필요). **이론 근거: 배치 ML 필드 6–24h + PoC margin: ★★★를 이론 최저가 아닌 2h로 둬 mock compute가 실제 Quantize/Compile 분포를 근사 못 할 위험 흡수.** silent cap: (i) mock compute가 실제 단계 시간 분포를 못 맞추면 critical path 왜곡, (ii) 실제 20GB 대역폭·노드 사양 의존(DP-0004 산식 실측 전엔 구조만 고정) — PoC는 "이 메커니즘으로 KPI 달성·측정 가능"만 보일 뿐 실측치 아님.
+> **재캘리브레이션(round-04)**: ★★★ 2h margin을 **"6h의 1/3"(왜 1/3 근거 없음) → "compute critical path 하한 ≈2h"**로 근거화(C2 — Quantize/Compile compute가 critical path라 그 이하 불가). **agentic E2E 가산 명시(C 보강)**: 배치 ML SLA(6~24h)는 전통 ML 파이프라인 기준 — **agentic E2E엔 LLM 호출 대기·rate-limit 큐잉이 가산됨**(외부 LLM 느리면 배치 ML 관례 초과 가능). 즉 `E2E = 배치 ML + LLM 큐잉`. 배치 ML SLA 6~24h는 1차 대조 미완("확인 불가, nightly 배치 관례 대역 정당화용"). 우리 워크로드(배치 SDK 빌드)와 도메인 정합 양호(C1 우려 낮음). 급간 수치는 round-03 유지(본 라운드 근거 보강만 — OI-9 하한 보정 없음).
 > **seats**: 발의 Seat 2(20년차 — percentile SLI·dual-threshold) · consensus (Seat 3 data-plane/handoff 분해 / Seat 1 throughput 조건 고정 동의)
 
 ## 변경 이력
+
+### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
+출처: [`discussion/qa/round-04`](../../discussion/qa/round-04/counsel/QA-10-performance-e2e.md) (red verdict: **Sound ◎ / KPI ○ — Low**; stance: 채택 권장 — ★★★ 2h margin 근거화·agentic LLM 큐잉 가산).
+
+**무엇이 문제였나 (review 지적)**
+- ★★★ 2h = "6h의 1/3"인데 왜 1/3인지 근거 없음(C2). 배치 ML SLA에 agentic LLM 호출 큐잉·rate-limit 지연 미반영.
+
+**무엇을 바꿨나 (반영 — 근거 보강만, 급간 수치 불변)**
+- **★★★ 2h margin을 "compute critical path 하한 ≈2h"로 근거화**(1/3 임의값 탈출).
+- **agentic E2E = 배치 ML + LLM 큐잉** 명시(LLM 호출 대기·rate-limit 큐잉 가산).
+
+**남은 일 (이 라운드에서 미반영)**
+- DP-0004 결정 산식(5% budget → A5 vs A8) 실측·노드 사양 의존(OI-7).
+- E2E latency 2/6/24h·throughput 50/일 예시값 — 부하시험으로 확정.
+
+> 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-10-performance-e2e.md) (verdict: Sound ◎ / KPI ○ — Low, 채택 권장).
 
 ### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
 출처: discussion/qa/round-03 (등급 척도 캘리브레이션, Council 3 seats). 팀이 13개 ★ 척도 전부 검토·승인(하한 재배치 포함).
