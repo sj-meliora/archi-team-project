@@ -39,6 +39,15 @@ discussion/
 - **contention(선택·ASR 대상만)**: counsel 직후 applier 전에, red↔blue가 **바운드된 1 왕복**(rebuttal→counter, +선택 referee)으로 약한 반박·회피된 지적·헤드라인 KPI 모순을 *반영 전에* 잡는다. **자유 토론 아님**(수렴/아첨 방지 — 1왕복 상한 + 안티-수렴 가드). 비싸서 **ASR 선정 QA에만**. 방법론: [`<concept>/Contention.md`](qa/Contention.md), 워커: [`.claude/agents/discussion-contention.md`](../.claude/agents/discussion-contention.md).
 - **추적성**: 권고가 원본에 반영되면 `changelog.md` 델타 + 다음 라운드 종합 보고서에 verdict 변화 기록.
 
+## 자문(advisory) 모드 — 라운드 밖 질문
+
+라운드는 **batch 심의**(대상 전체 스냅샷)다. 그러나 팀이 라운드를 거치지 않고 **개별 설계 질문**("이건 별도 DP로 가치 있나?", "어느 게 1번 타자?", "오케 없이 이 FR 되나?")을 던질 때가 있다. 이 자문은 다음 규칙으로 처리한다:
+
+- **disposition = Council(🔵 blue)**: 전향적·건설적 질문("어떻게 풀까/어느 게 나을까/가능한가")은 **권고**의 성격이라 Council의 자리다. Council의 3 seat(렌즈와 동형) 전문성으로 답한다. **단 라운드 산출물(`counsel/`)을 만들지 않는다** — 대화로 답하고 파일을 남기지 않는 비-라운드 모드.
+- **예외 = Reviewer(🔴 red)**: "이 아이디어를 부숴봐 / 반증해봐"처럼 **명시적 red-team**을 원할 때만 Reviewer의 적대적 렌즈를 부른다. 즉 disposition은 **질문 유형**을 따른다.
+- **추적성(중요)**: 자문에서 채택할 결론(설계 방향·신규 결정·결함)이 나오면, 다음 라운드의 **Reviewer 교차발견(C*)** 또는 **`_new-*-candidates.md`(NDP/NQA)** 로 접어 넣어 근거를 남긴다 — 잡담으로 증발시키지 않는다.
+- **실무**: 채팅 질문에 매번 에이전트를 띄울 필요는 없다. **메인 루프가 스펙의 렌즈/seat를 적용해 답하는 것**으로 충분하고, 에이전트(워커)는 *파일을 쓰는 라운드 작업*에서만 부른다.
+
 ## 새 개념 영역 추가하는 법 (예: DP)
 
 1. `discussion/dp/Reviewer.md` — DP용 렌즈·rubric 작성(QA의 측정가능성 rubric 대신 ATAM tradeoff/risk/sensitivity 등).
