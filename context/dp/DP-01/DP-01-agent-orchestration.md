@@ -36,7 +36,7 @@
 | | **1안 · 중앙 오케스트레이터 Agent** | **2안 · 엔진 기반 워크플로 (Choreography)** | **3안 · 중앙 오케스트레이터 Agent 이중화 (Active-Passive)** (강화·승격) |
 |---|---|---|---|
 | **(a) 도안** | ![1안](diagrams/1an-orchestrator.svg) | ![2안](diagrams/2an-choreography.svg) | ![3안](diagrams/3an-standby.svg) |
-| **(b) 설명** | **구조**: Orchestrator(LLM 감독자)가 노드에 작업 위임 · 실패 시 동적 재계획 · HITL 승인 · 교차 정책을 **한 점에서** 집행.<br>**＋** 정책·HITL을 단일 지점에서 일관 적용, 실패 시 *open-ended* 적응 재계획 가능<br>**－** 제어가 한 점에 집중 → **SPOF**, 모든 흐름이 오케스트레이터 경유 → hop 병목 | **구조**: 고정 파이프라인(IR→Opt→Quant→Compile)을 **durable 엔진**의 (순환) 그래프로 배선, 단계 간은 **이벤트 choreography**로 자율 전달, 게이트는 **stateless judge**/결정적 메트릭이 판정.<br>**＋** 중앙 제어점 없음 → **SPOF·장애 전파 없음**, 직접 전달로 hop 최소<br>**－** 교차 정책·HITL이 분산 → 일관 적용 난이도↑, 회복이 미리 그린 엣지로 한정(*bounded*만, open-ended 재계획 불가) | **구조**: 1안 그대로 + Orchestrator를 **Active-Passive 이중화**, 상태 외부화(heartbeat 감시·state resync·VIP)로 활성이 죽으면 대기가 승격(**failover**).<br>**＋** 1안의 제어성을 유지하며 **SPOF 완화** → Availability ★★☆→★★★<br>**－** 대기 인스턴스 상시 비용(QA-13), 페일오버 중 in-flight 일관성(QA-11 손실=0 과제), 복잡도↑ |
+| **(b) 설명** | **구조**: Orchestrator(LLM 감독자)가 노드에 작업을 위임하고, 실패하면 동적으로 재계획하며, 고위험 액션은 **HITL 승인**으로 거르고 교차 정책을 **한 점에서** 집행한다.<br>**＋** 정책과 HITL을 단일 지점에서 일관되게 적용할 수 있고, 실패 시 *open-ended* 적응 재계획이 가능하다.<br>**－** 제어가 한 점에 집중되어 오케스트레이터가 죽으면 전체가 멈추며(**SPOF**), 모든 실행 흐름이 오케스트레이터를 경유하므로 hop 병목이 생긴다. | **구조**: 고정 파이프라인(IR→Opt→Quant→Compile)을 **durable 엔진**의 (순환) 그래프로 배선하고, 단계 사이는 **이벤트 choreography**로 자율 전달하며, 게이트는 **stateless judge**나 결정적 메트릭이 판정한다.<br>**＋** 중앙 제어점이 없어 **SPOF와 장애 전파가 없고**, 단계 간 직접 전달로 hop이 최소화된다.<br>**－** 교차 정책과 HITL이 분산되어 일관 적용이 어렵고, 회복이 미리 그린 엣지로 한정되어(*bounded*만) open-ended 재계획은 불가하다. | **구조**: 1안 구조를 그대로 두되 Orchestrator를 **Active-Passive로 이중화**하고, 상태를 외부화(heartbeat 감시·state resync·VIP)하여 활성이 죽으면 대기가 승격한다(**failover**).<br>**＋** 1안의 제어성을 유지하면서 **SPOF를 완화**하여 Availability가 ★★☆에서 ★★★로 오른다.<br>**－** 대기 인스턴스의 상시 비용(QA-13), 페일오버 중 in-flight 일관성(QA-11 손실=0 과제), 복잡도 증가가 따른다. |
 | **(c) QA-03 Controllability** | ★★★ | ★★☆ | ★★★ |
 | **(c) QA-02 Availability** | ★★☆ | ★★★ | ★★★ ◯ |
 | **(c) QA-01 Scalability** | ★★☆ | ★★★ | ★★☆ |
@@ -63,7 +63,7 @@
 ### A2. 후보 대안 (전문)
 **1안. 중앙 오케스트레이터 Agent (Hierarchical)** — 구조: Orchestrator가 노드 위임·재계획·HITL gate·정책 집행. tactic: Orchestration, Centralized PEP, HITL gate. 장점 [Controllability] 단일 정책·HITL / open-ended 재계획. 단점 [Availability] SPOF / [Performance] 경유 병목.
 
-**2안. 엔진 기반 워크플로 (Choreography)** — 구조: 고정 파이프라인을 durable 엔진의 (순환) 그래프로, 단계 간 이벤트 choreography, 게이트 판정은 stateless judge/결정적 메트릭. tactic: Choreography, Durable execution, Stateless judge gate, Event sourcing. 장점 [Availability] SPOF 없음·무전파 / [Performance] 직접 전달. 단점 [Controllability] 교차 정책·HITL 분산 → 일관 적용 어려움 / 동적 재계획이 미리 그린 엣지로 제한(open-ended 불가).
+**2안. Durable 엔진 기반 워크플로 (Choreography)** — 구조: 고정 파이프라인을 durable 엔진의 (순환) 그래프로, 단계 간 이벤트 choreography, 게이트 판정은 stateless judge/결정적 메트릭. tactic: Choreography, Durable execution, Stateless judge gate, Event sourcing. 장점 [Availability] SPOF 없음·무전파 / [Performance] 직접 전달. 단점 [Controllability] 교차 정책·HITL 분산 → 일관 적용 어려움 / 동적 재계획이 미리 그린 엣지로 제한(open-ended 불가).
 
 **3안. Hierarchical + Standby (강화·고도화)** — 구조: 1안 + Orchestrator Active-Passive 이중화, 상태 외부화(heartbeat·state resync·VIP). 근거 tactic: Redundancy(Active-Passive)+Heartbeat — 1안 SPOF 강화. 별 변화: 1안 Availability ★★☆ → ★★★. 자기 trade-off: 대기 인스턴스(QA-13)·페일오버 일관성(QA-11 손실=0)·복잡도↑.
 
