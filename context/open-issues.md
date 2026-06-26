@@ -1,6 +1,6 @@
 # 정합성 / 미해결 결정 트래커 (Open Issues)
 
-> category: meta | updated: 2026-06-25 (OI-9 round-04 재보정 항목 append — ★ 등급 척도 근거 보강 라운드; QA-13 하한 보정 OI-9 등록 확인 해소) · 2026-06-24 (OI-8 닫힘 — NQA-A/B/C → QA-06/07/13 정식 편입·재번호; round-02 contention 반영; OI-9 신설·닫힘 — ★ rubric 캘리브레이션 + QAS 동기화)
+> category: meta | updated: 2026-06-26 (OI-10 신설·닫힘 — QA-06 Security/Safety → 제약 C-03 이관, ASR 축소) · 2026-06-25 (OI-9 round-04 재보정 항목 append — ★ 등급 척도 근거 보강 라운드; QA-13 하한 보정 OI-9 등록 확인 해소) · 2026-06-24 (OI-8 닫힘 — NQA-A/B/C → QA-06/07/13 정식 편입·재번호; round-02 contention 반영; OI-9 신설·닫힘 — ★ rubric 캘리브레이션 + QAS 동기화)
 > 자료 변동으로 생긴 불일치 + 미확정 사항. 확정되면 해당 개념 파일에 반영하고 여기서 닫는다([x]).
 
 ## [ ] OI-1 QA 번호 불일치
@@ -41,9 +41,9 @@
 - **DP-0001(1안 즉시 실행)**: latency만 보고 **품질 게이트(first-pass 성공)와 무연결** — "빠르게 틀리기" 차단 tactic 미명시 (QA-09 반영 시 발견).
 - **DP-0004/0005**: E2E latency 책임 및 **결정 산식(4단계×20GB÷대역폭 5% budget → A5 vs A8)의 실측 의존**, prompt/모델 교체 내성(workflow 버저닝·계약 분리) 미명시 (QA-10·QA-12 반영 시 발견).
 - **신규 QA 교차 의존(QA-07 전제)**: QA-09 first-pass 품질 게이트·QA-11 **②-2 정밀 유효-결정률**이 **QA-07(Correctness) golden 게이트에 의존** — QA-07 신설과 함께 가야 닫힘. (QA-11 contention 반영으로 ②-1 대리 유효-결정률은 golden 불요 룰 게이트로 분리·해소됨 — ②-2만 잔존 의존.)
-- **신규 QA 교차 의존(QA-06 전제) — round-02 QA-03 contention 등록**: QA-03 **②-2 적대적 위반0(acceptance)**가 **QA-06(Security) 공유 red-team 하네스 풀커버리지(OWASP LLM Top-10 매핑)에 의존** — QA-06 정식 채택과 함께 가야 닫힘(QA-11 ②-2 ↔ QA-07와 동일 구조). (QA-03 contention 반영으로 ②-1 권한외 차단율은 룰 체커로 분리·**현 조건 선닫힘** — ②-2만 잔존 의존.) eval/검증 서브시스템 DP 신설(아래)이 ②-2 하네스를 받침.
-- **eval/검증 서브시스템 = 신규 DP 후보**: QA-06 red-team 하네스·QA-07 golden+judge 하네스가 **어떤 DP에도 없는 신규 인프라** — DP 디스커션에서 "eval/검증 서브시스템" DP 신설 검토 (QA-06/07/QA-03 공유 자산).
-- **DP-0002/0003 보안 tactic 미명시**: 공급망 artifact 서명·secrets 관리·injection 가드레일이 후보 대안/ATAM에 없음 (QA-06 신설 시 발견).
+- **교차 의존(C-03 전제) — round-02 QA-03 contention 등록**: QA-03 **②-2 적대적 위반0(acceptance)**가 **C-03(보안·안전 제약) 공유 red-team 하네스 풀커버리지(OWASP LLM Top-10 매핑)에 의존** — 하네스(eval 서브시스템 DP, 아래) 구축과 함께 가야 닫힘(QA-11 ②-2 ↔ QA-07와 동일 구조). (QA-03 contention 반영으로 ②-1 권한외 차단율은 룰 체커로 분리·**현 조건 선닫힘** — ②-2만 잔존 의존.) eval/검증 서브시스템 DP 신설(아래)이 ②-2 하네스를 받침. *(원 QA-06 채택 의존은 2026-06-26 C-03 이관(OI-10)으로 채택이 완료돼, 잔존 의존은 하네스 구축뿐.)*
+- **eval/검증 서브시스템 = 신규 DP 후보**: C-03 red-team 하네스·QA-07 golden+judge 하네스가 **어떤 DP에도 없는 신규 인프라** — DP 디스커션에서 "eval/검증 서브시스템" DP 신설 검토 (C-03/QA-07/QA-03 공유 자산).
+- **DP-0002/0003 보안 tactic 미명시**: 공급망 artifact 서명·secrets 관리·injection 가드레일이 후보 대안/ATAM에 없음 (C-03 — 구 QA-06 — 의 핵심 게이트인데 DP에 미명시).
 - **`related-dp` 추가**: QA-05에 DP-0005, QA-09에 DP-0004 추가함(반영 완료). 역방향(DP의 `drives`)과 정합 확인 필요.
 - **남은 작업**: 각 DP에 해당 tactic(rate-limit headroom·admission control·외부 의존성 backoff·폴백·runaway cap·graceful 정지·span trace·품질 게이트·workflow 버저닝)을 후보 대안/ATAM에 명시할지 + DP-0001 drives 교정 + QA-07 교차 의존을 DP 디스커션에서 역검토.
 
@@ -63,3 +63,11 @@
   - **QA-13 하한 보정(70→50%) OI-9 등록 확인(round-04 권고 4)**: round-03 변경이력의 "open-issues 정합 점검(범위 외)" 표현으로 QA-13만 미등록 의심이었으나(QA-08~10은 등록 명시), **본 항목으로 명시 등록 — 해소.**
   - **glossary**: round-04도 수치 미포함이라 동기화 불요(★ 급간·KPL 수치는 glossary에 없음 — QA번호↔슬라이드 매핑만). **glossary 충돌 0 재확인.**
   - 등급 경계는 전부 예시값 — PoC 실측 시 최종 확정. (`changelog.md` 2026-06-25 round-04 항목 + 각 QA `## 변경 이력` 2026-06-25 블록.)
+
+## [x] OI-10 QA-06 Security/Safety → 제약 C-03 이관 — 2026-06-26 닫힘
+- **결정(2026-06-26 팀)**: `QA-06 Security/Safety`를 **제약 `C-03`으로 이관**. 사유 = 헤드라인 `권한 상승·범위 외 배포 = 0`이 1·2건을 허용 못 하는 **0건 절대형(pass/fail 게이트)** 이라 ★ 급간화 불가 → ATAM 대안 변별용 QA가 아니라 **모든 대안이 무조건 통과할 제약(Constraint)** 이 적정. (round-03 ★ rubric이 이미 "헤드라인 = Constraint 성격"을 지적했던 것을 팀이 전체 이관으로 확정.)
+- **gradable 보존**: `injection 차단율 ≥70%·FPR ≤1%`는 C-03 **측정 임계**로 보존. 종전 ★ rubric(★1~3 등급표)은 폐기(제약엔 ATAM ★ 비교 미적용).
+- **번호 정책**: **QA-07~13 현 위치 유지**(QA-07을 06으로 당기지 않음 — QA-06 번호 공석/은퇴). 짝 **QAS-06 제거**(제약엔 QAS 없음).
+- **ASR 축소(DP 생성 동인)**: ASR = **QA-01~05, QA-07**(종전 QA-01~07에서 Security 제외). C-03은 제약으로서 DP-0002/0003을 구동하나 ASR 목록엔 미포함.
+- **반영 완료**: `context/requirements/C-03-agent-security-safety.md` 신설(QA-06 6섹션 콘텐츠 제약 형식 이관) + QA-06·QAS-06 파일 삭제 + INDEX·glossary·open-issues(OI-7)·changelog + QA-03·QAS-03·QA-04·QAS-04·QA-07·QA-11·QA-13 라이브 cross-ref C-03 redirect + discussion 방법론 스펙(Contention.md·README.md) ASR 목록 갱신. (round-NN append-only 스냅샷·각 QA 변경이력의 과거 서술은 당시 번호 보존.)
+- **잔여**: 발표 우선순위 추가 상향(Security를 더 위로)은 무의미해짐(제약은 우선순위 번호 밖). DP-0002/0003 보안 tactic 미명시·eval 서브시스템 DP 신설은 OI-7로 계속 트래킹. **C 2자리 통일 완료(2026-06-26)**: C-0001/0002 → C-01/C-02 리네임 — 이제 C 전부 2자리(C-01·02·03). (FR/DP 2자리 전환은 추후 별도.)

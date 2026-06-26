@@ -26,7 +26,7 @@ updates:
 
 # QA-13 Cost-economy — 완료 모델당 비용
 
-> 📌 **정식 QA (2026-06-24 팀 결정, OI-8).** round-01 발굴 → round-02 정식 채택. 우선순위 **13위**(말미 유지, NQA-C → QA-13) — Med, Security·Correctness보다 후순위이나 비즈니스 설득에 필수. ASR 비대상(QA-01~07만).
+> 📌 **정식 QA (2026-06-24 팀 결정, OI-8).** round-01 발굴 → round-02 정식 채택. 우선순위 **13위**(말미 유지, NQA-C → QA-13) — Med, Correctness·보안(C-03)보다 후순위이나 비즈니스 설득에 필수. ASR 비대상(QA-01~05, QA-07만).
 >
 > **ISO/IEC 25010:2023 앵커**: 주 특성 **Performance Efficiency** / 하위특성 **Resource Utilization(자원 활용성)** — 비용을 "완료 모델당 소비 자원(토큰+compute+재시도)"으로 본다. ⚠️ QA-05(Efficiency)도 같은 ISO 특성이나 **altitude가 다름**: QA-05 = 요청당 토큰(per-request), QA-13 = 완료 모델당 총비용·ROI(business). 경계는 아래 정의의 altitude 줄.
 

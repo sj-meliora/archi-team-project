@@ -2,7 +2,7 @@
 
 > category: DP | status: 결정대기(A5 vs A8로 수렴) | source: pptx p.32 | updated: 2026-06-22
 > drives: QA-01(Scalability), QA-08(Reliability-Workflow), QA-10(Performance-E2E), QA-12(Maintainability)
-> realizes: FR-0001, FR-0002 | constrained-by: C-0001(Docker)
+> realizes: FR-0001, FR-0002 | constrained-by: C-01(Docker)
 > 보강작업: `dp4/`(INDEX·decision-axes·approaches A3~A8·evaluation·review)
 > note: ⚠️ 원본 헤더가 DP-0002 라벨(Hierarchical/Decentralized) 복붙 오류 — 내용 기준 라벨로 교정 (OI-3)
 
@@ -64,7 +64,7 @@
 - **R-3 (공통)**: 일회용 scale-to-zero 후 동시 폭증 시 throttling → min-instance 하한 필요.
 
 ### 비위험 (Non-Risks)
-- **NR-1**: A5·A8 모두 C-0001(Docker)·C-0002(이식성) 충족 — K8s Job / Knative(+pod affinity·local volume) 컨테이너 기반 구동.
+- **NR-1**: A5·A8 모두 C-01(Docker)·C-02(이식성) 충족 — K8s Job / Knative(+pod affinity·local volume) 컨테이너 기반 구동.
 
 ## 결정을 가르는 단일 질문
 > **`(4단계 × 20GB 왕복) ÷ 스토리지 대역폭`이 E2E의 5% budget(QA-10) 안에 드는가?**

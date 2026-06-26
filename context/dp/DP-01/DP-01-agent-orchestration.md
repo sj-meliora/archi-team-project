@@ -2,7 +2,7 @@
 
 > category: DP | status: 결정대기 (재구성안 — DP-0002 후신 검토) | source: pptx p.30 재구성 | updated: 2026-06-26
 > drives: QA-03(Controllability)↑, QA-02(Availability), QA-01(Scalability)
-> realizes: FR-0004 | constrained-by: C-0002(기존 시스템 무영향)
+> realizes: FR-0004 | constrained-by: C-02(기존 시스템 무영향)
 > 재구성 note: 기존 DP-0001(배치)+DP-0002(위상)를 **직교 2결정으로 분리** — 본 **DP-01 = 제어평면(오케스트레이터 有無)**, 짝 **DP-02 = Agent 특화 표면**. 2자리 신규 번호라 4자리 DP-0001/0002와 공존(검토 후 대체 결정). 근거: `discussion/dp/notes/agent-basics-and-dp1-retrospective.md`.
 
 ---

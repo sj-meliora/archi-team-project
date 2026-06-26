@@ -26,7 +26,7 @@
 ## mini-ATAM
 - **SP**: filter 무상태성 + pipe 유실방지 인프라가 QA-08·QA-10에 민감. 표준 스키마 안정성이 QA-12(재정렬 효과)에 민감.
 - **Risk**: monolithic 특성상 단계 fault가 전체 파이프라인 중단(QA-08 중단≤1% 위협) → 큐 기반 pipe + DLQ(A3와 결합)로 완화. 외부 상태 왕복이 QA-10 잠식.
-- **Non-Risk**: C-0001(Docker) — filter를 컨테이너로 배포 가능. C-0002(이식성)도 표준 스키마로 유리.
+- **Non-Risk**: C-01(Docker) — filter를 컨테이너로 배포 가능. C-02(이식성)도 표준 스키마로 유리.
 
 ## 인접 DP 정합
 - **A3(메시지 큐)를 pipe 구현체로 채택하면 A4의 monolithic 위험을 큐 버퍼+DLQ로 상쇄** → A3+A4 결합이 강력. DP-0005 캐시는 filter 입력 스키마 키로 memoization 가능.

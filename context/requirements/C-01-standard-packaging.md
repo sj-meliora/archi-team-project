@@ -1,4 +1,4 @@
-# C-0001 표준 패키징
+# C-01 표준 패키징
 
 > category: Constraint | source: pptx p.14 | updated: 2026-06-19
 

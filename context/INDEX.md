@@ -35,16 +35,17 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 - FR-0003 SDK Config 변경 추적
 - FR-0004 Agent 제어·관측
 - FR-0005 시스템 운영·제어 *(범위 미확정 — open-issues #4)*
-- C-0001 표준 패키징
-- C-0002 배포 이식성
+- C-01 표준 패키징
+- C-02 배포 이식성
+- C-03 자율 에이전트 보안·안전 게이트 *(2026-06-26 QA-06 → 제약 이관, OI-10)*
 
-### qa/ (우선순위 = 번호, 2026-06-24 재번호 / **ASR = QA-01~07**)
+### qa/ (우선순위 = 번호, 2026-06-24 재번호 / **ASR = QA-01~05, QA-07**)
 - QA-01 Scalability / QA-02 Availability / QA-03 Controllability / QA-04 Observability / QA-05 Efficiency
-- **QA-06 Security/Safety** (ISO 25010 Security+Safety) / **QA-07 Correctness** (ISO Functional Correctness)
+- ~~QA-06 Security/Safety~~ → **C-03으로 이관**(2026-06-26 제약 이관, OI-10). 번호 06은 공석(QA-07~13 현 위치 유지). / **QA-07 Correctness** (ISO Functional Correctness)
 - QA-08 Reliability(Workflow) / QA-09 Performance(Agent수행시간) / QA-10 Performance(E2E) / QA-11 Reliability(Agent일관성) / QA-12 Maintainability
 - **QA-13 Cost-economy** (ISO Performance Efficiency: Resource Utilization)
-- QAS-01~13 (QA별 6-part 시나리오, 같은 번호)
-- *QA-06/07/13은 round-01 디스커션 발굴 → 2026-06-24 정식 편입(OI-8). 기존 QA-06~10 +2 시프트.*
+- QAS-01~13 (QA별 6-part 시나리오, 같은 번호. **QAS-06 제거** — QA-06 제약 이관에 따름)
+- *QA-07/13은 round-01 디스커션 발굴 → 2026-06-24 정식 편입(OI-8). 기존 QA-06~10 +2 시프트. QA-06(Security)은 2026-06-26 C-03으로 이관(OI-10).*
 
 ### dp/
 - DP-0001 Workflow–Agent 매핑

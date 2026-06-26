@@ -26,7 +26,7 @@ updates:
 
 # QA-07 Correctness / Accuracy — 산출물 정확성
 
-> 📌 **정식 QA (2026-06-24 팀 결정, OI-8).** Security(QA-06)와 함께 "사람 없이 믿고 맡길 수 있는가"의 두 기둥. 우선순위 **7위**로 편입(NQA-B → QA-07). **ASR 선정(QA-01~07)** — DP 생성 동인. 추가 상향은 팀 논의 후 별도.
+> 📌 **정식 QA (2026-06-24 팀 결정, OI-8).** 보안(C-03 제약 — 구 QA-06)과 함께 "사람 없이 믿고 맡길 수 있는가"의 두 기둥. 우선순위 **7위**로 편입(NQA-B → QA-07, 현 위치 유지). **ASR 선정(QA-01~05, QA-07)** — DP 생성 동인. *(보안은 2026-06-26 QA-06 → 제약 C-03 이관으로 ASR에서 빠짐, OI-10.)*
 >
 > **ISO/IEC 25010:2023 앵커**: 주 특성 **Functional Suitability** / 하위특성 **Functional Correctness(기능 정확성)** — "Correctness"가 ISO 하위특성명 그 자체. (golden 커버리지는 보조적으로 **Functional Completeness**.) 일관성(QA-11 Reliability)과 **직교** — 정확성 ≠ 일관성, 둘은 짝.
 
@@ -71,7 +71,7 @@ updates:
 
 | KPI | 책임지는 설계 | 검증 방법 (설계) |
 |---|---|---|
-| **golden-set 정답률** `[주]` | **eval/검증 서브시스템(신규 — 현재 DP 없음)** + QA-04 trace가 산출물·결정 데이터 공급. QA-03/QA-06 red-team 하네스와 인프라 공유 가능 | **▶ 발표 서사(실측 미실행):** golden set + LLM-as-judge 하네스 — 단계별 golden(IR/Optimize/Quant/Compile) 대비 정답률 측정, **judge↔인간 일치도를 먼저 검증**한 뒤 채점. 하네스는 모듈 다이어그램에 박스로 존치, golden 구축·실행은 미수행 |
+| **golden-set 정답률** `[주]` | **eval/검증 서브시스템(신규 — 현재 DP 없음)** + QA-04 trace가 산출물·결정 데이터 공급. QA-03/C-03 red-team 하네스와 인프라 공유 가능 | **▶ 발표 서사(실측 미실행):** golden set + LLM-as-judge 하네스 — 단계별 golden(IR/Optimize/Quant/Compile) 대비 정답률 측정, **judge↔인간 일치도를 먼저 검증**한 뒤 채점. 하네스는 모듈 다이어그램에 박스로 존치, golden 구축·실행은 미수행 |
 | rework율 ≤ 10% | QA-09 first-pass 게이트와 공유(성공 판정 = 정확성 게이트) | 보조(발표 서사): 자동 결정 중 사람 재작업 유발 비율 집계 |
 | 회귀 미검출률 ≤ 5% | 회귀 골든·게이트 | 보조(발표 서사): 알려진 회귀 케이스 주입 → 게이트 누수율 측정 |
 
@@ -162,7 +162,7 @@ updates:
 
 **남은 일 (이 라운드에서 미반영)**
 - golden·judge 구축 [생략]([발표 서사]) — 정답률 main 축·κ는 순환(미수행).
-- eval/검증 서브시스템 신규 DP(related-dp 빈 상태, OI-7 1순위) — QA-03/06 red-team 하네스와 공유.
+- eval/검증 서브시스템 신규 DP(related-dp 빈 상태, OI-7 1순위) — QA-03/C-03 red-team 하네스와 공유.
 - QA-09 first-pass·QA-11 ②-2가 QA-07 golden 의존 → QA-07 닫힘이 교차 의존 해소 키.
 - 경계(93/99·91/93·rework 5/15/30%)는 예시값 — golden set으로 확정.
 

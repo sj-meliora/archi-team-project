@@ -26,7 +26,7 @@
 ## mini-ATAM
 - **SP**: **plugin 계약(API) 안정성**이 QA-12(변종 교체 효과)에 강하게 민감. plugin 격리 경계(in-process vs 컨테이너)가 QA-08에 민감.
 - **Risk**: ⚠️ **plugin API가 출시 후 변경 어려움** — breaking change가 plugin 생태계 붕괴 → 초기 계약 설계가 critical. plugin 간 **버전 충돌**, cross-boundary 비용 누적.
-- **Non-Risk**: C-0001(Docker) — plugin을 컨테이너로 격리·배포 가능. C-0002(이식성)도 계약 표준화로 유리.
+- **Non-Risk**: C-01(Docker) — plugin을 컨테이너로 격리·배포 가능. C-02(이식성)도 계약 표준화로 유리.
 
 ## 인접 DP 정합
 - **A7(변종 수용) + A5(ephemeral 실행) + A6(내구 실행)** = 다양성·확장·복구를 각 축에서 분담하는 강력한 조합. DP-0003(외부 시스템 안정성)의 어댑터도 plugin으로 통합 가능.

@@ -78,6 +78,23 @@
 - 사유: round-04(★ 등급 척도 red-team 검증 → Council 근거 보강). review 4축(C1 apples / C2 margin / C3 main축 실측불가 / C4 출처 신뢰성)에 레퍼런스+PoC로 응답. `_feasibility-filter.md` 없는 수렴/캘리브레이션 라운드 — counsel 채택 권고표를 등급 기준으로 적용. 경계는 전부 예시값 — PoC 실측으로 확정.
 - 영향 ID: QA-01~13 전체 + QAS-06·07·11(Measure) + QAS-01·02·03·04·05·08·09·10·12·13(노트), open-issues(OI-9 round-04 항목), changelog.
 
+## 2026-06-26 — QA-06 Security/Safety → 제약 C-03 이관 (OI-10 닫힘)
+- 변경(이관): `QA-06 Security/Safety` → **제약 `C-03`**(`context/requirements/C-03-agent-security-safety.md` 신설, QA-06 6섹션 콘텐츠를 제약 형식으로 이관). QA-06·QAS-06 파일 삭제.
+- 사유: 헤드라인 `권한 상승·범위 외 배포 = 0`이 1·2건을 허용 못 하는 **0건 절대형(pass/fail 게이트)** 이라 ★ 급간화 불가 → ATAM 대안 변별용 QA가 아니라 제약(Constraint)이 적정(팀 의논). round-03 ★ rubric이 이미 "헤드라인 = Constraint 성격"을 지적했던 것을 전체 이관으로 확정.
+- 변경(gradable 보존): `injection 차단율 ≥70%·FPR ≤1%`는 C-03 **측정 임계**로 승계. 종전 ★ rubric(★1~3 등급표)은 폐기.
+- 변경(번호): **QA-07~13 현 위치 유지**(QA-07을 06으로 당기지 않음 — QA-06 번호 공석). 짝 **QAS-06 제거**.
+- 변경(ASR 축소): ASR = **QA-01~05, QA-07**(종전 QA-01~07에서 Security 제외). discussion 방법론 스펙(`Contention.md`·`README.md`) ASR 목록 갱신.
+- 변경(cross-ref): INDEX·glossary·open-issues(OI-7 갱신·OI-10 신설) + QA-03·QAS-03·QA-04·QAS-04·QA-07·QA-11·QA-13 라이브 참조를 "QA-06" → "C-03"으로 redirect. (round-NN append-only 스냅샷·각 QA 변경이력의 과거 서술은 당시 번호 보존.)
+- 비고: 같은 날 **C-0001/0002 → C-01/C-02 2자리 통일**도 수행(아래 별도 항목) — 이제 C 전부 2자리.
+- 영향 ID: C-03(신규), QA-06·QAS-06(삭제), QA-03, QAS-03, QA-04, QAS-04, QA-07, QA-11, QA-13, INDEX, glossary, open-issues(OI-7·OI-10), discussion(qa/Contention·README).
+
+## 2026-06-26 — Constraint ID 2자리 통일 (C-0001/0002 → C-01/C-02)
+- 변경: `C-0001 표준 패키징` → **`C-01`**, `C-0002 배포 이식성` → **`C-02`**(파일 리네임 + heading + 라이브 cross-ref). C-03 신규와 자릿수 정합.
+- 사유: CLAUDE.md "FR/C/DP도 2자리 통일 예정"의 C 부분 이행 — C-03 신설로 생긴 4자리/2자리 혼용 해소.
+- 반영: requirements/ 2파일 리네임 + 라이브 참조(INDEX·dp/DP-0002·DP-0003·DP-0004·DP-01·dp4/approaches A3~A8) 일괄 치환. **round-NN append-only 스냅샷(discussion/dp/round-01/*)·과거 changelog 영향 ID(2026-06-23 항목)는 당시 표기 보존.**
+- 비고: ID는 영구 고정 원칙이나 자릿수 포맷 전환은 예외(내용·의미 불변, zero-pad만). FR/DP 2자리 전환은 추후 별도.
+- 영향 ID: C-01, C-02(리네임), INDEX, DP-0002, DP-0003, DP-0004, DP-01, dp4/approaches(A3·A4·A5·A6·A7·A8), changelog, open-issues(OI-10 잔여).
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>

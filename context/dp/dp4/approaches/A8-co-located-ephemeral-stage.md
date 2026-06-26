@@ -28,7 +28,7 @@
 ## mini-ATAM
 - **SP**: ① 노드 용량 대비 모델당 파이프라인 footprint가 QA-10(로컬 유지 vs spill)에 강하게 민감. ② 로컬 디스크 내구성 정책(복제/체크포인트 여부)이 QA-08에 민감.
 - **Risk**: 모델 폭증으로 노드 초과 시 **로컬리티 붕괴 → 원격 전달 degrade**(A8 강점 소멸, A5에 수렴). 로컬 디스크 유실로 재실행 비용↑. data-affinity 스케줄러 구현 난이도.
-- **Non-Risk**: C-0001(Docker)·C-0002(이식성) — K8s Job + pod affinity/local volume로 컨테이너 기반 구동 가능.
+- **Non-Risk**: C-01(Docker)·C-02(이식성) — K8s Job + pod affinity/local volume로 컨테이너 기반 구동 가능.
 
 ## 인접 DP 정합
 - DP-0001 2안(Dynamic Agent Pool)과 정합 — Agent를 노드 핀 ephemeral invocation으로. DP-0005 캐시는 로컬 볼륨 계층과 결합(노드 로컬 memoization). A4(무상태 filter)를 **로컬 스트리밍 모드**로 얹으면 A8의 단계 분해와 자연 결합.

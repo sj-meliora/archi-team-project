@@ -5,7 +5,8 @@
 > 공통 프로토콜·다른 영역(DP 등)은 상위 [`../README.md`](../README.md). 트리거: "QA 디스커션 돌리자".
 > updated: 2026-06-25 (round-04 counsel — ★ 등급 척도 근거 보강 + C4 웹검증; round-04 review·round-03 ★ 캘리브레이션·round-02 완료 + OI-8 닫힘·QA 재번호)
 >
-> ⚠️ **2026-06-24 QA 재번호(OI-8 닫힘)**: 신규 QA 정식 편입 — `NQA-A→QA-06`(Security)·`NQA-B→QA-07`(Correctness) 6·7위 삽입, 기존 **QA-06~10 → QA-08~12**(+2), `NQA-C→QA-13`(Cost). **ASR = QA-01~07.** 아래 라운드 이력·verdict 추세표의 번호는 **각 라운드 당시(구 번호)** 기준이다 — 현재 번호 환산은 이 매핑 또는 `context/changelog.md`. (round-NN 폴더는 append-only라 미수정.)
+> ⚠️ **2026-06-24 QA 재번호(OI-8 닫힘)**: 신규 QA 정식 편입 — `NQA-A→QA-06`(Security)·`NQA-B→QA-07`(Correctness) 6·7위 삽입, 기존 **QA-06~10 → QA-08~12**(+2), `NQA-C→QA-13`(Cost). 아래 라운드 이력·verdict 추세표의 번호는 **각 라운드 당시(구 번호)** 기준이다 — 현재 번호 환산은 이 매핑 또는 `context/changelog.md`. (round-NN 폴더는 append-only라 미수정.)
+> ⚠️ **2026-06-26 QA-06 → 제약 C-03 이관(OI-10 닫힘)**: `QA-06 Security/Safety`가 제약 `C-03`으로 이관(헤드라인 0건 절대형 = pass/fail 게이트라 QA 부적합). QA-07~13 현 번호 유지(QA-06 공석)·QAS-06 제거. **ASR = QA-01~05, QA-07.**
 
 ## 관리 체계
 

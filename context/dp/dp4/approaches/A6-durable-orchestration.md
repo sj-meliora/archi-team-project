@@ -26,7 +26,7 @@
 ## mini-ATAM
 - **SP**: 이벤트 스토어 영속화 빈도가 QA-10(오버헤드≤5%)에 민감. 오케스트레이터 샤딩 여부가 QA-01에 민감.
 - **Risk**: 중앙 오케스트레이터/이벤트 스토어 확장 한계 → 모델 폭증 시 병목(QA-01 위협). event log 비대화로 replay 비용↑.
-- **Non-Risk**: C-0001(Docker) — Temporal/Argo 모두 컨테이너·K8s 네이티브 구동.
+- **Non-Risk**: C-01(Docker) — Temporal/Argo 모두 컨테이너·K8s 네이티브 구동.
 
 ## 인접 DP 정합
 - ⚠️ **DP-0002(Agent Hierarchy) 오케스트레이터 논의와 직접 정합 필요** — A6의 워크플로 오케스트레이터를 DP-0002의 계층 제어와 일치시키거나 중복 방지. 엔진 worker로 **A5(ephemeral Job)** 를 쓰면 Reliability(A6)+Scalability(A5) 결합. DP-0005 캐시는 activity 결과 memoization으로 결합.

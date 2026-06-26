@@ -1,4 +1,4 @@
-# C-0002 배포 이식성
+# C-02 배포 이식성
 
 > category: Constraint | source: pptx p.14 | updated: 2026-06-19
 > related: QA-02, QA-03

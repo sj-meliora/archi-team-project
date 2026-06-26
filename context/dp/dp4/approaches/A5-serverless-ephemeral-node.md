@@ -26,7 +26,7 @@
 ## mini-ATAM
 - **SP**: **cold start 시간**이 QA-10(E2E)·QA-09(Agent 수행시간)에 강하게 민감. min-instance/pre-warm 정책이 비용↔latency 교환점.
 - **Risk**: 대형 이미지 cold start로 E2E 목표 잠식 / scale-to-zero 후 동시 폭증 시 throttling. → pre-warm pool, 이미지 슬림화로 완화.
-- **Non-Risk**: C-0001(Docker)·C-0002(이식성) — K8s Job/Knative는 컨테이너 기반·이식성 우수.
+- **Non-Risk**: C-01(Docker)·C-02(이식성) — K8s Job/Knative는 컨테이너 기반·이식성 우수.
 
 ## 인접 DP 정합
 - DP-0001 2안(Dynamic Agent Pool)과 정합 — Agent를 ephemeral invocation으로. A3(큐) 트리거로 호출하면 Knative 이벤트 구동과 자연 결합. 2안 대비 활용률↑이라 DP-0001 R-1(활용률 미달) 완화에도 기여.
