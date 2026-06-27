@@ -19,13 +19,14 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 | 기능 요구사항 | requirements/ | FR | |
 | 비기능 요구사항 | requirements/ | NFR | (현재 없음, 예약) |
 | 제약 | requirements/ | C | |
-| 품질 속성 | qa/ | QA | **2자리**, 번호 = 발표 우선순위(재정렬 가능) |
+| 품질 속성 | qa/ | QA | **2자리**, id는 **고정 식별자**(우선순위는 asr.md가 관리 — 재번호 안 함) |
 | 품질 속성 시나리오 | qa/ | QAS | 6-part 정형화, **2자리** |
+| **ASR 선정·우선순위** | (flat) **asr.md** | — | ASR(=DP 생성 동인) 목록·우선순위 **SSoT**. QA id와 분리 |
 | 설계 결정 | dp/ | DP | ATAM 분석을 문서 내부에 포함 |
 | 산출물(뷰/도표) | artifacts/ | (자유) | context/domain diagram 등 |
 
-- ID 포맷: `<CAT>-<NNNN>` (4자리 zero-pad). **단 QA·QAS는 2자리(`QA-01`)** — 번호가 곧 발표 우선순위. (FR/C/DP도 2자리 통일 예정.) 파일명 = `<ID>-<kebab-slug>.md`.
-- FR/C/DP ID는 영구 고정(슬러그/내용만 변경). **QA·QAS 번호는 우선순위가 바뀌면 재번호.** cross-link은 본문에 ID 텍스트로(`DP-0002`, `QA-03`) 적어 grep 역참조 가능하게.
+- ID 포맷: `<CAT>-<NNNN>` (4자리 zero-pad). **단 QA·QAS·C는 2자리(`QA-01`, `C-01`)**. (FR/DP도 2자리 통일 예정.) 파일명 = `<ID>-<kebab-slug>.md`.
+- **모든 ID(QA·QAS 포함)는 영구 고정 식별자**다(슬러그/내용만 변경). **우선순위·ASR 선정이 바뀌어도 QA id를 재번호하지 않는다** — 우선순위는 [`asr.md`](asr.md)에서만 관리(2026-06-27 정책 전환: 종전 "번호=우선순위→재번호"가 cross-ref 출렁임을 유발해 분리). cross-link은 본문에 ID 텍스트로(`DP-0002`, `QA-03`) 적어 grep 역참조 가능하게.
 
 ## 전체 ID 목록
 
@@ -39,7 +40,7 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 - C-02 배포 이식성
 - C-03 자율 에이전트 보안·안전 게이트 *(2026-06-26 QA-06 → 제약 이관, OI-10)*
 
-### qa/ (우선순위 = 번호, 2026-06-24 재번호 / **ASR = QA-01~05, QA-07**)
+### qa/ (**ASR 선정·우선순위 SSoT = [`asr.md`](asr.md)** — 현재 QA-01~05·QA-07. QA id는 고정 식별자)
 - QA-01 Scalability / QA-02 Availability / QA-03 Controllability / QA-04 Observability / QA-05 Efficiency
 - ~~QA-06 Security/Safety~~ → **C-03으로 이관**(2026-06-26 제약 이관, OI-10). 번호 06은 공석(QA-07~13 현 위치 유지). / **QA-07 Correctness** (ISO Functional Correctness)
 - QA-08 Reliability(Workflow) / QA-09 Performance(Agent수행시간) / QA-10 Performance(E2E) / QA-11 Reliability(Agent일관성) / QA-12 Maintainability

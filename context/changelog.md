@@ -95,6 +95,13 @@
 - 비고: ID는 영구 고정 원칙이나 자릿수 포맷 전환은 예외(내용·의미 불변, zero-pad만). FR/DP 2자리 전환은 추후 별도.
 - 영향 ID: C-01, C-02(리네임), INDEX, DP-0002, DP-0003, DP-0004, DP-01, dp4/approaches(A3·A4·A5·A6·A7·A8), changelog, open-issues(OI-10 잔여).
 
+## 2026-06-27 — ASR 선정·우선순위 SSoT 분리 (context/asr.md 신설, OI-11)
+- 변경: ASR(=DP 생성 동인) 목록·우선순위를 **`context/asr.md`로 분리(SSoT)**. 현재 ASR = QA-01~05, QA-07(우선순위순).
+- 사유: 종전 `QA 번호 = 발표 우선순위`라 우선순위 변경 시 **QA id 재번호 → 전 cross-ref 출렁임**. QA id를 **고정 식별자**로 두고 우선순위는 asr.md에서만 관리.
+- 반영: asr.md 신설 + **하드코딩된 ASR 목록을 asr.md 참조로 전환** — INDEX(ID 체계·qa 헤더)·CLAUDE.md(번호 정책)·discussion/dp(Reviewer·Council)·discussion/qa(Contention·README)·`.claude/skills/discussion/SKILL.md`·context/dp/DP-01. **우선순위가 바뀌어도 QA 재번호 안 함.**
+- 비고: round-NN append-only 스냅샷·각 변경이력·`discussion/dp/notes/dp2-drop-rationale.md`(드랍 결정 기록)의 과거 'QA-01~07' 서술은 당시 기준으로 보존.
+- 영향 ID: asr.md(신규), INDEX, CLAUDE.md, discussion(dp/Reviewer·Council, qa/Contention·README), SKILL.md, DP-01, changelog, open-issues(OI-11).
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>

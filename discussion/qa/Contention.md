@@ -2,14 +2,14 @@
 
 > 목적: counsel(blue) 직후, applier 반영 **전**에 red↔blue가 **바운드된 1 왕복**으로 쟁점을 다툰다.
 > red→blue 일방 파이프라인의 빈틈(약한 반박·회피된 지적·가짜 합의)을 *반영 전에* 잡는다.
-> **상태: selective 채택** — **ASR(architecturally significant)로 선정된 QA에만** 적용. 현재 선정: **QA-01~05, QA-07**(2026-06-24 Security·Correctness 편입으로 QA-01~07 확장, OI-8 → 2026-06-26 Security가 제약 C-03으로 이관돼 ASR에서 빠짐, OI-10). (round-01 QA-09[現 QA-11] 트라이얼로 가치 검증 완료 — 헤드라인 KPI 모순을 해소.)
+> **상태: selective 채택** — **ASR(architecturally significant)로 선정된 QA에만** 적용. **ASR 선정·우선순위는 [`context/asr.md`](../../context/asr.md)가 SSoT**(현재 QA-01~05·QA-07; 목록을 하드코딩하지 말고 asr.md를 본다). (round-01 QA-09[現 QA-11] 트라이얼로 가치 검증 완료 — 헤드라인 KPI 모순을 해소.)
 > 공통 프로토콜·다른 역할: [`../README.md`](../README.md) · [`Reviewer.md`](Reviewer.md) · [`Council.md`](Council.md) · [`Applier.md`](Applier.md).
 
 ## 적용 대상 (ASR selective — 전수 아님)
 - contention은 비싸다(트라이얼 기준 QA 1개당 ~78k 토큰·2단계). 그래서 **전 QA에 매 라운드 돌리지 않는다.**
-- **대상 = ASR(architecturally significant)로 선정된 QA뿐.** ASR 선정은 **팀 입력**이다(우선순위 = 발표 비중 상위, DP 생성 동인). **현재 선정: QA-01~05, QA-07**(2026-06-26 Security → 제약 C-03 이관으로 QA-06 제외, OI-10).
+- **대상 = ASR(architecturally significant)로 선정된 QA뿐.** ASR 선정은 **팀 입력**이다(우선순위 = 발표 비중 상위, DP 생성 동인). **목록은 [`context/asr.md`](../../context/asr.md) 참조**(현재 QA-01~05·QA-07).
 - ASR 아닌 QA(건강한·저우선)는 `counsel → applier`로 직행(contention 생략). 건강한 QA에 억지로 돌리면 공허한 트집만 늘어난다.
-- ASR 선정이 바뀌면 이 줄과 skill의 대상 목록을 갱신한다.
+- **ASR 선정이 바뀌면 [`context/asr.md`](../../context/asr.md)만 갱신한다** — 이 스펙·skill은 목록을 asr.md에서 읽으므로 여기 재기입 불요.
 
 ## 왜 (파이프라인의 빈틈)
 - Reviewer는 한 번 까고, Council은 한 번 답하고 끝 → **Council이 지적을 회피·약하게 답해도 검증할 기회가 없다.** Applier가 뒤에서 일부 거르지만, blue의 권고를 red 관점으로 되치는 단계가 없다.

@@ -14,7 +14,7 @@
 ### ATAM 표준 용어 (Architecture Tradeoff Analysis Method, SEI)
 | 용어 | 뜻 |
 |---|---|
-| **ASR** | Architecturally Significant Requirements — 아키텍처를 좌우하는 핵심 요구. 본 과제에선 **ASR = QA-01~07**(우선순위 상위 품질속성, *DP 생성 동인*). |
+| **ASR** | Architecturally Significant Requirements — 아키텍처를 좌우하는 핵심 요구. **ASR 목록·우선순위는 [`context/asr.md`](../../context/asr.md)가 SSoT**(현재 QA-01~05·QA-07; *DP 생성 동인*). 목록을 여기 하드코딩하지 말고 asr.md를 본다. |
 | **Sensitivity Point (S, 민감점)** | 한 설계 파라미터가 특정 QA 응답을 좌우하는 지점. 그 값을 바꾸면 그 QA가 크게 움직인다. |
 | **Tradeoff Point (T, 교환점)** | 둘 이상의 QA에 동시에 민감한 지점 — 한 QA를 올리면 다른 QA가 내려가는 교환이 일어나는 곳. ATAM 분석의 핵심. |
 | **Risk (R, 위험)** | 그대로 두면 품질 목표(KPI) 미달로 이어질 수 있는 우려되는 결정. |
@@ -43,14 +43,14 @@
 
 ## 0. 리뷰의 목표 (무엇을 판정하나)
 
-**DP는 ASR(Architecturally Significant Requirements)을 실현하려고 존재한다.** context 기준 **ASR = QA-01~07**(우선순위 상위 7개 — 곧 *DP 생성 동인*. `changelog.md`·`INDEX.md`). 그러므로 DP 리뷰가 **가장 먼저·가장 무겁게** 보는 것은 ASR cover다 — 이는 **두 층위**로 본다:
+**DP는 ASR(Architecturally Significant Requirements)을 실현하려고 존재한다.** **ASR 목록·우선순위는 [`context/asr.md`](../../context/asr.md)가 SSoT**다(현재 QA-01~05·QA-07 — *DP 생성 동인*. 목록을 하드코딩하지 말고 asr.md를 본다). 그러므로 DP 리뷰가 **가장 먼저·가장 무겁게** 보는 것은 ASR cover다 — 이는 **두 층위**로 본다:
 
-0. **세트 전체 coverage (대장 = 렌즈2 고유 책임) — 모든 DP를 합쳤을 때 ASR(QA-01~07) 전부가 어느 DP엔가 cover되는가?** 개별 DP가 각자 ASR을 잘 풀어도, **어느 DP에도 안 잡힌 ASR(orphan ASR)이 있으면 안 된다.** 세트 전체로 **Traceability Matrix(행=DP, 열=ASR, 셀=S/T/R/N)**를 그려 빈 열(미커버 ASR)을 드러내는 것이 DP 디스커션의 최상위 점검이다(→ §5). 빈 열은 신규 DP(NDP)로 메운다.
+0. **세트 전체 coverage (대장 = 렌즈2 고유 책임) — 모든 DP를 합쳤을 때 ASR(asr.md 목록) 전부가 어느 DP엔가 cover되는가?** 개별 DP가 각자 ASR을 잘 풀어도, **어느 DP에도 안 잡힌 ASR(orphan ASR)이 있으면 안 된다.** 세트 전체로 **Traceability Matrix(행=DP, 열=ASR, 셀=S/T/R/N)**를 그려 빈 열(미커버 ASR)을 드러내는 것이 DP 디스커션의 최상위 점검이다(→ §5). 빈 열은 신규 DP(NDP)로 메운다.
 
 1. **개별 ASR-coverage — 이 DP가 자신이 driving하는 ASR QA를 실제로 cover하는 설계인가?**
    - 결정 포인트와 후보 대안이 그 ASR QA의 관심사를 **실제로 움직이는가**(별점이 그 QA 칸에서 갈리는가), 아니면 이름만 걸어두고 정작 그 QA를 좌우하지 못하는가?
    - driving QA로 선언된 ASR이 **맞는** ASR인가? 이 결정이 응당 cover해야 할 ASR QA가 **빠지지 않았는가**(예: 멱등 가정이 QA-07 Correctness/QA-11 일관성을 건드리는데 driving에서 누락, findings F-05/F-12)?
-   - 비-ASR QA(QA-08~13)에만 강점이 쏠려 **정작 ASR은 ★★☆ 평이**한 대안을 권고하고 있지 않은가(F-07 최저중요도 과최적화의 ASR판).
+   - 비-ASR QA(asr.md 미선정)에만 강점이 쏠려 **정작 ASR은 ★★☆ 평이**한 대안을 권고하고 있지 않은가(F-07 최저중요도 과최적화의 ASR판).
 
 2. **KPI-comparison — 각 driving QA의 주요 KPI가 대안 비교의 축으로 제대로 비교되는가?**
    - ★ Trade-off 매트릭스의 각 칸이 **그 QA의 실제 KPI**(예: QA-10 “전달 오버헤드 ≤ E2E 5%”, QA-08 “타 Workflow 중단 ≤1%”)에 **앵커**돼 있는가, 아니면 막연한 별점인가?
@@ -74,7 +74,7 @@
 리뷰어는 아래 세 전문가 페르소나를 **각각 독립 섹션**으로 적용한다. 한 렌즈가 다른 렌즈를 대신하지 않는다. (QA Reviewer 3렌즈와 동형 — 같은 전문성을 DP/ATAM에 적용.)
 
 **역할 분담** (DP 리뷰의 핵심):
-- **렌즈 2 = 리뷰어 대장(lead)** — *coverage·KPI·ATAM 절차*를 총괄한다. 특히 **세트 전체 ASR coverage**: 개별 DP가 ASR을 잘 풀어도, **모든 DP를 합쳤을 때 ASR(QA-01~07) 중 어느 DP에도 커버되지 않는 것(orphan ASR)이 있으면 안 된다.** 개별 cover(§0-①)는 각 DP에서, 집합 cover(orphan 점검)는 렌즈2가 세트 전체 **Traceability Matrix**(§5)에서 본다.
+- **렌즈 2 = 리뷰어 대장(lead)** — *coverage·KPI·ATAM 절차*를 총괄한다. 특히 **세트 전체 ASR coverage**: 개별 DP가 ASR을 잘 풀어도, **모든 DP를 합쳤을 때 ASR(asr.md 목록) 중 어느 DP에도 커버되지 않는 것(orphan ASR)이 있으면 안 된다.** 개별 cover(§0-①)는 각 DP에서, 집합 cover(orphan 점검)는 렌즈2가 세트 전체 **Traceability Matrix**(§5)에서 본다.
 - **렌즈 1·3 = 도메인 전문가** — *설계 자체가 make sense 하는지*를 본다. 설계 approach가 도메인적으로 **말이 되는가**, 그리고 **너무 식상하거나 뻔하지 않은가** — DP는 *난이도 있는 문제를 설득력 있게* 풀어야 한다(자명한 1차 해법·교과서 패턴 단순 적용은 발표 산출물로 약하다). 더해 **각 설계의 trade-off 분석이 타당한지**(장점·단점·별점이 도메인 현실과 맞는지)를 중점적으로 본다.
 
 ### 렌즈 1 — Agentic Workflow 최상위 전문가 (Anthropic/OpenAI 급) — 도메인 전문가
@@ -88,8 +88,8 @@
 
 ### 렌즈 2 — 20년차 ATAM 평가 수석 아키텍트 (대장 — coverage·KPI·ATAM 총괄)
 **리뷰어 대장.** 최우선(§0의 두 축)은 ASR을 옳게 **cover**하고 그 **KPI로 정직하게 비교**하는가, 그리고 **세트 전체에 orphan ASR이 없는가**다. 그 다음 ATAM 형식 완성도를 본다. 점검 축:
-- **🔑 세트 전체 ASR coverage (대장 고유 책임)**: 모든 DP를 합쳤을 때 **ASR(QA-01~07) 전부가 어느 DP엔가 cover되는가?** 어느 DP에도 안 잡힌 **orphan ASR**이 있으면 그 자체가 최상위 결함(설계 세트의 구멍) → 세트 전체로 **Traceability Matrix(행=DP, 열=ASR, 셀=S/T/R/N)**를 그려 빈 열을 드러낸다(§5). 신규 DP 필요 시 NDP로 제기.
-- **개별 ASR-coverage**: driving으로 선언된 ASR QA가 맞는가, 빠진 ASR이 없는가? 후보 대안이 그 ASR QA를 **실제로 갈라놓는가**(별점이 그 칸에서 변별)? 비-ASR(QA-08~13) 강점에 쏠려 ASR이 평이하지 않은가?
+- **🔑 세트 전체 ASR coverage (대장 고유 책임)**: 모든 DP를 합쳤을 때 **ASR(asr.md 목록) 전부가 어느 DP엔가 cover되는가?** 어느 DP에도 안 잡힌 **orphan ASR**이 있으면 그 자체가 최상위 결함(설계 세트의 구멍) → 세트 전체로 **Traceability Matrix(행=DP, 열=ASR, 셀=S/T/R/N)**를 그려 빈 열을 드러낸다(§5). 신규 DP 필요 시 NDP로 제기.
+- **개별 ASR-coverage**: driving으로 선언된 ASR QA가 맞는가, 빠진 ASR이 없는가? 후보 대안이 그 ASR QA를 **실제로 갈라놓는가**(별점이 그 칸에서 변별)? 비-ASR(asr.md 미선정) 강점에 쏠려 ASR이 평이하지 않은가?
 - **KPI-comparison**: ★ 매트릭스 각 칸이 **그 QA의 실제 KPI 임계값에 앵커**돼 있나(막연한 별점 아님)? 그 KPI 축에서 대안이 **변별**되나(한 칸 전부 동일 = 변별력 0, F-01)? 별점이 인용한 수치가 **QA 원문과 일치**하나?
 - **Well-framed**: 진짜 아키텍처 결정인가? 결정축이 **직교**하게 분리됐나(여러 직교 축을 단일 택1로 뭉개지 않았나 — dp4 4축 통찰)?
 - **대안 완전성·공정성**: 대안 공간이 충분한가(지배되는 기준선/null 포함)? **범주오류·이중계상**이 없나(variety를 Scalability로 표기 등, F-08)?
@@ -152,7 +152,7 @@
 > lenses: (1) Agentic Workflow 전문가 · (2) ATAM 평가 수석 아키텍트 · (3) Runner 인프라 아키텍트
 
 ## 원문 요약          — 결정 포인트 · 후보 대안 · driving ASR QA · ★매트릭스 · ATAM(SP/TP/Risk) · 결정/근거 핵심을 3~4줄로
-## ASR cover·KPI 비교  — driving ASR(QA-01~07) cover 여부 + 각 QA 주요 KPI가 ★칸에 앵커·변별되는지 (이 DP의 1순위 판정)
+## ASR cover·KPI 비교  — driving ASR(asr.md 목록) cover 여부 + 각 QA 주요 KPI가 ★칸에 앵커·변별되는지 (이 DP의 1순위 판정)
 ## 렌즈 1 — Agentic Workflow 전문가 관점
 ## 렌즈 2 — ATAM 평가 수석 아키텍트 관점 (ASR cover·KPI 비교·분석 건전성)
 ## 렌즈 3 — Runner 인프라 아키텍트 관점 (구현 현실성)   (말미에 구현·측정 메커니즘)
@@ -169,7 +169,7 @@
 ## 5. 교차(cross-cutting) 분석
 
 개별 DP를 넘어 **결정 세트 전체의 구조적 문제**를 `C1, C2, …`로 번호 매겨 정리한다. **Traceability Matrix는 매 라운드 필수**(대장 렌즈2 산출):
-- **🔑 Traceability Matrix — DP × ASR (필수)**: **행 = DP, 열 = ASR(QA-01~07)**. 각 셀에 그 DP가 해당 ASR에 대해 갖는 ATAM 성격을 **S/T/R/N** 으로 표기(DP 문서의 ATAM 4절과 1:1):
+- **🔑 Traceability Matrix — DP × ASR (필수)**: **행 = DP, 열 = ASR(asr.md 목록)**. 각 셀에 그 DP가 해당 ASR에 대해 갖는 ATAM 성격을 **S/T/R/N** 으로 표기(DP 문서의 ATAM 4절과 1:1):
   - **S** 민감점(Sensitivity) — 이 DP가 그 ASR 달성을 좌우 · **T** 교환점(Tradeoff) — 그 ASR을 다른 ASR과 교환 · **R** 위험(Risk) — 그 ASR 미달 위험 · **N** 비위험(Non-Risk) — 안전 충족 · **빈칸** — 무관(이 DP는 그 ASR 안 다룸).
   - 한 셀에 복수 표기 가능(예: `S,T`). 근거는 해당 DP 문서의 SP/TP/Risk/Non-Risk 항목으로 grep 역참조.
   - **열 전체가 빈칸인 ASR = orphan ASR**(어느 DP도 안 푸는 ASR) → 최상위 우선순위 결함으로 report에 올리고, 메울 신규 DP를 `_new-dp-candidates.md`에 NDP로 제안. (한 ASR에 DP·R이 과집중된 불균형, T가 몰린 핵심 교환 ASR도 함께 읽힌다.)

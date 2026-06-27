@@ -71,3 +71,10 @@
 - **ASR 축소(DP 생성 동인)**: ASR = **QA-01~05, QA-07**(종전 QA-01~07에서 Security 제외). C-03은 제약으로서 DP-0002/0003을 구동하나 ASR 목록엔 미포함.
 - **반영 완료**: `context/requirements/C-03-agent-security-safety.md` 신설(QA-06 6섹션 콘텐츠 제약 형식 이관) + QA-06·QAS-06 파일 삭제 + INDEX·glossary·open-issues(OI-7)·changelog + QA-03·QAS-03·QA-04·QAS-04·QA-07·QA-11·QA-13 라이브 cross-ref C-03 redirect + discussion 방법론 스펙(Contention.md·README.md) ASR 목록 갱신. (round-NN append-only 스냅샷·각 QA 변경이력의 과거 서술은 당시 번호 보존.)
 - **잔여**: 발표 우선순위 추가 상향(Security를 더 위로)은 무의미해짐(제약은 우선순위 번호 밖). DP-0002/0003 보안 tactic 미명시·eval 서브시스템 DP 신설은 OI-7로 계속 트래킹. **C 2자리 통일 완료(2026-06-26)**: C-0001/0002 → C-01/C-02 리네임 — 이제 C 전부 2자리(C-01·02·03). (FR/DP 2자리 전환은 추후 별도.)
+
+## [x] OI-11 ASR 선정·우선순위 SSoT 분리(asr.md) — 2026-06-27 닫힘
+- **결정(2026-06-27)**: ASR(=DP 생성 동인) 목록·우선순위를 **`context/asr.md`로 분리**. **QA id는 고정 식별자**(우선순위가 바뀌어도 재번호하지 않는다).
+- **사유**: 종전 `QA 번호 = 발표 우선순위` 결합이 우선순위 변경 시 QA 재번호 → 전 cross-ref·문서 출렁임을 유발(OI-8·OI-10이 그 사례). id와 우선순위를 분리해 churn 제거.
+- **반영**: `context/asr.md` 신설(현재 ASR = QA-01~05·QA-07, 우선순위순) + INDEX(ID 체계·qa 헤더)·CLAUDE.md(번호 정책) 갱신 + QA/DP 디스커션 스펙·skill이 ASR 목록을 **하드코딩 대신 asr.md 참조**(discussion/dp Reviewer·Council, discussion/qa Contention·README, SKILL.md, context/dp/DP-01).
+- **유지보수**: 우선순위·ASR 변경은 **asr.md만** 수정(+ 근거는 여기 open-issues, 델타는 changelog). QA 본문·스펙의 목록을 일일이 고칠 필요 없음.
+- **후속**: FR/DP 2자리 통일은 추후 별도(OI-10 잔여와 동일).

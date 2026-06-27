@@ -67,7 +67,7 @@ DP는 고립된 섬이 아니다. 각 DP는 다른 DP와의 관계를 본문에 
 - [ ] **공유 가정 무모순** — load-bearing 가정이 DP 간 충돌 안 하나(멱등 ↔ QA-11 비결정)?
 - [ ] **일관성** — 용어·ID 참조·**별점 앵커(§9)** 가 전 DP에서 같은 기준인가?
 - [ ] **공유 장애도메인 합산** — 여러 DP가 들이는 공유 컴포넌트 blast-radius가 합쳐서 ASR 신뢰성을 깨지 않나?
-- [ ] **Traceability Matrix 완전성** — 전 ASR(QA-01~07)이 cover되나(**orphan = 전체 설계의 정합 구멍**)?
+- [ ] **Traceability Matrix 완전성** — 전 ASR([`asr.md`](../../context/asr.md) 목록)이 cover되나(**orphan = 전체 설계의 정합 구멍**)?
 - [ ] **단일 발표 서사** — DP들이 하나의 이야기로 쌓이나(1번 타자가 깔고 나머지가 얹힘)?
 - → 위반 시 권고: 동시결정 일원화, 가정 통일, 별점 재앵커, orphan 메우는 NDP. (Reviewer **교차발견(C*)·Traceability Matrix** 와 직결.)
 
@@ -141,7 +141,7 @@ context/dp/DP-0X/
 
 - **해당 라운드 `round-NN/review/` 전체** — `report.md`(Traceability Matrix·orphan ASR·red 결론), `DP-0X-*.md`(렌즈별 지적·Stage 2 권고), `_new-dp-candidates.md`. **Reviewer 의견을 빠짐없이 읽는 것이 1번 의무.** (자문 모드면 해당 DP 원본 + 관련 review만.)
 - `context/dp/` 원본 DP(+ 폴더 승격 DP의 하위 `evaluation.md`·`decision-axes.md`·`approaches`·`research/R-*`) — 특히 **dp4의 R-01~R-05 리서치는 재사용 가능한 근거 자산**이다.
-- `context/qa/QA-01~07`(ASR) — **각 QA의 등급 척도(★ rubric)가 DP 별점 앵커의 기준선**(§9). KPI 임계값도 여기서.
+- `context/qa/`의 ASR QA(목록: [`context/asr.md`](../../context/asr.md)) — **각 QA의 등급 척도(★ rubric)가 DP 별점 앵커의 기준선**(§9). KPI 임계값도 여기서.
 - `context/requirements/`(realizes FR·Constraint) · `context/overview.md`·`glossary.md`·`INDEX.md`·`open-issues.md`(OI-*).
 - 직전 라운드 `counsel.md`(있으면 — 권고 추세).
 

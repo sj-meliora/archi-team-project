@@ -22,7 +22,7 @@
 | **상태 외부화 / VIP** | 오케스트레이터 상태를 외부 저장소에 둬 페일오버 시 이어받게 함 / VIP=가상 IP, 요청을 활성 노드로 자동 라우팅 |
 | **stateless judge gate** | 단계 출력의 통과/실패를 판정하는 **일회용** 판정자(상주 감독자 아님) |
 | **bounded ↔ open-ended 회귀** | 고정된 회복 엣지(예: Quant 실패→Opt)는 *bounded*(엔진이 처리) / 회복 행동을 추론으로 *생성*하면 *open-ended*(오케스트레이터 필요) |
-| **ASR / driving QA** | ASR=아키텍처 핵심 요구(QA-01~07) / driving QA=이 결정이 좌우하는 주 품질속성 |
+| **ASR / driving QA** | ASR=아키텍처 핵심 요구(목록·우선순위 SSoT: [`context/asr.md`](../../asr.md)) / driving QA=이 결정이 좌우하는 주 품질속성 |
 | **★ 등급 · S·T·R·N** | ★=그 QA 만족도(등급척도 앵커) · S 민감점 · T 교환점 · R 위험 · N 비위험(ATAM) |
 
 ---

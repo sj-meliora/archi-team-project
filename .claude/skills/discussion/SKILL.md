@@ -39,7 +39,7 @@ description: >-
 4. 마스터 인덱스의 권고 추세·verdict 변화 갱신.
 
 ## 4.5 Contention 단계 (선택 · ASR 대상만)
-> 전제: 해당 라운드 `counsel/` 완성. **대상이 ASR(architecturally significant)로 선정된 QA일 때만** 돈다 — 현재 선정 **QA-01~QA-07**(2026-06-24 Security·Correctness 정식 편입으로 확장, OI-8). 방법론 [`discussion/<concept>/Contention.md`](../../discussion/qa/Contention.md). ASR 아닌 QA는 이 단계를 건너뛰고 바로 Applier로 간다.
+> 전제: 해당 라운드 `counsel/` 완성. **대상이 ASR(architecturally significant)로 선정된 QA일 때만** 돈다 — **ASR 목록은 [`context/asr.md`](../../../context/asr.md) 참조**(현재 QA-01~05·QA-07; 선정이 바뀌면 asr.md만 고친다). 방법론 [`discussion/<concept>/Contention.md`](../../discussion/qa/Contention.md). ASR 아닌 QA는 이 단계를 건너뛰고 바로 Applier로 간다.
 1. ASR 대상 QA마다 **Agent**로 `subagent_type: discussion-contention` 호출 — `role=rebuttal`(red 되치기) 먼저.
 2. rebuttal 완료 후 같은 QA에 `role=counter`(blue 응답, rebuttal.md를 읽음) 호출. **바운드 1 왕복** — 그 이상 핑퐁 금지.
 3. counter 후에도 충돌이 남으면(`referee 회부` 표기) `role=referee` 1회.
