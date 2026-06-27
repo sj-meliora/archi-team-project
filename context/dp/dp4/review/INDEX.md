@@ -2,7 +2,7 @@
 
 > category: DP-review | reviewer: 수석 아키텍트 관점(20년차 가정) | for: dp4(A3~A7 + evaluation) | updated: 2026-06-20
 > 대상: `context/dp/dp4/` 전체 — research(R-01~04), approaches(A3~A7), evaluation.md, INDEX.md
-> 교차검증 근거: DP-0004 본문, DP-0001/0002/0005, QA-01/08/10/12(+09/11), FR-0001/0002, overview, open-issues
+> 교차검증 근거: DP-0004 본문, 구 DP-0001/0002/0005, QA-01/08/10/12(+09/11), FR-0001/0002, overview, open-issues
 
 ## 한 줄 총평
 **대안 발굴(divergence)은 인증과정 수준을 넘어선다. 그러나 ATAM의 본령인 의사결정 수렴(convergence)과 "조합의 복합 trade-off" 검증이 비어 있어, 현 상태로 발표하면 '좋은 패턴을 다 모았다'는 과설계(over-engineering) 비판에 노출된다.**
@@ -12,7 +12,7 @@
 2. **패턴 근거의 엄밀성**: 각 안이 출처 있는 검증된 패턴(Azure, Temporal, Knative, Microkernel)에 정박. R-01~04 → A3~A7 추적이 명확.
 3. **mini-ATAM 일관 구조**(SP/Risk/Non-Risk)가 기존 DP 문서 양식과 정합. ⚠️ 표기로 약점을 스스로 노출한 점도 정직하다.
 4. **claim-check를 20GB+(FR-0002) 제약에 정확히 결합** — 실제 적합한 적용.
-5. 인접 DP(DP-0001/0002/0005)·FR 교차링크가 대체로 존재.
+5. 인접 DP(구 DP-0001/0002/0005)·FR 교차링크가 대체로 존재.
 
 ## 총평 판정
 - 발굴 단계로서: **합격**. 추가 대안 5개는 충분하고 근거가 탄탄하다.

@@ -1,7 +1,7 @@
 # FR-0001 Workflow 실행 인프라
 
 > category: FR | source: pptx p.12 | updated: 2026-06-19
-> related: QA-08, QA-02 | realized-by: DP-0001, DP-0004
+> related: QA-08, QA-02 | realized-by: DP-0004   <!-- 구 DP-0001(배치/풀) 삭제 → 재귀속 보류 OI-12 -->
 
 ## 요구
 노드 단위로 실행을 격리·재시도·복구할 수 있는 Workflow 실행 인프라 제공.

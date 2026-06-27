@@ -26,7 +26,7 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 | 산출물(뷰/도표) | artifacts/ | (자유) | context/domain diagram 등 |
 
 - ID 포맷: `<CAT>-<NNNN>` (4자리 zero-pad). **단 QA·QAS·C는 2자리(`QA-01`, `C-01`)**. (FR/DP도 2자리 통일 예정.) 파일명 = `<ID>-<kebab-slug>.md`.
-- **모든 ID(QA·QAS 포함)는 영구 고정 식별자**다(슬러그/내용만 변경). **우선순위·ASR 선정이 바뀌어도 QA id를 재번호하지 않는다** — 우선순위는 [`asr.md`](asr.md)에서만 관리(2026-06-27 정책 전환: 종전 "번호=우선순위→재번호"가 cross-ref 출렁임을 유발해 분리). cross-link은 본문에 ID 텍스트로(`DP-0002`, `QA-03`) 적어 grep 역참조 가능하게.
+- **모든 ID(QA·QAS 포함)는 영구 고정 식별자**다(슬러그/내용만 변경). **우선순위·ASR 선정이 바뀌어도 QA id를 재번호하지 않는다** — 우선순위는 [`asr.md`](asr.md)에서만 관리(2026-06-27 정책 전환: 종전 "번호=우선순위→재번호"가 cross-ref 출렁임을 유발해 분리). cross-link은 본문에 ID 텍스트로(`DP-01`, `QA-03`) 적어 grep 역참조 가능하게.
 
 ## 전체 ID 목록
 
@@ -49,9 +49,9 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 - *QA-07/13은 round-01 디스커션 발굴 → 2026-06-24 정식 편입(OI-8). 기존 QA-06~10 +2 시프트. QA-06(Security)은 2026-06-26 C-03으로 이관(OI-10).*
 
 ### dp/
-- DP-0001 Workflow–Agent 매핑
-- DP-0002 Agent Hierarchy
+- DP-01 에이전트 오케스트레이션 (제어성↔가용성) — **구 DP-0001(배치)+DP-0002(위상) 대체**. 짝 DP-02(Agent 특화)는 드랍(`discussion/dp/notes/dp2-drop-rationale.md`).
 - DP-0003 Agent 외부 시스템 안정성 보장
 - DP-0004 Workflow 실행 구조
 - DP-0005 E2E 개발시간 최적화
 - _backlog.md (신규 design approach 후보)
+- *2026-06-27: 구 DP-0001·DP-0002 삭제. DP-0002 → DP-01 승계, 구 DP-0001(배치/풀) 결정은 재귀속 보류(OI-12). DP는 2자리 전환 중(DP-0003/0004/0005 추후).*

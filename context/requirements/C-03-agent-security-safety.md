@@ -1,7 +1,7 @@
 # C-03 자율 에이전트 보안·안전 게이트
 
 > category: Constraint | source: discussion/qa/round-01 발굴 → QA-06(2026-06-24 QA 편입) → 2026-06-26 제약 이관(팀 결정) | updated: 2026-06-26
-> related: QA-03, QA-04, DP-0002, DP-0003
+> related: QA-03, QA-04, DP-01, DP-0003
 > ISO/IEC 25010:2023: Security(기밀성·무결성·부인방지·책임추적성·인증성) + Safety
 
 ## 배경 — 왜 QA가 아니라 제약인가
@@ -48,8 +48,8 @@
 
 | 게이트/임계 | 책임지는 설계 (DP 주장) | 검증 방법 (설계) |
 |---|---|---|
-| **권한 상승·범위 외 배포 = 0** `[헤드라인]` | **DP-0003 1안 사전 권한 게이트**(allowlist·실행 전 admission) + **2안 격리**(브로커/프록시) · **DP-0002 1안 HITL gate** | **▶ 발표 서사(실측 미실행):** red-team eval 하네스 — 권한 외 도구 호출·injection으로 악성 config 배포 유도·자격증명 탈취 시나리오 세트로 통과/차단 라벨. **QA-03 PoC-C2와 하나의 적대적 eval 하네스로 통합**(제어·보안 공유 자산). 하네스는 모듈 다이어그램에 박스로 존치, 세트 구축·실행은 미수행 |
-| HITL 통과율 100%·우회 0 | DP-0002 1안 HITL + DP-0003 1안 권한 게이트 | 고위험 액션 경로에 HITL 삽입 → 우회 경로 탐색(=0) |
+| **권한 상승·범위 외 배포 = 0** `[헤드라인]` | **DP-0003 1안 사전 권한 게이트**(allowlist·실행 전 admission) + **2안 격리**(브로커/프록시) · **DP-01 1안 HITL gate** | **▶ 발표 서사(실측 미실행):** red-team eval 하네스 — 권한 외 도구 호출·injection으로 악성 config 배포 유도·자격증명 탈취 시나리오 세트로 통과/차단 라벨. **QA-03 PoC-C2와 하나의 적대적 eval 하네스로 통합**(제어·보안 공유 자산). 하네스는 모듈 다이어그램에 박스로 존치, 세트 구축·실행은 미수행 |
+| HITL 통과율 100%·우회 0 | DP-01 1안 HITL + DP-0003 1안 권한 게이트 | 고위험 액션 경로에 HITL 삽입 → 우회 경로 탐색(=0) |
 | Artifact 서명·무결성 100% | DP-0003 1안 게이트에 서명 검증 추가(SLSA류) | 서명 변조 artifact 주입 → 검증 차단 확인 |
 | injection 차단율 ≥ 70% (FPR ≤1%) | 가드레일·입력 검증 계층 | red-team injection 세트 차단율 측정(직접·간접 injection 포함) |
 | Secrets 노출 = 0 | secrets 스캐너 + QA-04 trace 마스킹 | 로그·trace에서 secrets 패턴 스캔(=0) |
@@ -57,7 +57,7 @@
 > 가정·한계: **red-team 세트 커버리지가 곧 신뢰도 상한**(zero-day·미상상 공격 미검출) — 세트 출처·OWASP LLM Top-10 매핑을 log해야 한다. **세트 크기 silent cap**: 50~100건은 차단율 95% CI ~±10%p라 경계(85/90%) 변별 불충분 — 경계 신뢰엔 세트 확대 필요([생략]된 노동). 실제 자격증명 시스템(vault) 통합은 별도 환경 필요.
 
 ## 영향
-- **DP 구동**: DP-0003 1안(사전 권한 게이트·서명 검증), DP-0002 1안(HITL gate)이 이 제약을 책임진다. DP-0002/0003은 **공급망 artifact 서명·secrets 관리·injection 가드레일·admission 게이트를 후보 대안/ATAM에 명시**해야 한다(미명시 — OI-7 트래킹).
+- **DP 구동**: DP-0003 1안(사전 권한 게이트·서명 검증), DP-01 1안(HITL gate)이 이 제약을 책임진다. DP-01/0003은 **공급망 artifact 서명·secrets 관리·injection 가드레일·admission 게이트를 후보 대안/ATAM에 명시**해야 한다(미명시 — OI-7 트래킹).
 - **eval/검증 서브시스템 = 신규 DP 후보**: 이 제약의 red-team 하네스는 QA-07 golden+judge 하네스·QA-03 적대적 eval과 공유되는 신규 인프라 — DP 디스커션에서 신설 검토(OI-7).
 - **QA-03 의존**: QA-03 ②-2(적대적 위반 0 acceptance)는 이 제약의 공유 red-team 하네스(eval 서브시스템 DP, OI-7)에 의존한다.
 - **경계**: 제어성(중단·권한 게이트)은 QA-03(Controllability)에서 본다 — **Controllability ⊂ Security**(제어성은 안전의 한 수단, C-03은 비밀관리·공급망·injection·감사를 포괄). 감사 trace 100%는 QA-04와 교차.
@@ -68,7 +68,7 @@
 - **무엇을 바꿨나**: 종전 `QA-06 Security/Safety`를 **제약 C-03으로 이관**. 사유 = 헤드라인 `권한 상승·범위 외 배포 = 0`이 1·2건을 허용 못 하는 0건 절대형(pass/fail)이라 ★ 급간화 불가 → QA가 아닌 Constraint가 적정(팀 의논).
 - **gradable 보조지표 보존**: `injection 차단율 ≥70%·FPR ≤1%`는 **측정 임계**로 보존. 종전 QA-06의 ★ rubric(★1~3 등급표)은 폐기(제약엔 ATAM ★ 비교 미적용).
 - **QA 번호**: QA-07~13은 **현 위치 유지**(QA-07을 QA-06으로 당기지 않음 — QA-06 번호는 공석/은퇴). 짝 `QAS-06`도 제거(제약엔 QAS 없음 — 6-part 시나리오 요지는 위 제약·영향에 흡수).
-- **ASR 축소**: ASR(DP 생성 동인) = **QA-01~05, QA-07**(종전 QA-01~07에서 Security 제외). C-03은 제약으로서 DP-0002/0003을 구동하나 ASR 목록엔 미포함.
+- **ASR 축소**: ASR(DP 생성 동인) = **QA-01~05, QA-07**(종전 QA-01~07에서 Security 제외). C-03은 제약으로서 DP-01/0003을 구동하나 ASR 목록엔 미포함.
 - **cross-ref 동기화**: INDEX·glossary·open-issues(OI-10 신설)·changelog + QA-03·QAS-03·QA-04·QAS-04·QA-07·QA-11·QA-13 본문의 "QA-06" 라이브 참조를 C-03으로 redirect. discussion 방법론 스펙(Contention.md·README.md) ASR 목록 갱신. (round-NN append-only 스냅샷·각 QA 변경이력의 과거 서술은 당시 번호 보존.)
 
 ### 이관 이전 이력 (QA-06 시절, 요지)

@@ -4,7 +4,7 @@ category: QA
 importance: H
 difficulty: H
 source: pptx p.13
-related-dp: [DP-0001, DP-0004]
+related-dp: [DP-0004]   # 구 DP-0001(배치/풀) 삭제 → 재귀속 보류 OI-12
 updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
@@ -67,7 +67,7 @@ updates:
 
 | KPI | 책임지는 설계 (DP 주장) | 검증 실험·모델 |
 |---|---|---|
-| **노드타입별 speedup (first-pass)** `[주]` | **DP-0001 1안 즉시 실행**([Performance] 선택 없이 즉시 실행 ★★★) — 단, **latency만 보고 품질 게이트와 무연결** → first-pass 게이트 연계 보강 필요 | **▶ 실제 제작:** speedup×품질게이트 모델 — 고정 노드 집합(IR/Optimize/Quant/Compile 각 N건) + 수동 baseline 시간표 + 성공판정용 mini golden(QA-07) → agent 수행 후 **first-pass 성공분만으로 speedup·커버리지** 산출, easy-node만 골랐을 때 커버리지 하락(gaming) 탐지 |
+| **노드타입별 speedup (first-pass)** `[주]` | **구 DP-0001 1안 즉시 실행**([Performance] 선택 없이 즉시 실행 ★★★) — 단, **latency만 보고 품질 게이트와 무연결** → first-pass 게이트 연계 보강 필요 | **▶ 실제 제작:** speedup×품질게이트 모델 — 고정 노드 집합(IR/Optimize/Quant/Compile 각 N건) + 수동 baseline 시간표 + 성공판정용 mini golden(QA-07) → agent 수행 후 **first-pass 성공분만으로 speedup·커버리지** 산출, easy-node만 골랐을 때 커버리지 하락(gaming) 탐지 |
 | 품질 게이트 = first-pass 성공률 | **QA-07(Correctness) golden 게이트**(교차 의존 — QA-07와 함께 가야 KPI가 닫힘) | 보조 모델: 위 모델의 성공/실패 라벨링이 곧 게이트 — golden mini set으로 판정 |
 | 커버리지 ≥ 80% | 고정 노드 집합 정의(easy-node cherry-picking 방지) | 보조 모델: 측정 노드 / 전체 노드타입 비율 집계 |
 | runner 오버헤드 비율 ≤ 15% | **DP-0004 SP-3 cold-start**(이미지 크기·pre-warm/min-instance가 오버헤드에 직결) + warm pool | 보조 모델: OTel span으로 (큐+콜드스타트)/총시간 분해, warm pool On/Off A/B — PoC-P2가 DP-0004 A5 vs A8 콜드스타트 budget에도 데이터 공급 |
@@ -112,7 +112,7 @@ updates:
 
 **남은 일 (이 라운드에서 미반영)**
 - first-pass 게이트가 QA-07 golden(미구축·[발표 서사]) 의존 → QA-07 닫힘과 묶음(OI-7/OI-8 트래킹). 본 라운드 신규 조치 없음.
-- DP-0001 1안이 latency만 보고 품질 게이트 무연결(OI-7).
+- 구 DP-0001 1안이 latency만 보고 품질 게이트 무연결(OI-7).
 - speedup 경계(1×/3×/8×)·커버리지 80%·오버헤드 15%는 예시값 — 노드타입별 baseline 측정으로 확정.
 
 > 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-09-performance-agent-time.md) (verdict: Sound ◎ / KPI ○ — Med, 조건부 채택).
@@ -144,5 +144,5 @@ updates:
 
 **남은 일 (이 라운드에서 미반영)**
 - **first-pass 성공 판정은 QA-07(Correctness) golden 게이트에 의존** → **QA-07 채택과 함께 가야 QA-09 KPI가 닫힌다**(교차 의존). golden set **구축**은 [생략]/[발표 서사](실측 미실행) — 슬라이드 한 줄("speedup을 first-pass 성공분에만 집계해 '빠르게 틀리기' 차단").
-- **DP-0001(1안 즉시 실행)이 latency만 보고 품질 게이트와 무연결** → 품질 게이트 연계 보강 역검토 (`open-issues.md` 트래킹 대상).
+- **구 DP-0001(1안 즉시 실행)이 latency만 보고 품질 게이트와 무연결** → 품질 게이트 연계 보강 역검토 (`open-issues.md` 트래킹 대상).
 - speedup `3배`·커버리지 `80%`·오버헤드 `15%`는 **예시값**이며 노드타입별 baseline 측정으로 확정.

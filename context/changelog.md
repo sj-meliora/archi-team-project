@@ -102,6 +102,15 @@
 - 비고: round-NN append-only 스냅샷·각 변경이력·`discussion/dp/notes/dp2-drop-rationale.md`(드랍 결정 기록)의 과거 'QA-01~07' 서술은 당시 기준으로 보존.
 - 영향 ID: asr.md(신규), INDEX, CLAUDE.md, discussion(dp/Reviewer·Council, qa/Contention·README), SKILL.md, DP-01, changelog, open-issues(OI-11).
 
+## 2026-06-27 — 구 DP-0001·DP-0002 삭제 (DP 재구성 정리, OI-12 신설)
+- 변경: 4자리 `DP-0001`(Workflow–Agent 매핑·배치)·`DP-0002`(Agent Hierarchy·위상) 파일 삭제.
+- 승계: **DP-0002 → DP-01**(에이전트 오케스트레이션) — DP-01이 명시된 후신(오케스트레이션·Standby 3안 흡수). 전 라이브 참조 redirect(QA-02/03·QAS-02/03·C-03·FR-0004·module-view·asr·_backlog·dp4·OI-7). SP 인덱스 보정(구 DP-0002 SP-1↔DP-01 SP-2 등 swap).
+- 보류: **구 DP-0001 배치/풀 결정**은 DP-01(제어평면)이 안 다뤄 어느 DP에도 미귀속 → **재귀속 보류(OI-12 신설)**. 인용처(QA-01/05/09/13·QAS·FR-0001·dp4)는 본문 `구 DP-0001` 표기 + `related-dp`에서 제거(보류 포인터), `_backlog` BL-3 등록.
+- 정리: INDEX dp 목록·CLAUDE.md/discussion 스펙의 DP-0002 예시 → DP-01. OI-2 무효화(구 DP-0001 삭제), OI-7 DP-0001 항목 OI-12로 이관.
+- 비고: DP-01은 2자리, 잔여 DP-0003/0004/0005는 4자리 — 2자리 전환은 추후 별도.
+- round-NN append-only 스냅샷·`dp2-drop-rationale`·각 변경이력의 과거 DP-0001/0002 서술은 당시 기준 보존.
+- 영향 ID: DP-0001·DP-0002(삭제), DP-01, QA-01/02/03/05/09/13, QAS-01/02/03/05/09/13, C-03, FR-0001·FR-0004, module-view, asr, INDEX, CLAUDE, _backlog, dp4/*, open-issues(OI-2·OI-7·OI-12), discussion(dp·qa 스펙), changelog.
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>

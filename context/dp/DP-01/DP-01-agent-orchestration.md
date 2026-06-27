@@ -1,9 +1,9 @@
 # DP-01 제어성과 가용성을 고려한 에이전트 오케스트레이션 설계 (Agent Orchestration)
 
-> category: DP | status: 결정대기 (재구성안 — DP-0002 후신 검토) | source: pptx p.30 재구성 | updated: 2026-06-26
+> category: DP | status: 결정대기 (구 DP-0001/0002 대체 — 2026-06-27 삭제 완료) | source: pptx p.30 재구성 | updated: 2026-06-27
 > drives: QA-03(Controllability)↑, QA-02(Availability), QA-01(Scalability)
 > realizes: FR-0004 | constrained-by: C-02(기존 시스템 무영향)
-> 재구성 note: 기존 DP-0001(배치)+DP-0002(위상)를 **직교 2결정으로 분리** — 본 **DP-01 = 제어평면(오케스트레이터 有無)**, 짝 **DP-02 = Agent 특화 표면**. 2자리 신규 번호라 4자리 DP-0001/0002와 공존(검토 후 대체 결정). 근거: `discussion/dp/notes/agent-basics-and-dp1-retrospective.md`.
+> 재구성 note: 기존 DP-0001(배치)+DP-0002(위상)를 **직교 2결정으로 분리** — 본 **DP-01 = 제어평면(오케스트레이터 有無)**, 짝 **DP-02 = Agent 특화 표면**. **2026-06-27 구 DP-0001/0002 삭제(대체 완료)**: DP-0002(위상·Standby)는 본 DP-01로 승계, 구 DP-0001(배치/풀) 결정은 재귀속 보류(OI-12), DP-02(특화)는 드랍(`discussion/dp/notes/dp2-drop-rationale.md`). 근거: `discussion/dp/notes/agent-basics-and-dp1-retrospective.md`.
 
 ---
 
@@ -78,7 +78,7 @@
 
 ### A4. 대안 고도화 (비선택안도 tactic으로 강화)
 - **2안 Choreography Controllability(★★☆) 강화**: 분산 정책 → **중앙 PEP + policy-as-code**로 ★★★ 근접. *그러나* open-ended 재계획은 여전히 불가 → 자율 이슈처리가 binding이면 1/3안 대비 잔여 열위로 미채택.
-- **1안 Availability(★★☆) 강화**: Standby tactic → **3안(★★★) 역전 → 승격**(repo DP-0002 3안 사례 계승).
+- **1안 Availability(★★☆) 강화**: Standby tactic → **3안(★★★) 역전 → 승격**(구 DP-0002 3안 사례 계승).
 
 ### A5. ATAM 분석
 **민감점** — SP-1(제어 집중도→QA-03 ack≤5s·graceful≤30s) · SP-2(Orchestrator 가용성→QA-02 재기동≤4분·손실=0) · SP-3(흐름 동적성→오케스트레이터 정당성, 드라이버).

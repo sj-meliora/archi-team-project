@@ -16,7 +16,7 @@
 - **[Reliability-Workflow QA-08] ★★★ (주 강점)**: durable replay로 crash 후 무손실 복구, 실패 노드만 자동 retry/보상 → 타 Workflow 무영향(중단≤1% 직접 겨냥). immutable event log로 SPOF 완화.
 - **[Maintainability QA-12] ★★★**: workflow를 코드/선언으로 명시 → 흐름 가시성↑, 노드 추가·변경·재정렬이 명시적이라 Change Impact 추적 용이.
 - **[Performance-E2E QA-10] ★★☆**: ⚠️ event log 영속화·엔진 hop 오버헤드. 단 장기 실행 timeout 부재로 대형 컴파일에 안정. 전달 오버헤드 ≤5% 검증 필요.
-- **[Scalability QA-01] ★★☆**: 엔진 worker는 수평 확장 가능하나 ⚠️ **중앙 오케스트레이터/이벤트 스토어가 확장 한계점**(DP-0002 TP-2 병목과 연계) → 샤딩/네임스페이스 분할 필요.
+- **[Scalability QA-01] ★★☆**: 엔진 worker는 수평 확장 가능하나 ⚠️ **중앙 오케스트레이터/이벤트 스토어가 확장 한계점**(DP-01 TP-2 병목과 연계) → 샤딩/네임스페이스 분할 필요.
 
 ## Trade-off 별점
 | Performance | Scalability | Reliability-WF | Maintainability |
@@ -29,4 +29,4 @@
 - **Non-Risk**: C-01(Docker) — Temporal/Argo 모두 컨테이너·K8s 네이티브 구동.
 
 ## 인접 DP 정합
-- ⚠️ **DP-0002(Agent Hierarchy) 오케스트레이터 논의와 직접 정합 필요** — A6의 워크플로 오케스트레이터를 DP-0002의 계층 제어와 일치시키거나 중복 방지. 엔진 worker로 **A5(ephemeral Job)** 를 쓰면 Reliability(A6)+Scalability(A5) 결합. DP-0005 캐시는 activity 결과 memoization으로 결합.
+- ⚠️ **DP-01(Agent Hierarchy) 오케스트레이터 논의와 직접 정합 필요** — A6의 워크플로 오케스트레이터를 DP-01의 계층 제어와 일치시키거나 중복 방지. 엔진 worker로 **A5(ephemeral Job)** 를 쓰면 Reliability(A6)+Scalability(A5) 결합. DP-0005 캐시는 activity 결과 memoization으로 결합.

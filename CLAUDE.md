@@ -30,7 +30,7 @@ archi-team-project/
 - **방법론 개념 단위**로 관리한다 (FR / NFR / Constraint / QA / QAS / DP / ATAM). DP 보강 시 driving QA의 tactic·pattern에서 새 design approach를 발굴하기 위함이다.
 - **ID 포맷**: `<CAT>-<NNNN>` (4자리 zero-pad). **단 QA·QAS·C는 2자리(`QA-01`, `QAS-01`, `C-01`)**. (FR/DP도 추후 2자리로 통일 예정.) 파일명 = `<ID>-<kebab-slug>.md`.
 - **모든 ID는 영구 고정 식별자**다(QA·QAS 포함 — 슬러그/내용만 바꾼다). **우선순위·ASR 선정이 바뀌어도 QA id를 재번호하지 않는다.** 우선순위·ASR 목록은 **`context/asr.md`가 SSoT**다 (2026-06-27 정책 전환: 종전 "번호=우선순위→재번호"가 전 cross-ref 출렁임을 유발 → QA id와 우선순위를 분리). ASR이 필요한 산출물·디스커션 스펙은 목록을 하드코딩하지 말고 `asr.md`를 참조한다.
-- **cross-link**은 본문에 ID 텍스트(`DP-0002`, `QA-03`)로 적어 grep 역참조가 되게 한다.
+- **cross-link**은 본문에 ID 텍스트(`DP-01`, `QA-03`)로 적어 grep 역참조가 되게 한다.
 - **항목은 파일로 분리**한다. 커지면 폴더로 승격하되 ID는 유지한다.
 - 자료가 바뀌면 최신 pptx를 `source/`에 넣고 **델타만 `changelog.md`에 append**한다. 정합성·미결정은 `open-issues.md`로 관리한다.
 - **발표 우선순위·ASR 선정은 `context/asr.md`** (팀 합의 기준, 2026-06-23 재정렬). 원본 슬라이드 대조는 `glossary.md`.
@@ -50,7 +50,7 @@ archi-team-project/
 | `refactor` | 구조 변경 (파일 분리·이동, 리네이밍 등 내용 변화 없음) |
 | `chore` | 잡무 (설정, 보관 이동 등) |
 
-- scope는 선택. 가능하면 ID나 폴더를 쓴다 (예: `feat(dp): DP-0002 Standby 대안 추가`, `fix(qa): QA 번호 슬라이드13 기준 통일`).
+- scope는 선택. 가능하면 ID나 폴더를 쓴다 (예: `feat(dp): DP-01 Standby 대안 추가`, `fix(qa): QA 번호 슬라이드13 기준 통일`).
 - subject는 한국어로 간결하게, 명령형/요약형.
 
 ## 언어

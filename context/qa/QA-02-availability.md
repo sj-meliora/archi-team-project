@@ -4,7 +4,7 @@ category: QA
 importance: H
 difficulty: H
 source: pptx p.13
-related-dp: [DP-0002, DP-0003]
+related-dp: [DP-01, DP-0003]
 updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
@@ -63,8 +63,8 @@ updates:
 
 | KPI | 책임지는 설계 (DP 주장) | 검증 실험·모델 |
 |---|---|---|
-| **재기동 ≤ 1분 AND 손실 = 0** `[주]` | **DP-0002 3안 H+Standby**(Active-Passive 이중화·상태 외부화로 Availability ★★☆ → ★★★) · **DP-0002 SP-1** Orchestrator 가용성이 전체 MTTR을 좌우 | **▶ 실제 제작:** chaos 모델 — durable 워크플로우 엔진(Temporal류) + mock 4단계 파이프라인에서 **worker를 무작위 강제 종료** → lease 만료·재스케줄로 다른 worker가 체크포인트부터 재개 → **손실 건수·재개 시간**을 분포로 산출 |
-| 워크플로우 성공률 ≥ 99.5% | **DP-0002 R-1** Orchestrator SPOF 완화(3안 Standby) · **DP-0003 3안 모니터링**(빠른 탐지·복구로 MTTR 단축) | 보조 모델: 위 chaos 모델을 N회 반복해 장애 주입 하 종단 성공률 집계 (failover 시간 파라미터) |
+| **재기동 ≤ 1분 AND 손실 = 0** `[주]` | **DP-01 3안 H+Standby**(Active-Passive 이중화·상태 외부화로 Availability ★★☆ → ★★★) · **DP-01 SP-2** Orchestrator 가용성이 전체 MTTR을 좌우 | **▶ 실제 제작:** chaos 모델 — durable 워크플로우 엔진(Temporal류) + mock 4단계 파이프라인에서 **worker를 무작위 강제 종료** → lease 만료·재스케줄로 다른 worker가 체크포인트부터 재개 → **손실 건수·재개 시간**을 분포로 산출 |
+| 워크플로우 성공률 ≥ 99.5% | **DP-01 R-1** Orchestrator SPOF 완화(3안 Standby) · **DP-0003 3안 모니터링**(빠른 탐지·복구로 MTTR 단축) | 보조 모델: 위 chaos 모델을 N회 반복해 장애 주입 하 종단 성공률 집계 (failover 시간 파라미터) |
 | 외부 LLM 자동 재개율 ≥ 95% | **DP-0003 2안 격리(브로커/프록시)** + **3안 모니터링**으로 외부 장애를 흡수 — 단, **외부 LLM degradation을 명시 안 함**(아래 "남은 일") | 보조 모델: fault-injection — LLM 프록시에 timeout/429/5xx 주입 → retry backoff + bounded queue → outage 종료 후 자동 재개율·backpressure 작동을 곡선으로 |
 | side-effect 멱등성 = 100% | **DP-0003 1안 사전 권한 게이트**(허용 액션만 통과) + 멱등 키 부여한 activity | 보조 모델: 위 chaos 모델에서 deploy/쓰기 activity에 멱등 키 부여 → 강제 재실행 후 중복 배포·중복 쓰기 건수(=0 목표) 집계 |
 
@@ -104,7 +104,7 @@ updates:
 - **lease trade-off** 명시(빠른 lease가 손실 게이트와 trade-off일 수 있음 → 손실률 독립 확인).
 
 **남은 일 (이 라운드에서 미반영)**
-- DP-0002/0003 외부 LLM degradation(backoff·폴백) 미명시(OI-7).
+- DP-01/0003 외부 LLM degradation(backoff·폴백) 미명시(OI-7).
 - 재기동 10초/1분/4분·성공률·재개율 예시값 — chaos 주입으로 확정.
 
 > 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-02-availability.md) (verdict: Sound ◎ / KPI ○ — Low, 조건부 채택).
@@ -131,10 +131,10 @@ updates:
 - **정의**: "외부 의존성(LLM) 장애 포함 + 진행 작업 무손실 + 멱등 재개"로 보강. QA-08(격리)과 경계를 `> altitude` 한 줄로 분리.
 - **KPI 분해**: `MTTR<1분` 폐기 → ① `재기동 ≤1분 AND in-flight 손실=0`(대상·조건 명시) ② `워크플로우 성공률 ≥99.5%`(가용률 상위지표) ③ `외부 LLM 장애 자동 재개율 ≥95%`(예시값) ④ `side-effect 멱등성=100%`.
 - 짝 시나리오 `QAS-02`의 자극(외부 LLM outage 추가)·Response·Measure를 동일하게 동기화.
-- `related-dp`를 `DP-0001, DP-0002, DP-0003` → `DP-0002, DP-0003`으로 조정(DP-0001은 Per-Node 격리 결정으로 QA-02 복구 책임과 직접 연결 약함 — QAS 비고와 검증 전략은 DP-0002 Standby·DP-0003 격리/모니터링 기준으로 재배치).
+- `related-dp`를 `구 DP-0001, DP-01, DP-0003` → `DP-01, DP-0003`으로 조정(구 DP-0001은 Per-Node 격리 결정으로 QA-02 복구 책임과 직접 연결 약함 — QAS 비고와 검증 전략은 DP-01 Standby·DP-0003 격리/모니터링 기준으로 재배치).
 
 **남은 일 (이 라운드에서 미반영)**
-- **DP-0002(Standby)·DP-0003(격리/모니터링) 모두 "외부 LLM degradation" 시나리오를 명시 안 함** → backoff·폴백 tactic 보강 역검토 필요 (`open-issues.md` OI-7 트래킹 대상). 검증 전략 ③의 "책임지는 설계"가 현재 약한 이유.
+- **DP-01(Standby)·DP-0003(격리/모니터링) 모두 "외부 LLM degradation" 시나리오를 명시 안 함** → backoff·폴백 tactic 보강 역검토 필요 (`open-issues.md` OI-7 트래킹 대상). 검증 전략 ③의 "책임지는 설계"가 현재 약한 이유.
 - 외부 LLM 장애 자동 재개율의 `95%`·가용률 `99.5%`는 **예시값**이며 실환경 측정으로 확정.
 - 폴백 모델 전환 시 결정 일관성(다른 모델로 재개)은 QA-11/QA-07 영역 — 여기선 미검증(검증 전략의 silent cap).
 - QA-08↔QA-02 cross-link은 QA-08 반영 시 양방향으로 박는다(현재 QA-02 정의에 단방향 명시).

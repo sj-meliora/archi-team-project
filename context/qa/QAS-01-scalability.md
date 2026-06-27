@@ -12,5 +12,5 @@
 | **응답 측정 (Measure)** | scaling efficiency ≥ 0.70 (★☆☆ 합격 하한; 부하 2배→처리량 ≥1.40배), rate-limit 헤드룸 ≥ 20%(throttle 0), 큐 대기 p95 ≤ 5분 |
 
 ## 비고
-- 설계 연결: DP-0001(2안 동적 풀), DP-0004(1안 타입별 scale out).
+- 설계 연결: 구 DP-0001(2안 동적 풀), DP-0004(1안 타입별 scale out).
 - (★ 급간은 QA-01 등급 척도; round-04 margin 차등·LLM-bound USL apples 근거 보강 — 급간 수치 불변)

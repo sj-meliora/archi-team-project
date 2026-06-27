@@ -5,7 +5,7 @@ importance: M
 difficulty: M
 source: discussion/qa/round-01 (신규 — pptx 외 발굴, C5)
 iso-25010: "Performance Efficiency / Resource Utilization (자원 활용성)"
-related-dp: [DP-0001, DP-0004, DP-0005]
+related-dp: [DP-0004, DP-0005]   # 구 DP-0001(배치/풀) 삭제 → 재귀속 보류 OI-12
 updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
@@ -72,7 +72,7 @@ updates:
 
 | KPI | 책임지는 설계 (DP 주장) | 검증 방법 (설계) |
 |---|---|---|
-| **완료 모델당 비용($)** `[주]` | **DP-0001 2안**(작업별 최적 agent = 비용 기준 라우팅) · **DP-0004 A5/A8**(scale-to-zero로 과프로비저닝 0 = compute↓) · **DP-0005 2안**(캐시로 토큰비↓) | **▶ 발표 서사(실측 미실행):** 비용 분해 집계 — OTel `gen_ai.usage.*` 토큰 계측(QA-04) + compute 단가표 + 재시도 카운트로 $/완료모델을 토큰/compute/재시도로 분해. QA-05 prompt caching A/B 위에 얹어 절감 기여 분리. **수작업 baseline은 추정값** |
+| **완료 모델당 비용($)** `[주]` | **구 DP-0001 2안**(작업별 최적 agent = 비용 기준 라우팅) · **DP-0004 A5/A8**(scale-to-zero로 과프로비저닝 0 = compute↓) · **DP-0005 2안**(캐시로 토큰비↓) | **▶ 발표 서사(실측 미실행):** 비용 분해 집계 — OTel `gen_ai.usage.*` 토큰 계측(QA-04) + compute 단가표 + 재시도 카운트로 $/완료모델을 토큰/compute/재시도로 분해. QA-05 prompt caching A/B 위에 얹어 절감 기여 분리. **수작업 baseline은 추정값** |
 | 수작업 대비 절감률 ≥ 70% | 위 DP들의 비용 절감 효과 합산 vs 수작업 baseline | 보조(발표 서사): $/완료모델 vs 수작업 baseline 비교 → 절감률 |
 | 비용 분해(토큰/compute/재시도) | QA-04 trace(결정당 비용) + 재시도 계측 | 보조(발표 서사): 세 축으로 분해 집계해 재시도 오버헤드 가시화 |
 
@@ -166,7 +166,7 @@ KPI가 `$/모델 ≤$5` + `절감률 ≥70%` **2-index** → 규칙4. **절감�
 
 **남은 일 (이 라운드에서 미반영)**
 - 수작업 baseline·compute 단가 추정은 [발표 서사](실측 미실행).
-- DP-0001(비용 라우팅)·DP-0004(scale-to-zero)·DP-0005(캐시) 귀속(OI-7).
+- 구 DP-0001(비용 라우팅)·DP-0004(scale-to-zero)·DP-0005(캐시) 귀속(OI-7).
 - 절감률(50/60/75%)·재시도 오버헤드(10/25/40%) 예시값 — 우리 측정·단가로 확정.
 
 > 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-13-cost-economy.md) (verdict: Sound ◎ / KPI ○ — Med, 조건부 채택).

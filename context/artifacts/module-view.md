@@ -1,7 +1,7 @@
 # Module View — To-Be
 
 > category: artifact | updated: 2026-06-22
-> cross-link: DP-0002, DP-0003, FR-0004
+> cross-link: DP-01, DP-0003, FR-0004
 
 ---
 
@@ -124,6 +124,6 @@ Agentic Interface는 두 시스템이 맞닿는 경계면에 세로로 길게 �
 
 ## 5. 설계 근거 cross-link
 
-- **DP-0002** (Agent Hierarchy): Orchestrator → Workflow Manager 단일 제어 진입점.
+- **DP-01** (Agent Orchestration — 구 DP-0002 Hierarchy 승계): Orchestrator → Workflow Manager 단일 제어 진입점.
 - **DP-0003** (외부 시스템 안정성): Permission Manager가 Tool Adapters 사용 전 사전 권한 체크.
 - **FR-0004** (Agent 제어·관측): Report Generator / Issue Tracker가 Agent 실행 관측 지원.

@@ -31,4 +31,4 @@
 - **Non-Risk**: C-01(Docker)·C-02(이식성) — K8s Job + pod affinity/local volume로 컨테이너 기반 구동 가능.
 
 ## 인접 DP 정합
-- DP-0001 2안(Dynamic Agent Pool)과 정합 — Agent를 노드 핀 ephemeral invocation으로. DP-0005 캐시는 로컬 볼륨 계층과 결합(노드 로컬 memoization). A4(무상태 filter)를 **로컬 스트리밍 모드**로 얹으면 A8의 단계 분해와 자연 결합.
+- 구 DP-0001 2안(Dynamic Agent Pool)과 정합 — Agent를 노드 핀 ephemeral invocation으로. DP-0005 캐시는 로컬 볼륨 계층과 결합(노드 로컬 memoization). A4(무상태 filter)를 **로컬 스트리밍 모드**로 얹으면 A8의 단계 분해와 자연 결합.

@@ -48,7 +48,7 @@
 
 ### 2) 직교 보강축(A4·A6·A7)은 "조건부로 얹기" — 동시 채택 아님
 - **A4(구조 분해)**: 선택된 실행기반 위 **설계 규율**로만 채택(신규 인프라 아님). A8과는 로컬 스트리밍 모드로 결합.
-- **A3 vs A6(제어평면)**: **동시 채택 금지**(이중 제어평면 안티패턴, F-03). 이 축은 **DP-0002(Agent Hierarchy)와 동시 결정** — Orchestration이면 A6, Choreography면 A3로 단일화.
+- **A3 vs A6(제어평면)**: **동시 채택 금지**(이중 제어평면 안티패턴, F-03). 이 축은 **DP-01(Agent Hierarchy)와 동시 결정** — Orchestration이면 A6, Choreography면 A3로 단일화.
 - **A7(변종)**: Scalability 아님(variety=Extensibility). **변종 수가 임계치 초과 시에만** 도입.
 
 ### 3) 단계적 채택 로드맵 + 배제 기준 (발표 결론 슬라이드 골격)
@@ -56,7 +56,7 @@
 0) 기준선: 2안(로컬 격리) — 비교 기준으로 유지
 1) 실행기반 택일: 5% 산식 → A5(원격) 또는 A8(로컬)
 2) A4 분해 규율 적용 (단계 입도 확장의 전제)
-   [트리거] 제어 가시성/복구가 binding → DP-0002와 함께 A3 or A6 택1
+   [트리거] 제어 가시성/복구가 binding → DP-01와 함께 A3 or A6 택1
    [트리거] 변종 수 > N → A7
 ```
 - **배제 기준**: cold-start를 X ms 이하로 못 누르면 A5 보류 / 노드가 모델 파이프라인을 못 담으면 A8 보류 / 변종 < N이면 A7 미도입.
@@ -67,9 +67,9 @@
 - **A8 노드 footprint**: 모델당 파이프라인이 노드에 들어가는지(안 들어가면 spill → A5 수렴) 검증.
 - **잔여 P0(리뷰)**: 가중 매트릭스(H/M/M/L)·간이 FMEA·멱등성↔QA-11 모순 해소는 **미반영** — 다음 수렴 iteration 과제.
 - **전달 오버헤드 ≤5%(QA-10)**: A3/A5/A6 모두 hop·cold-start 추가 → claim-check + pre-warm 효과 정량 검증 필요.
-- **공유 의존점 SPOF**: A3 브로커 / A6 오케스트레이터 → 다중화·샤딩 전제. DP-0002와 정합.
+- **공유 의존점 SPOF**: A3 브로커 / A6 오케스트레이터 → 다중화·샤딩 전제. DP-01와 정합.
 - **plugin API 안정성(A7)**: 초기 계약 설계가 critical(breaking change 리스크).
-- **DP-0001·DP-0005 정합**: A5↔DP-0001(Dynamic Pool), A3/A6↔DP-0005(공유 캐시·memoization) 일관 결정 필요.
+- **구 DP-0001·DP-0005 정합**: A5↔구 DP-0001(Dynamic Pool), A3/A6↔DP-0005(공유 캐시·memoization) 일관 결정 필요.
 
 ## 출처 (리서치 근거)
 - R-01 [Azure Competing Consumers](https://learn.microsoft.com/en-us/azure/architecture/patterns/competing-consumers) · [Claim-Check](https://learn.microsoft.com/en-us/azure/architecture/patterns/claim-check)

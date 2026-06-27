@@ -15,6 +15,6 @@
 
 ## 비고
 - ISO/IEC 25010:2023 Performance Efficiency / Resource Utilization(자원 활용성). QA-05(Efficiency)와 같은 ISO 특성이나 altitude 분리: QA-05=요청당 토큰, QA-13=완료 모델당 총비용·ROI.
-- 설계 연결: DP-0001(비용 기준 라우팅)·DP-0004(scale-to-zero)·DP-0005(캐시). 검증은 QA-05 caching A/B 공유 + 수작업 baseline 추정([발표 서사]).
+- 설계 연결: 구 DP-0001(비용 기준 라우팅)·DP-0004(scale-to-zero)·DP-0005(캐시). 검증은 QA-05 caching A/B 공유 + 수작업 baseline 추정([발표 서사]).
 - 흡수: QA-05 top-line(`$/완료모델`)·QA-01 "자원 활용률"을 QA-13로 이양. 데이터는 QA-04 결정당 비용 trace 수급.
 - 수치($5 게이트·절감률 50%)는 측정가능 KPI 예시값 — 인프라 단가·baseline 추정으로 확정. (★ 급간은 QA-13 등급 척도; round-04 ★★★ 75% 도메인무관 분포 재근거·재시도 오버헤드 보조 별점 축·baseline 추정 silent cap)

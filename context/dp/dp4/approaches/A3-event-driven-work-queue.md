@@ -30,4 +30,4 @@
 - **Non-Risk**: C-01(Docker) — 소비자/브로커 모두 컨테이너 구동 가능.
 
 ## 인접 DP 정합
-- DP-0001 2안(Dynamic Agent Pool)과 자연 정합 — 소비자=Agent 동적 풀. DP-0005 공유 캐시(2안)는 claim-check 스토리지 계층과 결합 가능.
+- 구 DP-0001 2안(Dynamic Agent Pool)과 자연 정합 — 소비자=Agent 동적 풀. DP-0005 공유 캐시(2안)는 claim-check 스토리지 계층과 결합 가능.

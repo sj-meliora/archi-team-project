@@ -4,7 +4,7 @@ category: QA
 importance: H
 difficulty: M
 source: pptx p.13
-related-dp: [DP-0002, DP-0003]
+related-dp: [DP-01, DP-0003]
 updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
@@ -70,11 +70,11 @@ Agent는 **최소권한·도구 allowlist(허용된 도구만 호출 가능한 �
 
 | KPI | 책임지는 설계 (DP 주장) | 검증 실험·모델 |
 |---|---|---|
-| **중단 ack ≤5초 AND 안전 정지(graceful stop)+롤백 ≤30초** `[주]` | **DP-0002 1안 단일 제어지점**(중앙 정책·HITL로 Controllability ★★★) · **SP-2** 정책 적용 지점의 집중도가 중단 latency를 좌우 + runner의 협조적 취소(cancel token 폴링→불응 시 hard-kill) | **▶ 실제 제작:** 협조적 취소 타이밍 모델 — 장기 activity에 cancel 폴링 지점을 **밀도별로** 삽입한 mock 파이프라인에서 cancel 발행 → **ack 시간·정지완료 시간**을 폴링 밀도별 분포로 산출, 불응 시 hard-kill로 상한 보장 확인 |
+| **중단 ack ≤5초 AND 안전 정지(graceful stop)+롤백 ≤30초** `[주]` | **DP-01 1안 단일 제어지점**(중앙 정책·HITL로 Controllability ★★★) · **DP-01 SP-1** 정책 적용 지점의 집중도가 중단 latency를 좌우 + runner의 협조적 취소(cancel token 폴링→불응 시 hard-kill) | **▶ 실제 제작:** 협조적 취소 타이밍 모델 — 장기 activity에 cancel 폴링 지점을 **밀도별로** 삽입한 mock 파이프라인에서 cancel 발행 → **ack 시간·정지완료 시간**을 폴링 밀도별 분포로 산출, 불응 시 hard-kill로 상한 보장 확인 |
 | **②-1 권한외 차단율 + 차단/안전정지 latency 분포** | **DP-0003 1안 사전 권한 게이트**(allowlist·실행 전 admission, Controllability ★★★) — hard-invalid(allowlist/스키마/범위 위반)를 실행 전 차단 | 보조 모델: 주입한 hard-invalid 시도 N건(룰 판정 가능) → admission 게이트 통과/차단 라벨 + 차단/안전정지 latency 분포. **golden·적대적 풀세트 불요 — 룰 체커로 현 조건 산출**(①의 cancel→ack/정지 분포 모델과 합치거나 별도 마이크로-PoC, PoC 밀도는 재량). **OI-8 무관 선(先)닫힘.** |
 | ②-2 적대적 위반0 (acceptance) | **DP-0003 1안** + **eval/검증 서브시스템(C-03 공유 red-team 하네스, OI-7)** | 보조 모델(발표 서사): 적대적 eval 풀세트(OWASP LLM Top-10 매핑·injection·권한상승)로 통과/차단 — **실제 세트 구축은 C-03와 공유**, 본 라운드 미실행. **②-2·C-03 게이트는 하네스 구축 시 동일 하네스로 동반 닫힘**(무조건 동반 닫힘 아님 — 하네스 구축 의존 open-issue). 세트 커버리지 = 위반0의 신뢰 상한(미상상 우회 미검출, OWASP 매핑 log). |
-| Runaway cap 작동 = 100% | **DP-0002**(중앙 오케스트레이터가 cap 강제) + runner activity timeout/retry cap — 단, **DP-0002/0003이 runaway cap을 명시 안 함**(아래 "남은 일") | 보조 모델: cap 시나리오(무한루프 유도) 주입 → max iter/token/wall-clock 도달 시 자동 중단율 집계 |
-| 고위험 HITL 통과율 100%·우회 0 | **DP-0002 1안 HITL gate** + **DP-0003 1안 권한 게이트**(허용 액션만 통과) | 보조 모델: 고위험 액션 경로에 HITL 게이트 삽입 → 승인 없는 우회 경로 탐색(=0 목표) |
+| Runaway cap 작동 = 100% | **DP-01**(중앙 오케스트레이터가 cap 강제) + runner activity timeout/retry cap — 단, **DP-01/0003이 runaway cap을 명시 안 함**(아래 "남은 일") | 보조 모델: cap 시나리오(무한루프 유도) 주입 → max iter/token/wall-clock 도달 시 자동 중단율 집계 |
+| 고위험 HITL 통과율 100%·우회 0 | **DP-01 1안 HITL gate** + **DP-0003 1안 권한 게이트**(허용 액션만 통과) | 보조 모델: 고위험 액션 경로에 HITL 게이트 삽입 → 승인 없는 우회 경로 탐색(=0 목표) |
 
 > 가정·한계: 폴링 지점 밀도·취소 전파 지연·activity 길이는 **가정 파라미터**다. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — 슬라이드엔 가정값을 명시한다. deploy 중 취소의 **부분 롤백 정합성**(외부 시스템 상태)과 적대적 세트의 **커버리지 상한**(미상상 공격 미검출)은 통합 환경·실제 eval 구축이 필요해 미검증(silent cap).
 
@@ -120,7 +120,7 @@ Agent는 **최소권한·도구 allowlist(허용된 도구만 호출 가능한 �
 
 **남은 일 (이 라운드에서 미반영)**
 - **검증수단(적대적 eval로 위반0 증명)은 [발표 서사]로 분기** — 슬라이드 한 줄("권한 외 액션·injection을 red-team eval로 통과 0건 검증")로만, 본 라운드 실측 미실행. PoC-C2는 QA-06(Security) PoC와 공유.
-- **DP-0002/0003이 runaway cap·안전 정지(graceful stop, 롤백)를 명시 안 함** → tactic 보강 역검토 필요 (`open-issues.md` 트래킹 대상).
+- **DP-01/0003이 runaway cap·안전 정지(graceful stop, 롤백)를 명시 안 함** → tactic 보강 역검토 필요 (`open-issues.md` 트래킹 대상).
 - QA-06(Security) 신설 시 Controllability ⊂ Security 경계 cross-link을 **양방향**으로 박는다(현재 QA-03 정의에 단방향 명시).
 - 안전 정지(graceful stop)+롤백 `30초`·HITL/위반 임계는 **예시값**이며 실환경 측정으로 확정.
 
@@ -141,7 +141,7 @@ Agent는 **최소권한·도구 allowlist(허용된 도구만 호출 가능한 �
 
 **남은 일 (이 라운드에서 미반영)**
 - **②-2 ↔ QA-06 하네스 채택(OI-8)**: 적대적 풀커버리지 위반0 실측은 QA-06 정식 채택(사람 결정) 동반 — `open-issues.md` OI-8에 교차 의존 등록(QA-11 ②-2 ↔ QA-07와 동일 구조).
-- **DP 귀속(OI-7)**: runaway cap·graceful stop+롤백 tactic이 DP-0002/0003에 미명시 + eval/검증 서브시스템 DP 신설(②-2 하네스) → DP 디스커션 위임.
+- **DP 귀속(OI-7)**: runaway cap·graceful stop+롤백 tactic이 DP-01/0003에 미명시 + eval/검증 서브시스템 DP 신설(②-2 하네스) → DP 디스커션 위임.
 - ②-1 latency 분포를 ① PoC에 합칠지 별도 마이크로-PoC로 둘지는 PoC 밀도 재량(측정가능성·정합성 무관).
 
 ### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
@@ -166,7 +166,7 @@ Agent는 **최소권한·도구 allowlist(허용된 도구만 호출 가능한 �
 - **롤백 외부 정합성을 ★ 급간 표에 한 줄**로 노출(별도 변수·silent cap).
 
 **남은 일 (이 라운드에서 미반영)**
-- DP-0002/0003 runaway cap·graceful stop tactic 미명시 + eval/검증 서브시스템 DP(②-2 하네스, OI-7). ②-2 ↔ QA-06 하네스(OI-8) 교차 의존 정상 트래킹.
+- DP-01/0003 runaway cap·graceful stop tactic 미명시 + eval/검증 서브시스템 DP(②-2 하네스, OI-7). ②-2 ↔ QA-06 하네스(OI-8) 교차 의존 정상 트래킹.
 - 15초/30초 예시값 — 폴링 밀도 sweep로 확정.
 
 > 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-03-controllability.md) (verdict: Sound ◎ / KPI ○ — Low, 채택 권장).

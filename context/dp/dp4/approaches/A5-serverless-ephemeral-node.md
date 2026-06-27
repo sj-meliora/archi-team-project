@@ -29,4 +29,4 @@
 - **Non-Risk**: C-01(Docker)·C-02(이식성) — K8s Job/Knative는 컨테이너 기반·이식성 우수.
 
 ## 인접 DP 정합
-- DP-0001 2안(Dynamic Agent Pool)과 정합 — Agent를 ephemeral invocation으로. A3(큐) 트리거로 호출하면 Knative 이벤트 구동과 자연 결합. 2안 대비 활용률↑이라 DP-0001 R-1(활용률 미달) 완화에도 기여.
+- 구 DP-0001 2안(Dynamic Agent Pool)과 정합 — Agent를 ephemeral invocation으로. A3(큐) 트리거로 호출하면 Knative 이벤트 구동과 자연 결합. 2안 대비 활용률↑이라 구 DP-0001 R-1(활용률 미달) 완화에도 기여.

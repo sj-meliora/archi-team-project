@@ -4,7 +4,7 @@ category: QA
 importance: H
 difficulty: H
 source: pptx p.13
-related-dp: [DP-0001, DP-0002, DP-0004]
+related-dp: [DP-01, DP-0004]   # 구 DP-0001(배치/풀) 삭제 → 재귀속 보류 OI-12
 updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
@@ -67,9 +67,9 @@ updates:
 
 | KPI | 책임지는 설계 (DP 주장) | 검증 실험·모델 |
 |---|---|---|
-| **scaling efficiency ≥ 0.8** `[주]` | **DP-0001 2안 동적 풀**(고정배치 ★★☆ → 풀 ★★★) · **DP-0004 A8** 병목 단계만 일꾼(worker) 확장 | **▶ 실제 제작:** ① 큐잉 시뮬: **공유 풀 vs 고정배치** 처리량·효율 비교 ② 4단계 비대칭 파이프라인에서 **병목 단계만 늘렸을 때** 전체 효율 측정 |
+| **scaling efficiency ≥ 0.8** `[주]` | **구 DP-0001 2안 동적 풀**(고정배치 ★★☆ → 풀 ★★★) · **DP-0004 A8** 병목 단계만 일꾼(worker) 확장 | **▶ 실제 제작:** ① 큐잉 시뮬: **공유 풀 vs 고정배치** 처리량·효율 비교 ② 4단계 비대칭 파이프라인에서 **병목 단계만 늘렸을 때** 전체 효율 측정 |
 | rate-limit 헤드룸 ≥ 20% | **DP-0004 R-3**: 자원을 0까지 줄였다 갑자기 폭증하면 호출이 거부(throttle)됨 → **최소 대기 인스턴스(min-instance) 하한**이 필요 | 보조 모델: 버스트(순간 폭증) 도착 시뮬 — 헤드룸 0%→30% 변화 → throttle 0을 유지하는 최소 헤드룸 곡선 |
-| 큐 대기 p95 ≤ 5분 | **DP-0001 R-2** 동적 할당 시 라우팅 지연 · **DP-0004 SP-3** 컨테이너 첫 기동 지연(cold-start) | 보조 모델: 위 두 시뮬에서 p95 대기 산출 (라우팅·cold-start 지연을 파라미터로) |
+| 큐 대기 p95 ≤ 5분 | **구 DP-0001 R-2** 동적 할당 시 라우팅 지연 · **DP-0004 SP-3** 컨테이너 첫 기동 지연(cold-start) | 보조 모델: 위 두 시뮬에서 p95 대기 산출 (라우팅·cold-start 지연을 파라미터로) |
 
 > 가정·한계: 서비스 시간·도착률·cold-start·LLM 한도는 **가정 파라미터**다. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — 슬라이드엔 가정값을 명시한다.
 
@@ -114,7 +114,7 @@ updates:
 - 짝 시나리오 `QAS-01`의 Response·Measure도 동일하게 동기화.
 
 **남은 일 (이 라운드에서 미반영)**
-- DP-0001(동적 풀)·DP-0004(타입별 scale-out)가 rate-limit·admission control 차원을 명시 안 함 → DP 역검토 필요 (`open-issues.md` 트래킹 대상).
+- 구 DP-0001(동적 풀)·DP-0004(타입별 scale-out)가 rate-limit·admission control 차원을 명시 안 함 → DP 역검토 필요 (`open-issues.md` 트래킹 대상).
 - 활용률 KPI 이전은 **QA-13 신설**이 전제 — 신설 전까지는 잠정 보류.
 
 ### 2026-06-24 — round-02 디스커션 반영
@@ -128,7 +128,7 @@ updates:
 
 **남은 일 (이 라운드에서 미반영)**
 - 활용률 QA-13 이양은 **QA-13 정식 채택(OI-8)** 동반 — 미채택 시 부유(C2). 사람 결정.
-- rate-limit headroom·admission control·bounded queue tactic이 DP-0001/0004에 미명시(OI-7) → DP 디스커션 위임. bounded queue 없으면 `큐 p95 ≤5분`이 폭주 시 깨짐.
+- rate-limit headroom·admission control·bounded queue tactic이 구 DP-0001/0004에 미명시(OI-7) → DP 디스커션 위임. bounded queue 없으면 `큐 p95 ≤5분`이 폭주 시 깨짐.
 - 부하 단위(정규화 동시 WF 수 또는 토큰 처리량)·예시값은 실환경 측정으로 확정.
 
 ### 2026-06-25 — round-04 디스커션 반영 (★ 등급 척도 근거 보강)
@@ -142,7 +142,7 @@ updates:
 - **LLM-bound USL apples silent cap**: SPARCcenter 1990s CPU 벤치라 contention/coherency 구조 다름 — 측정 조건(헤드룸 ≥20%)으로 rate-limit 포화 배제한 순수 큐잉 효율 명시.
 
 **남은 일 (이 라운드에서 미반영)**
-- DP-0001/0004 rate-limit headroom·admission control·bounded queue 미명시(OI-7).
+- 구 DP-0001/0004 rate-limit headroom·admission control·bounded queue 미명시(OI-7).
 - LLM-bound worker USL 회귀는 미발견 — 우리 PoC로 직접 측정. 경계는 예시값.
 
 > 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-01-scalability.md) (verdict: Sound ◎ / KPI ○ — Low, 조건부 채택).

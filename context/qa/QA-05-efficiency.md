@@ -4,7 +4,7 @@ category: QA
 importance: H
 difficulty: H
 source: pptx p.13/p.25
-related-dp: [DP-0001, DP-0003, DP-0005]
+related-dp: [DP-0003, DP-0005]   # 구 DP-0001(배치/풀) 삭제 → 재귀속 보류 OI-12
 updates:
   - date: 2026-06-24
     by: discussion/qa/round-01
@@ -67,9 +67,9 @@ updates:
 
 | KPI | 책임지는 설계 (DP 주장) | 검증 실험·모델 |
 |---|---|---|
-| **신규 토큰 캡 + 캐시 분리집계** `[주]` | **DP-0005 2안 공유 캐시**(memoization으로 유사 작업 재사용, [Performance]★★★) · **DP-0001 2안 동적 풀**([Efficiency] 작업별 최적 agent 선택 ★★★) | **▶ 실제 제작:** prompt caching On/Off **A/B** — 대표 노드 작업(빌드로그·config diff 포함) N건 × caching On/Off → **$/task·신규 vs 캐시 토큰 비율·TTFT** 측정, 복합 노드의 신규 토큰 분포로 캡 후보 산출 |
-| 작업 난이도별 tier | **DP-0001 2안** 작업별 최적 agent(난이도에 맞는 모델 선택) | 보조 모델: 위 A/B를 노드타입별로 분리해 tier(★) 경계가 현실적인지 확인 |
-| worker 가동률 / compute 비용 | **DP-0001 2안 동적 풀**(warm pool 재사용으로 cold-start 절감) — routing 지연(SP-1)은 캐싱/사전 워밍으로 완화 | 보조 모델: warm pool On/Off로 가동률·cold-start 비용 비교(QA-01 시뮬과 공유) |
+| **신규 토큰 캡 + 캐시 분리집계** `[주]` | **DP-0005 2안 공유 캐시**(memoization으로 유사 작업 재사용, [Performance]★★★) · **구 DP-0001 2안 동적 풀**([Efficiency] 작업별 최적 agent 선택 ★★★) | **▶ 실제 제작:** prompt caching On/Off **A/B** — 대표 노드 작업(빌드로그·config diff 포함) N건 × caching On/Off → **$/task·신규 vs 캐시 토큰 비율·TTFT** 측정, 복합 노드의 신규 토큰 분포로 캡 후보 산출 |
+| 작업 난이도별 tier | **구 DP-0001 2안** 작업별 최적 agent(난이도에 맞는 모델 선택) | 보조 모델: 위 A/B를 노드타입별로 분리해 tier(★) 경계가 현실적인지 확인 |
+| worker 가동률 / compute 비용 | **구 DP-0001 2안 동적 풀**(warm pool 재사용으로 cold-start 절감) — routing 지연(SP-1)은 캐싱/사전 워밍으로 완화 | 보조 모델: warm pool On/Off로 가동률·cold-start 비용 비교(QA-01 시뮬과 공유) |
 
 > 가정·한계: 캐시 적중률·작업 다양성·인프라 단가는 **가정 파라미터**다(캐시 적중률은 워크로드 유사성에 의존 — 다양성 높은 실운영에선 절감폭이 다를 수 있음). 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다. compute 비용(보조)은 실제 인프라 단가가 있어야 정밀 — silent cap.
 
@@ -109,7 +109,7 @@ updates:
 - 짝 시나리오 `QAS-05`의 Response·Measure를 신규/캐시 분리·compute 효율로 동기화.
 
 **남은 일 (이 라운드에서 미반영)**
-- **DP-0001(2안 작업별 최적 agent)이 토큰 기준인지 비용 기준인지 역검토** — 비용 기준 정렬 권고 (`open-issues.md` 트래킹 대상).
+- **구 DP-0001(2안 작업별 최적 agent)이 토큰 기준인지 비용 기준인지 역검토** — 비용 기준 정렬 권고 (`open-issues.md` 트래킹 대상).
 - top-line `$/완료모델` 이양은 **QA-13 신설이 전제** — 신설 전까지 발표 ROI 수치는 잠정 보유.
 - 신규 토큰 `6k`·tier 경계·compute 단가는 **예시값**이며 실환경 A/B로 확정.
 
@@ -117,14 +117,14 @@ updates:
 출처: [`discussion/qa/round-02`](../../discussion/qa/round-02/counsel/QA-05-efficiency.md) (red team verdict: **Sound ○ / KPI ○ — Low** · Med 해소·닫힘 확인)
 
 **무엇이 문제였나 (review 지적)**
-- round-01 캐시 분리집계로 Med 해소·닫힘. 잔여는 비-verdict: `$/완료모델` top-line QA-13 이양 미채택 시 부유(C2), DP-0001 라우팅 토큰 vs 비용 기준 미명시(OI-7), 캐시 적중률 보조 노출 누락(Low).
+- round-01 캐시 분리집계로 Med 해소·닫힘. 잔여는 비-verdict: `$/완료모델` top-line QA-13 이양 미채택 시 부유(C2), 구 DP-0001 라우팅 토큰 vs 비용 기준 미명시(OI-7), 캐시 적중률 보조 노출 누락(Low).
 
 **무엇을 바꿨나 (반영)**
 - **Low 보강**: **캐시 적중률을 보조 KPI로 노출** — 주 KPI(신규 토큰 ≤6k) 합격이 적중률에 좌우되므로 둘을 함께 봐야 진짜 효율과 캐시 의존을 구분(측정 정직성). 워크로드 다양성 의존은 기존 silent cap과 정합.
 
 **남은 일 (이 라운드에서 미반영)**
 - `$/완료모델` top-line QA-13 이양은 **QA-13 정식 채택(OI-8)** 동반 — 미채택 시 부유(C2·QA-01 활용률과 동일 구조). 사람 결정.
-- DP-0001 2안 라우팅을 비용 기준 정렬로 명시(현재 토큰/비용 기준 미명시, OI-7) → DP 디스커션 위임.
+- 구 DP-0001 2안 라우팅을 비용 기준 정렬로 명시(현재 토큰/비용 기준 미명시, OI-7) → DP 디스커션 위임.
 
 ### 2026-06-24 — 등급 척도(★ rubric) 캘리브레이션
 출처: [`discussion/qa/round-03`](../../discussion/qa/round-03/) (Council 3 seats — reviewer-less ★ rubric 변형, 팀 승인)
@@ -149,7 +149,7 @@ updates:
 - **단일 출처 다양화 silent cap**: Requesty=코딩 도메인·우리=빌드 노드 워크로드 유사성 가정, 우리 PoC로 확정.
 
 **남은 일 (이 라운드에서 미반영)**
-- DP-0001 2안 라우팅 토큰 vs 비용 기준(OI-7). `$/완료모델` QA-13 이양 정합.
+- 구 DP-0001 2안 라우팅 토큰 vs 비용 기준(OI-7). `$/완료모델` QA-13 이양 정합.
 - tier 4k/6k/8k·적중률 85% 예시값 — caching A/B로 확정.
 
 > 출처: [discussion/qa/round-04](../../discussion/qa/round-04/counsel/QA-05-efficiency.md) (verdict: Sound ◎ / KPI ○ — Low, 채택 권장).

@@ -4,7 +4,7 @@
 > drives: QA-01(Scalability), QA-08(Reliability-Workflow), QA-10(Performance-E2E), QA-12(Maintainability)
 > realizes: FR-0001, FR-0002 | constrained-by: C-01(Docker)
 > 보강작업: `dp4/`(INDEX·decision-axes·approaches A3~A8·evaluation·review)
-> note: ⚠️ 원본 헤더가 DP-0002 라벨(Hierarchical/Decentralized) 복붙 오류 — 내용 기준 라벨로 교정 (OI-3)
+> note: ⚠️ 원본 헤더가 DP-01 라벨(Hierarchical/Decentralized) 복붙 오류 — 내용 기준 라벨로 교정 (OI-3)
 
 ## 결정 포인트
 파이프라인 노드 작업(IR Converter → Graph Optimizer → Quantizer → Compiler)을 **어떤 실행 구조**로 처리할 것인가.
@@ -75,5 +75,5 @@
 ## 결정 / 근거
 - **수렴 결론**: 후보를 **A5(일회용·원격) vs A8(일회용·로컬)** 둘로 압축. 1안·2안은 비교 기준선으로만 유지(각 진화형에 지배).
 - **택일 기준**: 위 5% 산식(SP-1/TP-1)이 최종 택일을 결정. 부차적으로 — 노드가 모델 파이프라인을 **못 담으면 A8 보류**(R-2 spill), cold-start를 목표 이하로 **못 누르면 A5 보류**(R-1).
-- **직교 보강축은 동시 채택 아님**(상세 `dp4/evaluation.md`): A4(무상태 분해)는 선택안 위 설계 규율로만, A3↔A6(제어평면)은 **DP-0002와 동시 단일화**(이중 제어평면 금지), A7(변종)은 변종 수 임계 초과 시에만.
-- **인접 DP 정합**: A5·A8 모두 DP-0001 2안(Dynamic Agent Pool)과 정합. A8은 DP-0005 캐시를 노드 로컬 볼륨 계층과 결합. → DP-0001·DP-0005와 격리·확장 정책 일관 결정 필요.
+- **직교 보강축은 동시 채택 아님**(상세 `dp4/evaluation.md`): A4(무상태 분해)는 선택안 위 설계 규율로만, A3↔A6(제어평면)은 **DP-01와 동시 단일화**(이중 제어평면 금지), A7(변종)은 변종 수 임계 초과 시에만.
+- **인접 DP 정합**: A5·A8 모두 구 DP-0001 2안(Dynamic Agent Pool)과 정합. A8은 DP-0005 캐시를 노드 로컬 볼륨 계층과 결합. → 구 DP-0001·DP-0005와 격리·확장 정책 일관 결정 필요.
