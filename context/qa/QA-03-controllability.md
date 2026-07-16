@@ -71,10 +71,10 @@ Agent는 **최소권한·도구 allowlist(허용된 도구만 호출 가능한 �
 | KPI | 책임지는 설계 (DP 주장) | 검증 실험·모델 |
 |---|---|---|
 | **중단 ack ≤5초 AND 안전 정지(graceful stop)+롤백 ≤30초** `[주]` | **DP-01 1안 단일 제어지점**(중앙 정책·HITL로 Controllability ★★★) · **DP-01 SP-1** 정책 적용 지점의 집중도가 중단 latency를 좌우 + runner의 협조적 취소(cancel token 폴링→불응 시 hard-kill) | **▶ 실제 제작:** 협조적 취소 타이밍 모델 — 장기 activity에 cancel 폴링 지점을 **밀도별로** 삽입한 mock 파이프라인에서 cancel 발행 → **ack 시간·정지완료 시간**을 폴링 밀도별 분포로 산출, 불응 시 hard-kill로 상한 보장 확인 |
-| **②-1 권한외 차단율 + 차단/안전정지 latency 분포** | **DP-0003 1안 사전 권한 게이트**(allowlist·실행 전 admission, Controllability ★★★) — hard-invalid(allowlist/스키마/범위 위반)를 실행 전 차단 | 보조 모델: 주입한 hard-invalid 시도 N건(룰 판정 가능) → admission 게이트 통과/차단 라벨 + 차단/안전정지 latency 분포. **golden·적대적 풀세트 불요 — 룰 체커로 현 조건 산출**(①의 cancel→ack/정지 분포 모델과 합치거나 별도 마이크로-PoC, PoC 밀도는 재량). **OI-8 무관 선(先)닫힘.** |
+| **②-1 권한외 차단율 + 차단/안전정지 latency 분포** | **DP-0003 사전 통제(게이트, 1안·2안 공통)**(allowlist·실행 전 admission, Controllability ★★★) — hard-invalid(allowlist/스키마/범위 위반)를 실행 전 차단 | 보조 모델: 주입한 hard-invalid 시도 N건(룰 판정 가능) → admission 게이트 통과/차단 라벨 + 차단/안전정지 latency 분포. **golden·적대적 풀세트 불요 — 룰 체커로 현 조건 산출**(①의 cancel→ack/정지 분포 모델과 합치거나 별도 마이크로-PoC, PoC 밀도는 재량). **OI-8 무관 선(先)닫힘.** |
 | ②-2 적대적 위반0 (acceptance) | **DP-0003 1안** + **eval/검증 서브시스템(C-03 공유 red-team 하네스, OI-7)** | 보조 모델(발표 서사): 적대적 eval 풀세트(OWASP LLM Top-10 매핑·injection·권한상승)로 통과/차단 — **실제 세트 구축은 C-03와 공유**, 본 라운드 미실행. **②-2·C-03 게이트는 하네스 구축 시 동일 하네스로 동반 닫힘**(무조건 동반 닫힘 아님 — 하네스 구축 의존 open-issue). 세트 커버리지 = 위반0의 신뢰 상한(미상상 우회 미검출, OWASP 매핑 log). |
 | Runaway cap 작동 = 100% | **DP-01**(중앙 오케스트레이터가 cap 강제) + runner activity timeout/retry cap — 단, **DP-01/0003이 runaway cap을 명시 안 함**(아래 "남은 일") | 보조 모델: cap 시나리오(무한루프 유도) 주입 → max iter/token/wall-clock 도달 시 자동 중단율 집계 |
-| 고위험 HITL 통과율 100%·우회 0 | **DP-01 1안 HITL gate** + **DP-0003 1안 권한 게이트**(허용 액션만 통과) | 보조 모델: 고위험 액션 경로에 HITL 게이트 삽입 → 승인 없는 우회 경로 탐색(=0 목표) |
+| 고위험 HITL 통과율 100%·우회 0 | **DP-01 1안 HITL gate** + **DP-0003 사전 통제(게이트, 1안·2안 공통)**(허용 액션만 통과) — HITL이 게이트에 내장(1안)되는지 독립 컴포넌트(2안)로 분리되는지는 위치만 다를 뿐 100%·우회 0 요건은 동일 | 보조 모델: 고위험 액션 경로에 HITL 게이트 삽입 → 승인 없는 우회 경로 탐색(=0 목표) |
 
 > 가정·한계: 폴링 지점 밀도·취소 전파 지연·activity 길이는 **가정 파라미터**다. 이 실험이 증명하는 것은 "이 설계가 *이런 메커니즘으로* KPI를 달성하고, KPI가 *이 방법으로 측정 가능*하다"이지 가상 시스템의 실측치가 아니다 — 슬라이드엔 가정값을 명시한다. deploy 중 취소의 **부분 롤백 정합성**(외부 시스템 상태)과 적대적 세트의 **커버리지 상한**(미상상 공격 미검출)은 통합 환경·실제 eval 구축이 필요해 미검증(silent cap).
 
