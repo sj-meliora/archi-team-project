@@ -30,12 +30,14 @@ dp3/
 | R-01 | 축① 스펙트럼(runc·gVisor·microVM·full VM), 결선 가르는 Q1/Q2 | 완료 |
 | R-02 | 축② 3단 메커니즘, 승인 경계=격리 경계 원리, CC 로컬/클라우드 레퍼런스 | 완료 |
 | decision-axes.md | 두 축 정의, 축 간 관계(도출 아님·전제 공급), 소유권 정합, ATAM 요소 후보 | 완료 |
-| 본문 (dp3 DP 문서) | 결선 비교·별점·ATAM(SP/TP/Risk/NR)·결정 질문 통합 | **예정** (DP id 확정 후) |
+| evaluation.md | 기준별 판정·★ 매트릭스·수렴 결론(**microVM + 3단 배정**)·뒤집힘 조건 | 완료 |
+| 본문 (dp3 DP 문서) | evaluation 수렴 결론을 ATAM 절로 승격한 정식 DP 문서 | **예정** (DP id 확정 후) |
 | 시각 자료 | `docs/isolation-spectrum.html` — 축① 4단 스펙트럼 다이어그램 ([Pages](https://sj-meliora.github.io/archi-team-project/isolation-spectrum.html)) | 완료 |
 
 ## Iteration 로그
 - **Iter1 (2026-07-31)**: 원 프레임의 문제 3개 식별 — ① 축(2) 양끝이 SSoT에 격추됨(전면 자동=C-03 위반 부적격 / 전면 HITL=시스템 전제·QA-01 위배) ② 축(1) 이지선다가 지배적 중간(gVisor·microVM) 은폐 ③ 두 축의 범주 혼동(비인가 능력 vs 인가된 오판단). → 재정식화: 독립 서브결정 2개 + TP-1 연결. R-01·R-02·decision-axes 작성, 축① 다이어그램 시각화·Pages 배포. 레퍼런스: Claude Code 로컬/클라우드 승인 비대칭(R-02).
 - **Iter2 (2026-07-31)**: **dp2 결정 입력 반영** — dp2 = A5 계열(외부 오브젝트 스토리지 전달) 채택 + bare-metal 가용(팀 입력). → 축① **Q1 해소**(microVM 잔류·변별력 상실), **Q2′ 재정의**(로컬 볼륨 전제 폐기 → 스토리지 왕복의 격리 계층 경유 세금: gVisor netstack+gofer 이중 vs microVM virtio), 부차 변별(toolchain 호환성 ↔ 밀도·성숙도) 추가. 축②: 스토리지 write를 경계 통과 인터페이스 1급 등재 — **정책 사전승인 티어**(스코프 자격증명 + C-03 서명), durable state 외부화로 "내부=자동 승인" 전제 강화(QA-02 정합).
+- **Iter3 (2026-07-31)**: **통합 평가·수렴**(`evaluation.md`) — ASR 기준별 판정 결과 gVisor의 승리 시나리오 2개(가상화 불가 환경·I/O 가벼운 워크로드)가 모두 팀 입력으로 소거됨을 확인 → **축① microVM(Kata/FC) 채택 권고**(Q2′ 벤치는 확인용 강등), **축② 3단 티어 배정 권고**(배정표 초안 포함). 뒤집힘 조건 2개(bare-metal 철회 → gVisor / virtio도 5% 미달 → dp2 재론) 기록.
 
 ## 미결 (본문 작성 시 처리)
 - **DP id 부여** (기존 DP-0003과 충돌 회피 — 팀 확정).
