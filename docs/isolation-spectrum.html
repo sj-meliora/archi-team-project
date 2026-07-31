@@ -419,22 +419,23 @@
     </table>
   </div>
 
-  <h3>결선(gVisor vs microVM)을 가르는 두 질문 <span class="tag">실측 의존 — 구조는 고정, 수치는 측정으로</span></h3>
+  <h3>결선(gVisor vs microVM)을 가르는 질문 <span class="tag">2026-07-31 갱신 — dp2=A5 확정·bare-metal 가용 반영</span></h3>
   <section class="questions">
     <div class="q">
       <span class="qn">Q1</span>
       <div>
-        <h4>인프라 게이트</h4>
-        <p>클러스터가 <b>bare-metal 또는 nested virtualization</b>을 지원하는가?
-        지원하지 않으면 microVM 계열은 원천 탈락 — 결선에 <b>gVisor만 남는다.</b></p>
+        <h4>인프라 게이트 — 충족 확인 ✓</h4>
+        <p><b>bare-metal 선택 가능(팀 입력)</b> → microVM 계열 잔류.
+        Q1은 변별력을 잃고 결정은 <b>Q2′로 내려간다.</b></p>
       </div>
     </div>
     <div class="q">
-      <span class="qn">Q2</span>
+      <span class="qn">Q2′</span>
       <div>
-        <h4>성능 게이트</h4>
-        <p>dp2가 확정한 <b>20 GB 중간 산출물의 로컬 볼륨 I/O</b>에서 gVisor의 가로채기 세금이
-        E2E budget(QA-10 ≤ 5%)을 잠식하는가? 잠식하면 <b>microVM 우위.</b></p>
+        <h4>성능 게이트 — A5 기준 재정의</h4>
+        <p>dp2가 <b>외부 오브젝트 스토리지(claim-check) 전달</b>을 채택 → 20 GB는 단계마다 스토리지 왕복으로 흐른다.
+        <b>격리 계층 경유 후에도 전달세금이 QA-10 ≤ 5% budget에 남는가?</b>
+        gVisor는 네트워크(netstack)·파일(gofer) 이중 가로채기, microVM은 virtio near-native — 못 남으면 <b>microVM 우위.</b></p>
       </div>
     </div>
   </section>
