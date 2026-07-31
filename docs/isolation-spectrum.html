@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>격리 경계 4단 스펙트럼 — runc · gVisor · microVM · VM</title>
+<style>
+  :root {
+    --paper: #F1F2F4;
+    --card: #FBFBFC;
+    --ink: #1B222B;
+    --muted: #5C6672;
+    --line: #D6DADF;
+    --rust: #B04A2F;      /* 약한 벽 — SW 규칙 */
+    --ochre: #8F6D1C;     /* 중간 — 좁은 문 */
+    --steel: #3E5C76;     /* 강한 벽 — HW 가상화 */
+    --deep: #24384E;      /* 가장 무거운 벽 */
+    --shared-bg: rgba(176, 74, 47, .09);
+    --shared-line: rgba(176, 74, 47, .38);
+    --pick-bg: rgba(62, 92, 118, .07);
+    --hw-bg: #1B222B;
+    --hw-ink: #E9ECEF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #14181D;
+      --card: #1C2229;
+      --ink: #E5E8EB;
+      --muted: #99A3AE;
+      --line: #333C46;
+      --rust: #D4744E;
+      --ochre: #C29A40;
+      --steel: #82A8CB;
+      --deep: #A6BED4;
+      --shared-bg: rgba(212, 116, 78, .12);
+      --shared-line: rgba(212, 116, 78, .42);
+      --pick-bg: rgba(130, 168, 203, .08);
+      --hw-bg: #0C0F12;
+      --hw-ink: #C5CDD5;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #F1F2F4; --card: #FBFBFC; --ink: #1B222B; --muted: #5C6672; --line: #D6DADF;
+    --rust: #B04A2F; --ochre: #8F6D1C; --steel: #3E5C76; --deep: #24384E;
+    --shared-bg: rgba(176, 74, 47, .09); --shared-line: rgba(176, 74, 47, .38);
+    --pick-bg: rgba(62, 92, 118, .07); --hw-bg: #1B222B; --hw-ink: #E9ECEF;
+  }
+  :root[data-theme="dark"] {
+    --paper: #14181D; --card: #1C2229; --ink: #E5E8EB; --muted: #99A3AE; --line: #333C46;
+    --rust: #D4744E; --ochre: #C29A40; --steel: #82A8CB; --deep: #A6BED4;
+    --shared-bg: rgba(212, 116, 78, .12); --shared-line: rgba(212, 116, 78, .42);
+    --pick-bg: rgba(130, 168, 203, .08); --hw-bg: #0C0F12; --hw-ink: #C5CDD5;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 40px 22px 56px; }
+
+  /* ── header ─────────────────────────── */
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 10px;
+  }
+  h1 {
+    font-size: clamp(24px, 3.4vw, 31px); font-weight: 800;
+    letter-spacing: -.01em; margin: 0 0 12px; text-wrap: balance;
+  }
+  .lede { max-width: 68ch; font-size: 14.5px; color: var(--muted); margin: 0 0 34px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ── spectrum axis ──────────────────── */
+  .spectrum { margin-bottom: 26px; }
+  .spec-bar {
+    height: 9px; border-radius: 5px;
+    background: linear-gradient(90deg, var(--rust), var(--ochre) 34%, var(--steel) 68%, var(--deep));
+  }
+  .spec-labels {
+    display: flex; justify-content: space-between; gap: 16px;
+    margin-top: 8px; font-size: 11.5px; color: var(--muted);
+  }
+  .spec-labels .axis {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 11px; letter-spacing: .1em; color: var(--ink); font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ── cards ──────────────────────────── */
+  .cards {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    margin-bottom: 40px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 15px 15px;
+    display: flex; flex-direction: column;
+  }
+  .card.pick { border-color: var(--steel); background: linear-gradient(var(--pick-bg), var(--pick-bg)), var(--card); }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+  .card-head h2 {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 15.5px; font-weight: 700; margin: 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 9px; height: 9px; border-radius: 2.5px; background: var(--c); flex: none; }
+  .badge {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 9.5px; letter-spacing: .07em; padding: 3px 8px;
+    border-radius: 999px; white-space: nowrap;
+  }
+  .badge.base { color: var(--muted); border: 1px solid var(--line); }
+  .badge.pick { background: var(--steel); color: var(--paper); font-weight: 700; }
+  .card-sub { font-size: 11.5px; color: var(--muted); margin: 0 0 14px; min-height: 2.6em; }
+
+  /* stack diagram */
+  .stack { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+  .layer {
+    border: 1px solid var(--line); background: var(--paper);
+    border-radius: 6px; padding: 7px 9px;
+    font-size: 12.5px; font-weight: 600; text-align: center;
+  }
+  .layer small { display: block; font-size: 10px; font-weight: 400; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+  .layer.shared { background: var(--shared-bg); border-color: var(--shared-line); }
+  .layer.hw {
+    background: var(--hw-bg); color: var(--hw-ink); border-color: transparent;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 9.5px; font-weight: 500; letter-spacing: .22em; padding: 5px;
+  }
+  .apps { display: flex; gap: 6px; }
+  .apps .layer { flex: 1; }
+  .flow {
+    flex: 1; min-height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 10px; color: var(--muted); text-align: center; line-height: 1.5;
+    padding: 2px 0;
+  }
+  .flow.wide { color: var(--rust); font-weight: 700; }
+
+  /* boundary — 벽의 재질 */
+  .boundary { display: flex; align-items: center; gap: 7px; padding: 3px 0; }
+  .boundary .ln { flex: 1; border-top: 2px solid var(--line); }
+  .boundary .blabel {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 9.5px; letter-spacing: .02em; white-space: nowrap;
+  }
+  .b-soft .ln { border-top: 2px dashed var(--rust); }
+  .b-soft .blabel { color: var(--rust); }
+  .b-gate .ln { border-top: 3px solid var(--ochre); }
+  .b-gate .blabel {
+    color: var(--ochre); border: 1.5px solid var(--ochre);
+    border-radius: 4px; padding: 2px 7px; font-weight: 700;
+  }
+  .b-hw .ln { border-top: 6px solid var(--steel); border-radius: 2px; }
+  .b-hw .blabel { color: var(--steel); font-weight: 700; }
+  .b-hw2 .ln { border-top: 8px solid var(--deep); border-radius: 2px; }
+  .b-hw2 .blabel { color: var(--deep); font-weight: 700; }
+
+  /* metrics */
+  .metrics {
+    display: grid; grid-template-columns: auto 1fr; gap: 5px 10px;
+    border-top: 1px solid var(--line); margin-top: 13px; padding-top: 11px;
+    font-size: 11.5px;
+  }
+  .metrics dt {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 9.5px; letter-spacing: .09em; color: var(--muted); padding-top: 2px;
+    white-space: nowrap;
+  }
+  .metrics dd { margin: 0; line-height: 1.45; }
+  .metrics dd b { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ── table ──────────────────────────── */
+  h3 {
+    font-size: 15px; font-weight: 700; margin: 0 0 12px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  h3 .tag {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 10px; letter-spacing: .12em; color: var(--muted); font-weight: 500;
+  }
+  .twrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 40px; background: var(--card); }
+  table { border-collapse: collapse; width: 100%; min-width: 780px; font-size: 12.5px; }
+  th, td { padding: 9px 13px; text-align: left; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.45; }
+  thead th {
+    border-top: none;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 11.5px; letter-spacing: .02em;
+  }
+  thead th small { display: block; font-size: 9.5px; font-weight: 400; color: var(--muted); letter-spacing: .05em; margin-top: 1px; }
+  tbody th {
+    font-weight: 600; color: var(--muted); font-size: 11.5px; white-space: nowrap;
+  }
+  td { font-variant-numeric: tabular-nums; }
+  col.pickcol { background: var(--pick-bg); }
+  td em { font-style: normal; color: var(--rust); font-weight: 600; }
+
+  /* ── deciding questions ─────────────── */
+  .questions { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+  .q {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 15px 16px; display: flex; gap: 13px;
+  }
+  .q .qn {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 20px; font-weight: 800; color: var(--steel); line-height: 1.1; flex: none;
+  }
+  .q h4 { font-size: 13px; margin: 0 0 4px; }
+  .q p { font-size: 12.5px; color: var(--muted); margin: 0; }
+  .q p b { color: var(--ink); }
+
+  .footnote { font-size: 11.5px; color: var(--muted); max-width: 78ch; margin: 0; }
+  .footnote a { color: var(--steel); }
+  .footnote a:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; border-radius: 2px; }
+
+  @media (max-width: 1000px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    .card-sub { min-height: 0; }
+  }
+  @media (max-width: 560px) {
+    .cards { grid-template-columns: 1fr; }
+    .questions { grid-template-columns: 1fr; }
+    .spec-labels { flex-direction: column; gap: 3px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">DP3 · 축① — Agent 실행 격리 경계 등급</p>
+    <h1>격리 경계 4단 스펙트럼 — 벽의 재질이 결정을 가른다</h1>
+    <p class="lede">
+      컨테이너(커널 공유)와 VM(커널 통째) 사이에는 두 개의 중간 지대가 있다.
+      <strong>gVisor</strong>는 컨테이너 쪽에서 출발해 공유 커널로 가는 문을 좁혔고,
+      <strong>microVM</strong>은 VM 쪽에서 출발해 하드웨어 벽만 남기고 짐을 뜯어냈다.
+      양극단은 기준선으로 격하되고, 결선은 이 중간 둘이다.
+    </p>
+  </header>
+
+  <section class="spectrum" aria-label="격리 강도 스펙트럼">
+    <div class="spec-bar"></div>
+    <div class="spec-labels">
+      <span>벽 = SW 규칙 · 기동 가벼움 · 탈출 쉬움</span>
+      <span class="axis">격리 강도 · 기동/밀도 비용 →</span>
+      <span>벽 = 하드웨어 · 기동 무거움 · 탈출 어려움</span>
+    </div>
+  </section>
+
+  <section class="cards">
+
+    <!-- 1. runc -->
+    <article class="card" style="--c: var(--rust)">
+      <div class="card-head">
+        <h2><span class="dot"></span>runc 컨테이너</h2>
+        <span class="badge base">기준선 · 약</span>
+      </div>
+      <p class="card-sub">커널을 직접 공유 — 격리는 소프트웨어 규칙(namespace · cgroup)뿐</p>
+      <div class="stack">
+        <div class="apps">
+          <div class="layer">App A</div>
+          <div class="layer">App B</div>
+        </div>
+        <div class="flow wide">▼▼▼ ~300+ syscalls<br>커널 직행 — 공격면 최대</div>
+        <div class="boundary b-soft"><span class="ln"></span><span class="blabel">namespace · cgroup (SW 규칙)</span><span class="ln"></span></div>
+        <div class="layer shared">Host Kernel<small>모든 컨테이너가 직접 공유 — 취약점 1개면 노드 전체 함락</small></div>
+        <div class="layer hw">HARDWARE</div>
+      </div>
+      <dl class="metrics">
+        <dt>기동</dt><dd><b>~수십 ms</b></dd>
+        <dt>탈출</dt><dd>커널 취약점 1개</dd>
+        <dt>약점</dt><dd>공격면 최대</dd>
+        <dt>실사용</dt><dd>Docker · K8s 기본값</dd>
+      </dl>
+    </article>
+
+    <!-- 2. gVisor -->
+    <article class="card pick" style="--c: var(--ochre)">
+      <div class="card-head">
+        <h2><span class="dot"></span>gVisor</h2>
+        <span class="badge pick">결선 후보</span>
+      </div>
+      <p class="card-sub">유저스페이스 커널 — 공유는 유지하되 직접 접근을 차단하는 통역</p>
+      <div class="stack">
+        <div class="layer">App</div>
+        <div class="flow">▼ syscall 전부 가로채기</div>
+        <div class="layer">Sentry<small>유저스페이스 가짜 커널 — 커널 재구현, 자기 선에서 처리</small></div>
+        <div class="boundary b-gate"><span class="ln"></span><span class="blabel">좁은 문 · ~50 syscalls</span><span class="ln"></span></div>
+        <div class="layer shared">Host Kernel<small>공유하되 좁은 문으로만 접근</small></div>
+        <div class="layer hw">HARDWARE</div>
+      </div>
+      <dl class="metrics">
+        <dt>기동</dt><dd><b>~수백 ms</b></dd>
+        <dt>탈출</dt><dd>가짜 커널 돌파 + 좁은 문 너머 커널 취약점</dd>
+        <dt>약점</dt><dd>I/O 가로채기 세금 · syscall 호환성 구멍</dd>
+        <dt>실사용</dt><dd>Cloud Run · GKE Sandbox</dd>
+      </dl>
+    </article>
+
+    <!-- 3. microVM -->
+    <article class="card pick" style="--c: var(--steel)">
+      <div class="card-head">
+        <h2><span class="dot"></span>microVM</h2>
+        <span class="badge pick">결선 후보</span>
+      </div>
+      <p class="card-sub">VM의 벽은 유지, 집은 뼈대만 — Kata = microVM + 컨테이너 UX(C-01 정합)</p>
+      <div class="stack">
+        <div class="layer">App</div>
+        <div class="flow">▼ syscall — 게스트 안에서 완결</div>
+        <div class="layer">Guest Kernel<small>전용 · 최소 구성 — virtio 장치만</small></div>
+        <div class="boundary b-hw"><span class="ln"></span><span class="blabel">HW 가상화 · VT-x</span><span class="ln"></span></div>
+        <div class="layer">VMM<small>Firecracker — VM당 오버헤드 ~5 MB</small></div>
+        <div class="layer hw">HARDWARE</div>
+      </div>
+      <dl class="metrics">
+        <dt>기동</dt><dd><b>~125 ms – 1 s</b></dd>
+        <dt>탈출</dt><dd>하이퍼바이저(VMM) 취약점 — 희귀</dd>
+        <dt>약점</dt><dd>bare-metal · nested virt 지원 필요</dd>
+        <dt>실사용</dt><dd>AWS Lambda · Fargate · Kata</dd>
+      </dl>
+    </article>
+
+    <!-- 4. full VM -->
+    <article class="card" style="--c: var(--deep)">
+      <div class="card-head">
+        <h2><span class="dot"></span>full VM</h2>
+        <span class="badge base">기준선 · 과잉</span>
+      </div>
+      <p class="card-sub">완전한 OS를 통째로 — 벽은 microVM과 같으나 짐이 크다</p>
+      <div class="stack">
+        <div class="layer">App</div>
+        <div class="flow">▼ syscall — 게스트 안에서 완결</div>
+        <div class="layer">Guest OS<small>완전한 커널 + userland 전체</small></div>
+        <div class="layer">장치 에뮬레이션<small>BIOS · PCI · legacy (QEMU)</small></div>
+        <div class="boundary b-hw2"><span class="ln"></span><span class="blabel">HW 가상화 · VT-x</span><span class="ln"></span></div>
+        <div class="layer">Hypervisor<small>KVM · ESXi …</small></div>
+        <div class="layer hw">HARDWARE</div>
+      </div>
+      <dl class="metrics">
+        <dt>기동</dt><dd><b>수십 초</b></dd>
+        <dt>탈출</dt><dd>하이퍼바이저 취약점</dd>
+        <dt>약점</dt><dd>수 GB 메모리 · 밀도 최저 — 일회용 모델(dp2)과 경제성 불일치</dd>
+        <dt>실사용</dt><dd>전통 서버 가상화</dd>
+      </dl>
+    </article>
+
+  </section>
+
+  <h3>한 장 비교 <span class="tag">BOUNDARY CLASS × COST</span></h3>
+  <div class="twrap">
+    <table>
+      <colgroup>
+        <col><col>
+        <col class="pickcol"><col class="pickcol">
+        <col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th></th>
+          <th>runc 컨테이너<small>기준선 · 약</small></th>
+          <th>gVisor<small>결선 후보</small></th>
+          <th>microVM (Kata·FC)<small>결선 후보</small></th>
+          <th>full VM<small>기준선 · 과잉</small></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">벽의 재질</th>
+          <td>커널 SW 규칙</td>
+          <td>유저스페이스 가짜 커널 — 문 좁힘</td>
+          <td><b>하드웨어 가상화</b></td>
+          <td>하드웨어 가상화</td>
+        </tr>
+        <tr>
+          <th scope="row">커널 공유</th>
+          <td><em>직접 공유</em></td>
+          <td>공유하되 좁은 문으로만</td>
+          <td>게스트 커널 별도 (최소)</td>
+          <td>게스트 커널 별도 (완전)</td>
+        </tr>
+        <tr>
+          <th scope="row">탈출하려면</th>
+          <td><em>커널 취약점 1개</em></td>
+          <td>가짜 커널 + 좁은 문의 커널 취약점</td>
+          <td>하이퍼바이저 취약점 (희귀)</td>
+          <td>하이퍼바이저 취약점</td>
+        </tr>
+        <tr>
+          <th scope="row">기동</th>
+          <td>~수십 ms</td>
+          <td>~수백 ms</td>
+          <td>~125 ms – 1 s</td>
+          <td>수십 초</td>
+        </tr>
+        <tr>
+          <th scope="row">약점</th>
+          <td>공격면 최대</td>
+          <td><em>I/O 느림</em> · 호환성 구멍</td>
+          <td>가상화 지원 필요</td>
+          <td>무겁고 밀도 최저</td>
+        </tr>
+        <tr>
+          <th scope="row">실사용</th>
+          <td>Docker · K8s 기본값</td>
+          <td>Cloud Run · GKE Sandbox</td>
+          <td>AWS Lambda · Fargate · 에이전트 샌드박스</td>
+          <td>전통 가상화</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>결선(gVisor vs microVM)을 가르는 두 질문 <span class="tag">실측 의존 — 구조는 고정, 수치는 측정으로</span></h3>
+  <section class="questions">
+    <div class="q">
+      <span class="qn">Q1</span>
+      <div>
+        <h4>인프라 게이트</h4>
+        <p>클러스터가 <b>bare-metal 또는 nested virtualization</b>을 지원하는가?
+        지원하지 않으면 microVM 계열은 원천 탈락 — 결선에 <b>gVisor만 남는다.</b></p>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qn">Q2</span>
+      <div>
+        <h4>성능 게이트</h4>
+        <p>dp2가 확정한 <b>20 GB 중간 산출물의 로컬 볼륨 I/O</b>에서 gVisor의 가로채기 세금이
+        E2E budget(QA-10 ≤ 5%)을 잠식하는가? 잠식하면 <b>microVM 우위.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <p class="footnote">
+    기동·오버헤드 수치는 대표 공개값 기반 예시(<a href="https://firecracker-microvm.github.io/">Firecracker</a> ~125 ms/~5 MB,
+    <a href="https://gvisor.dev/docs/">gVisor 아키텍처</a>, <a href="https://katacontainers.io/">Kata Containers</a>)이며 합격선은 실측으로 확정한다.
+    이 축①(격리 경계 등급)은 dp2(일회용 컨테이너 실행 구조) 위에 얹는 결정으로, 채택 등급이 "샌드박스 내부 = 자동 승인" 원리(축② 승인 배정)의 전제를 공급한다.
+  </p>
+</div>
+</body>
+</html>
