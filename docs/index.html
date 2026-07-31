@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>archi-team-project — 산출물 미리보기</title>
+<style>
+  :root { --paper: #F1F2F4; --card: #FBFBFC; --ink: #1B222B; --muted: #5C6672; --line: #D6DADF; --steel: #3E5C76; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #14181D; --card: #1C2229; --ink: #E5E8EB; --muted: #99A3AE; --line: #333C46; --steel: #82A8CB; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink); margin: 0;
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 22px; }
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px;
+  }
+  h1 { font-size: 24px; font-weight: 800; margin: 0 0 6px; }
+  .lede { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+  ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  a.item {
+    display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; text-decoration: none; color: inherit;
+  }
+  a.item:hover, a.item:focus-visible { border-color: var(--steel); outline: none; }
+  a.item b { display: block; font-size: 15px; }
+  a.item span { font-size: 12.5px; color: var(--muted); }
+  a.item .tag {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 10px; letter-spacing: .1em; color: var(--steel);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">17조 · Agentic AI 기반 On-device AI SDK 개발 자동화</p>
+  <h1>산출물 미리보기</h1>
+  <p class="lede">발표 준비용 다이어그램·도표를 브라우저에서 바로 확인하는 페이지. 원본은 저장소 <code>docs/</code>.</p>
+  <ul>
+    <li>
+      <a class="item" href="isolation-spectrum.html">
+        <span class="tag">DP3 · 축①</span>
+        <b>격리 경계 4단 스펙트럼</b>
+        <span>runc · gVisor · microVM · full VM — 벽의 재질과 비용 비교, 결선을 가르는 두 질문</span>
+      </a>
+    </li>
+  </ul>
+</div>
+</body>
+</html>
