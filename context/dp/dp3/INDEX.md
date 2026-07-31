@@ -33,6 +33,7 @@ dp3/
 | evaluation.md | 기준별 판정·★ 매트릭스·수렴 결론(**microVM + 3단 배정**)·뒤집힘 조건 | 완료 |
 | 본문 (dp3 DP 문서) | evaluation 수렴 결론을 ATAM 절로 승격한 정식 DP 문서 | **예정** (DP id 확정 후) |
 | 시각 자료 | `docs/isolation-spectrum.html` — 축① 4단 스펙트럼 다이어그램 ([Pages](https://sj-meliora.github.io/archi-team-project/isolation-spectrum.html)) | 완료 |
+| 시각 자료 | `docs/dp3-decision-comparison.html` — 수렴 결론 선정안 vs 비교안 ([Pages](https://sj-meliora.github.io/archi-team-project/dp3-decision-comparison.html)) | 완료 |
 
 ## Iteration 로그
 - **Iter1 (2026-07-31)**: 원 프레임의 문제 3개 식별 — ① 축(2) 양끝이 SSoT에 격추됨(전면 자동=C-03 위반 부적격 / 전면 HITL=시스템 전제·QA-01 위배) ② 축(1) 이지선다가 지배적 중간(gVisor·microVM) 은폐 ③ 두 축의 범주 혼동(비인가 능력 vs 인가된 오판단). → 재정식화: 독립 서브결정 2개 + TP-1 연결. R-01·R-02·decision-axes 작성, 축① 다이어그램 시각화·Pages 배포. 레퍼런스: Claude Code 로컬/클라우드 승인 비대칭(R-02).
