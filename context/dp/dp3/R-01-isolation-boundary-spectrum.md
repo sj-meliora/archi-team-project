@@ -61,13 +61,14 @@
 
 - **격리 등급 요구는 위협 모델에서 도출**: C-03의 injection 차단율 임계 `≥70%`는 곧 **최대 ~30%의 악성 지시가 가드레일을 통과함을 공식 인정**한 것 — 그 잔여 위협(조종당한 에이전트의 임의 코드 실행)을 봉쇄하는 층이 샌드박스다. 위협 모델에 이것이 포함되면 커널 공유 경계(runc)로는 부족하다는 논리가 성립.
 - **축②와의 관계 (도출 아님·전제 공급)**: 격리 등급이 위협 모델을 담아내면 "샌드박스 내부 = 자동 승인" 원리가 성립하고, 축②는 경계 통과 지점(배포·push·credential·외부 API)별 승인 메커니즘 배정 문제로 축소된다. 격리가 불충분하면 내부에도 게이트가 필요해져 자동존이 좁아진다(TP 후보).
-- **dp2 정합**: 격리 등급은 dp2 결선(A5/A8″)의 **cold-start(SP-3)와 노드 밀도/footprint(SP-4)에 직접 되먹임** — 샌드박스 기동 시간을 dp2 cold-start budget에 게이트로 건다.
+- **dp2 정합 (갱신 2026-07-31 — A5 확정 반영)**: dp2가 **A5(외부 오브젝트 스토리지 전달)** 를 채택(팀 입력). A5의 cold-start 지배 항은 대형 컴파일러 이미지라 샌드박스 기동(~125ms/~수백ms)은 **비변별**로 강등. 지배 변별은 **스토리지 왕복 I/O의 격리 계층 경유 세금**(아래 Q2′)으로 이동. A8 고유였던 footprint(SP-4) 되먹임은 소거.
 - ⚠️ **범주 오류 주의(F-08 재발 방지)**: **microVM ≠ microkernel**. Microkernel/Plug-in(dp4 A7)은 변종 수용(Extensibility) 축의 아키텍처 패턴이고, 이 축의 어휘는 Bulkhead / Sandbox / Defense-in-depth 계열이다.
 
-**결선(gVisor vs microVM)을 가르는 두 질문 — 실측 의존, 구조는 고정·수치는 측정으로:**
+**결선(gVisor vs microVM)을 가르는 질문 — 실측 의존, 구조는 고정·수치는 측정으로:**
 
-1. **[Q1 인프라 게이트]** 클러스터가 **bare-metal / nested virtualization**을 지원하는가? — 아니면 microVM 계열 원천 탈락 → gVisor만 결선에 남음.
-2. **[Q2 성능 게이트]** dp2가 확정한 **20GB 중간 산출물의 로컬 볼륨 I/O**에서 gVisor의 가로채기 세금이 E2E budget(QA-10 ≤5%)을 잠식하는가? — gVisor의 알려진 최약점이 정확히 대용량 I/O라 dp2의 로컬 전달 구조와 상성 검증이 필수. 잠식하면 microVM(virtio) 우위.
+1. **[Q1 인프라 게이트 — 충족 확인 ✓ (2026-07-31 팀 입력)]** bare-metal 선택 가능 → microVM 계열 잔류. Q1은 변별력을 잃고 결정은 Q2′로 내려간다.
+2. **[Q2′ 성능 게이트 — dp2=A5 확정 반영 재정의]** dp2가 A5(claim-check)를 채택해 20GB는 **단계마다 스토리지 read → 로컬 스크래치 → write 왕복**으로 흐른다(구 Q2의 "로컬 볼륨" 전제 폐기). 격리 계층은 이 경로에 곱해지는 세금 — gVisor는 네트워크(netstack)·파일(gofer) syscall 이중 가로채기, microVM은 virtio near-native. **격리 계층 경유 후에도 전달세금이 QA-10 ≤5% budget에 남는가?** 못 남으면 microVM 우위.
+3. **[부차 변별 — Q2′ 동률 시]** gVisor syscall 호환성 구멍(컴파일러·양자화 toolchain smoke test 필요) ↔ microVM 밀도·운영 성숙도.
 
 ## 출처
 - [gVisor — Architecture Guide](https://gvisor.dev/docs/) — Sentry(유저스페이스 커널)·시스템콜 가로채기 구조

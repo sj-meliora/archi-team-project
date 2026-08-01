@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dp3 수렴 결론 — 선정안 vs 비교안 (microVM + 3단 승인 배정)</title>
+<style>
+  :root {
+    --paper: #F1F2F4; --card: #FBFBFC; --ink: #1B222B; --muted: #5C6672; --line: #D6DADF;
+    --rust: #B04A2F; --steel: #3E5C76; --deep: #24384E;
+    --pick-bg: rgba(62, 92, 118, .07); --fail-bg: rgba(176, 74, 47, .08);
+    --hw-bg: #1B222B; --hw-ink: #E9ECEF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #14181D; --card: #1C2229; --ink: #E5E8EB; --muted: #99A3AE; --line: #333C46;
+      --rust: #D4744E; --steel: #82A8CB; --deep: #A6BED4;
+      --pick-bg: rgba(130, 168, 203, .09); --fail-bg: rgba(212, 116, 78, .10);
+      --hw-bg: #0C0F12; --hw-ink: #C5CDD5;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink); margin: 0;
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 22px 56px; }
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 10px;
+  }
+  h1 { font-size: clamp(23px, 3.2vw, 30px); font-weight: 800; letter-spacing: -.01em; margin: 0 0 12px; text-wrap: balance; }
+  .lede { max-width: 70ch; font-size: 14px; color: var(--muted); margin: 0 0 26px; }
+  .lede strong { color: var(--ink); }
+  h2 { font-size: 16.5px; font-weight: 800; margin: 40px 0 6px; }
+  h2 .tag {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 10px; letter-spacing: .12em; color: var(--muted); font-weight: 500; margin-left: 8px;
+  }
+  .sub { font-size: 12.5px; color: var(--muted); margin: 0 0 14px; max-width: 74ch; }
+
+  /* verdict banner */
+  .verdict {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    background: linear-gradient(var(--pick-bg), var(--pick-bg)), var(--card);
+    border: 1.5px solid var(--steel); border-radius: 12px; padding: 16px 18px;
+  }
+  .verdict .v { flex: 1; min-width: 260px; }
+  .verdict .axis-label {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 10px; letter-spacing: .12em; color: var(--muted);
+  }
+  .verdict .pickname { font-size: 16px; font-weight: 800; margin: 3px 0 2px; }
+  .verdict .vs { font-size: 12px; color: var(--muted); }
+  .verdict .vs s { text-decoration-color: var(--rust); }
+
+  /* head-to-head table */
+  .twrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 12.5px; }
+  th, td { padding: 9px 13px; text-align: left; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.45; }
+  thead th { border-top: none; font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 11.5px; }
+  thead th small { display: block; font-size: 9.5px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+  tbody th { font-weight: 600; color: var(--muted); font-size: 11.5px; white-space: nowrap; }
+  col.pickcol { background: var(--pick-bg); }
+  .stars { font-family: ui-monospace, "SF Mono", Consolas, monospace; color: var(--steel); letter-spacing: .06em; white-space: nowrap; }
+  .stars.low { color: var(--rust); }
+  td .why { display: block; font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .win { font-weight: 700; color: var(--steel); white-space: nowrap; }
+  .win.weak { font-weight: 500; }
+
+  /* callout */
+  .callout {
+    border-left: 3px solid var(--steel); background: var(--card); border-radius: 0 10px 10px 0;
+    padding: 12px 16px; margin-top: 14px; font-size: 12.5px;
+  }
+  .callout b { color: var(--steel); }
+  .callout .strike { color: var(--muted); }
+
+  /* 축② cards */
+  .cards3 { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 12px; }
+  .alt {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 15px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .alt.pick { border: 1.5px solid var(--steel); background: linear-gradient(var(--pick-bg), var(--pick-bg)), var(--card); }
+  .alt.fail { background: linear-gradient(var(--fail-bg), var(--fail-bg)), var(--card); }
+  .alt h3 { font-size: 13.5px; margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .badge {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 9.5px; letter-spacing: .07em; padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+  }
+  .badge.pick { background: var(--steel); color: var(--paper); font-weight: 700; }
+  .badge.base { color: var(--muted); border: 1px solid var(--line); }
+  .badge.fail { background: var(--rust); color: var(--paper); font-weight: 700; }
+  .alt ul { margin: 0; padding-left: 16px; font-size: 11.5px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  .alt ul b { color: var(--ink); }
+  .tiers { border-top: 1px solid var(--line); padding-top: 8px; margin-top: auto; font-size: 11px; }
+  .tiers .t { display: flex; gap: 8px; padding: 3px 0; }
+  .tiers .t .m {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 9.5px; white-space: nowrap;
+    color: var(--steel); font-weight: 700; min-width: 72px;
+  }
+  .tiers .t span:last-child { color: var(--muted); }
+
+  /* TP-1 quadrant */
+  .quad-wrap { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+  .quad-ylabel {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 10px; letter-spacing: .12em;
+    color: var(--muted); text-align: center;
+  }
+  .quad { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .qcell { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--card); min-height: 86px; }
+  .qcell h4 { font-size: 12.5px; margin: 0 0 4px; display: flex; align-items: center; gap: 6px; }
+  .qcell p { font-size: 11px; color: var(--muted); margin: 0; }
+  .qcell.ok { border: 1.5px solid var(--steel); background: linear-gradient(var(--pick-bg), var(--pick-bg)), var(--card); }
+  .qcell.no { background: linear-gradient(var(--fail-bg), var(--fail-bg)), var(--card); }
+  .qcell .mark { font-weight: 800; }
+  .qcell.ok .mark { color: var(--steel); }
+  .qcell.no .mark { color: var(--rust); }
+  .quad-xlabel {
+    grid-column: 2; text-align: center;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 10px; letter-spacing: .12em; color: var(--muted);
+  }
+
+  /* reversal conditions */
+  .revs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .rev { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 13px 15px; display: flex; gap: 12px; }
+  .rev .rn { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 17px; font-weight: 800; color: var(--rust); flex: none; }
+  .rev h4 { font-size: 12.5px; margin: 0 0 3px; }
+  .rev p { font-size: 11.5px; color: var(--muted); margin: 0; }
+
+  .footnote { font-size: 11.5px; color: var(--muted); max-width: 80ch; margin: 34px 0 0; }
+  .footnote a { color: var(--steel); }
+  .footnote a:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; border-radius: 2px; }
+
+  @media (max-width: 860px) {
+    .cards3 { grid-template-columns: 1fr; }
+    .revs { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">DP3 · 수렴 결론 — evaluation.md 시각화</p>
+    <h1>선정안 vs 비교안 — 왜 microVM + 3단 승인 배정인가</h1>
+    <p class="lede">
+      전제(팀 입력): <strong>dp2 = A5 채택</strong>(외부 오브젝트 스토리지 전달) · <strong>bare-metal 선택 가능</strong>.
+      이 두 입력이 비교안(gVisor·전면 HITL·전면 자동)의 승리 시나리오를 소거하고, 선정 조합만 남긴다.
+    </p>
+  </header>
+
+  <section class="verdict" aria-label="수렴 결론">
+    <div class="v">
+      <span class="axis-label">축① 격리 경계 등급</span>
+      <p class="pickname">✓ microVM (Kata / Firecracker)</p>
+      <p class="vs">vs <s>gVisor</s>(전 기준 열세) · <s>runc</s>(C-03 격추) · <s>full VM</s>(microVM에 지배)</p>
+    </div>
+    <div class="v">
+      <span class="axis-label">축② 승인 경계 배치</span>
+      <p class="pickname">✓ 3단 위험 티어 배정</p>
+      <p class="vs">vs <s>전면 HITL</s>(QA-01 격추) · <s>전면 자동</s>(C-03 위반 부적격)</p>
+    </div>
+  </section>
+
+  <h2>축① 결선 — gVisor vs microVM <span class="tag">기준별 판정</span></h2>
+  <p class="sub">별점은 "격리 계층이 해당 QA에 끼치는 영향" 기준의 예시 캘리브레이션 — Q2′ 마이크로벤치로 확정.</p>
+  <div class="twrap">
+    <table>
+      <colgroup><col><col><col class="pickcol"><col></colgroup>
+      <thead>
+        <tr>
+          <th></th>
+          <th>gVisor<small>비교안 (결선 상대)</small></th>
+          <th>microVM<small>선정안</small></th>
+          <th>판정</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Performance-E2E<br>(QA-10)</th>
+          <td><span class="stars low">★☆☆</span><span class="why">20GB×2/단계가 netstack(네트워크)+gofer(파일) 이중 가로채기 — A5 전달세금 증폭</span></td>
+          <td><span class="stars">★★★</span><span class="why">virtio-net/blk near-native</span></td>
+          <td><span class="win">microVM 결정적</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Availability<br>(QA-02)</th>
+          <td><span class="stars">★★☆</span><span class="why">호환성 구멍 = 단계 실행 중 실패 리스크</span></td>
+          <td><span class="stars">★★★</span><span class="why">자기 커널 — Lambda 규모 실증</span></td>
+          <td><span class="win weak">microVM 약우위</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Controllability<br>(QA-03)</th>
+          <td><span class="stars">★★★</span><span class="why">중단·게이트는 제어평면(DP-01/0003) 소관 — 비변별. 단 C-03 봉쇄 논증은 공유 커널이라 부담↑</span></td>
+          <td><span class="stars">★★★</span><span class="why">하드웨어 벽 — 봉쇄 논증 단순</span></td>
+          <td><span class="win weak">microVM 약우위</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Scalability<br>(QA-01)</th>
+          <td><span class="stars">★★☆</span><span class="why">netstack CPU 세금이 storage-bw knee를 앞당김</span></td>
+          <td><span class="stars">★★★</span><span class="why">오버헤드 ~5MB — 밀도 영향 미미</span></td>
+          <td><span class="win weak">microVM 약우위</span></td>
+        </tr>
+        <tr>
+          <th scope="row">Correctness<br>(QA-07)</th>
+          <td><span class="stars">★★☆</span><span class="why">toolchain syscall 미지원 구멍 가능</span></td>
+          <td><span class="stars">★★★</span><span class="why">완전한 커널 — 무수정 구동</span></td>
+          <td><span class="win">microVM 우위</span></td>
+        </tr>
+        <tr>
+          <th scope="row">C-01 · 인프라</th>
+          <td>어디서나 구동 <span class="why">(유일 강점이었음)</span></td>
+          <td>Kata RuntimeClass + bare-metal 가용</td>
+          <td><span class="win weak">동률 (강점 소거)</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <b>소거 논리</b> — gVisor가 이기는 시나리오는 둘뿐이었다:
+    ① <span class="strike">가상화 불가 환경</span> → <b>bare-metal 가용</b> 입력으로 소거 ·
+    ② <span class="strike">I/O 가벼운 워크로드</span> → <b>dp2 = A5</b> 확정으로 워크로드가 정반대(단계마다 20GB 왕복)가 되어 소거.
+    → 방향은 microVM으로 확정, Q2′ 벤치는 "선택 근거"가 아니라 <b>budget 통과 확인용</b>.
+  </div>
+
+  <h2>축② 승인 배치 — 3안 비교 <span class="tag">기준선 2 + 채택 1</span></h2>
+  <section class="cards3">
+    <article class="alt">
+      <h3>전면 HITL <span class="badge base">기준선 · 격추</span></h3>
+      <ul>
+        <li><b>QA-01</b>: 사람 = USL α항, workload에 비례 — 일 ~50건 승인</li>
+        <li><b>QA-03</b>: 승인 피로 → <b>rubber-stamping</b>으로 게이트 실질 무력화</li>
+        <li><b>QA-02</b>: 사람 부재 = 파이프라인 블로킹</li>
+        <li>시스템 전제("사람 개입 없이")와 모순</li>
+      </ul>
+    </article>
+    <article class="alt pick">
+      <h3>3단 위험 티어 배정 <span class="badge pick">채택</span></h3>
+      <ul>
+        <li><b>원리</b>: 승인 경계 = 격리 경계 — 효과가 컨테이너 폐기를 넘어 지속되는가(기계 판정 술어)</li>
+        <li><b>QA-01</b>: 에스컬레이션 ∝ 산출물 수 — 사람 병목 분리</li>
+        <li><b>C-03</b>: 고위험 HITL 100% 게이트 충족</li>
+      </ul>
+      <div class="tiers">
+        <div class="t"><span class="m">자동</span><span>샌드박스 내부 — 노드 실행·중간 처리 (롤백 = 컨테이너 폐기)</span></div>
+        <div class="t"><span class="m">정책 사전승인</span><span>스토리지 write(스코프 자격증명+서명) · canary 배포 · 허용 외부 API</span></div>
+        <div class="t"><span class="m">액션별 HITL</span><span>production 승격 · credential 사용 · delete</span></div>
+      </div>
+    </article>
+    <article class="alt fail">
+      <h3>전면 자동 승인 <span class="badge fail">부적격</span></h3>
+      <ul>
+        <li><b>C-03 위반</b>: "고위험 액션 HITL 통과율 100% · 우회 0건"은 pass/fail 제약 — 비교 매트릭스에 올라올 자격 없음</li>
+        <li>격리 등급이 아무리 강해도 <b>인가된 나쁜 배포</b>는 샌드박스가 못 막는다</li>
+      </ul>
+    </article>
+  </section>
+
+  <h2>TP-1 — 왜 이 조합만 성립하는가 <span class="tag">벽 강도 × 자동존 폭</span></h2>
+  <div class="quad-wrap">
+    <div class="quad-ylabel">벽 강도 → (아래: 약 · 위: 강)</div>
+    <div>
+      <div class="quad">
+        <div class="qcell no">
+          <h4><span class="mark">✗</span> 강한 벽 + 전면 HITL</h4>
+          <p>격리 비용은 내고 처리량은 못 얻음 — QA-01 사람 병목 + rubber-stamping.</p>
+        </div>
+        <div class="qcell ok">
+          <h4><span class="mark">✓</span> 강한 벽 + 넓은 자동존</h4>
+          <p><b>채택 (microVM + 3단 배정)</b> — 가장 강한 벽이 가장 넓은 자동존을 떠받쳐 ASR#1(Scalability)의 "사람 개입 없는" 처리량을 만든다.</p>
+        </div>
+        <div class="qcell">
+          <h4><span class="mark">—</span> 약한 벽 + 좁은 자동존</h4>
+          <p>로컬 Claude Code 모델 — 사람이 곧 샌드박스. 안전하나 확장 불가(기준선).</p>
+        </div>
+        <div class="qcell no">
+          <h4><span class="mark">✗</span> 약한 벽 + 넓은 자동존</h4>
+          <p>C-03 봉쇄 논증 실패 — injection 잔여 ~30%의 임의 코드가 커널 공유 경계 안에서 자유.</p>
+        </div>
+      </div>
+      <p class="quad-xlabel" style="grid-column:auto; margin-top:8px;">자동존 폭 → (왼쪽: 좁음/HITL · 오른쪽: 넓음/자동)</p>
+    </div>
+  </div>
+
+  <h2>뒤집힘 조건 <span class="tag">이 2개 외에는 선택 안정</span></h2>
+  <section class="revs">
+    <div class="rev">
+      <span class="rn">R1</span>
+      <div>
+        <h4>bare-metal 전제 철회</h4>
+        <p>Q1(인프라 게이트)이 부활 → microVM 원천 탈락 → <b>gVisor로 회귀</b>.</p>
+      </div>
+    </div>
+    <div class="rev">
+      <span class="rn">R2</span>
+      <div>
+        <h4>virtio 경유조차 5% budget 미달</h4>
+        <p>격리 계층이 아니라 <b>dp2 전달 구조의 문제로 격상</b>(dp2 재론) — 격리 등급 교체로는 해결 불가.</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="footnote">
+    근거·전체 논거는 <code>context/dp/dp3/evaluation.md</code> (기준별 판정·★ 매트릭스·미해결 항목).
+    축① 4단 스펙트럼 배경 자료는 <a href="isolation-spectrum.html">격리 경계 4단 스펙트럼</a>.
+    별점·수치는 예시 캘리브레이션이며 Q2′ 마이크로벤치(20GB 왕복 × 격리 계층별)로 확정한다.
+  </p>
+</div>
+</body>
+</html>
