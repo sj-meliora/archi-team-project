@@ -111,6 +111,12 @@
 - round-NN append-only 스냅샷·`dp2-drop-rationale`·각 변경이력의 과거 DP-0001/0002 서술은 당시 기준 보존.
 - 영향 ID: DP-0001·DP-0002(삭제), DP-01, QA-01/02/03/05/09/13, QAS-01/02/03/05/09/13, C-03, FR-0001·FR-0004, module-view, asr, INDEX, CLAUDE, _backlog, dp4/*, open-issues(OI-2·OI-7·OI-12), discussion(dp·qa 스펙), changelog.
 
+## 2026-08-10 — DP-06 Agent 지식 베이스 신설 (RAG vs LLM Wiki, OI-13 신설)
+- 변경: 신규 **`dp/DP-06-knowledge-base.md`** — 자율 이슈처리(불량 분석·회귀)의 전제인 **지식 공급 계층** DP 신설. 슬라이드 2장 구성(1장 필요성 3축: 자율 이슈처리 전제·LLM 파라미터 지식 한계·컨텍스트/토큰 한계 / 2장 RAG vs LLM Wiki ★비교).
+- 사유: DP-01(제어평면)·DP-0004(실행구조)는 "어떻게 실행되나"만 다루고 "무엇을 알고 판단하나"는 어떤 DP도 미결정 — 발표 서사 핵심(자율 이슈처리)의 공백.
+- drives: QA-07↑·QA-05·QA-01 (ASR 3종). 하이브리드(Wiki 1차+RAG fallback)는 승격 후보로 디스커션 회부. DP-06부터 신규 DP는 2자리 발번(DP-02는 드랍 결번).
+- 영향 ID: DP-06(신규), INDEX, open-issues(OI-13 신설), changelog.
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>

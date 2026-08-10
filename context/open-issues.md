@@ -83,3 +83,8 @@
 - **인용 중인 곳(보류 포인터)**: QA-01(scaling efficiency·큐 p95)·QA-05(작업별 최적 agent·warm pool)·QA-09(즉시 실행 speedup)·QA-13(비용 라우팅)의 검증 전략, 짝 QAS-01·05·09·13, FR-0001 `realized-by`, dp4(A3/A5/A8·evaluation·INDEX·review)의 "정합" 언급. 본문엔 모두 `구 DP-0001`로 표기(삭제 표식 — grep 추적 가능).
 - **후보 행선지(미결정)**: (a) **DP-0004**(Workflow 실행 구조)가 scale-out(A5/A8 ephemeral)으로 동적 풀을 흡수 / (b) 신규 DP로 분리 / (c) 비-ASR이면 드랍. **DP 디스커션에서 결정.**
 - **남은 작업**: 행선지 확정 시 위 인용처의 `구 DP-0001` 참조를 새 owner로 redirect + `_backlog.md` BL-3 갱신.
+
+## [ ] OI-13 DP-06 지식 베이스 — 형태 결정(RAG vs Wiki vs 하이브리드) 미확정
+- **맥락(2026-08-10)**: DP-06(Agent 지식 베이스) 신설 — 자율 이슈처리(불량 분석·회귀)의 전제인 지식 공급 계층이 어떤 DP에도 없던 공백을 닫음. 슬라이드 2장(필요성 / RAG vs LLM Wiki 비교) 구성.
+- **미확정**: ① 1안(RAG) vs 2안(LLM Wiki) vs 3안(하이브리드 — 승격 후보, 별점 미부여) 선택 — DP 디스커션 회부. ② 2안 Correctness `★★★◯`의 `◯` 해제(이벤트 트리거 증류 파이프라인 PoC). ③ 도안 SVG 미작성(선택안 확정 후 `diagrams/` 승격).
+- **남은 작업**: 선택안 확정 시 — module-view Repository 레이어에 `Knowledge Base` 박스(+ 증류 경로) 반영, QA-07/05/01 `related-dp`에 DP-06 역방향 링크 추가, eval/검증 서브시스템 DP(OI-7)와 R-4(위키 오염) 방어선 정합 확인.
