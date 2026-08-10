@@ -123,6 +123,11 @@
 - drives 불변(QA-07↑·QA-05·QA-01). 매트릭스에 QA-07 초기/정상 분리(콜드스타트가 핵심 변별). 권고 = 3안 Distill-seeded(드라이버 2단 질문으로 택일).
 - 영향 ID: DP-06(v2), _backlog(BL-4 신설), INDEX, open-issues(OI-13 갱신), changelog.
 
+## 2026-08-10 — DP-06 슬라이드 재편: 공통 조회 계층 구조도 신설, Cerebras는 Appendix로
+- 변경: 슬라이드 구성 2장 → **본편 3장 + Appendix 1장**. 신설 슬라이드 2 = **공통 조회 계층 구조도**(Mermaid) — 단일 인덱스 아래 LLM Wiki·Confluence·Jira·채팅·빌드 로그·trace가 federation으로 붙는 구조, 1안(raw 직결) vs 2·3안(증류 경유) 인덱싱 경로 시각화. Cerebras Field Reference는 Appendix 슬라이드로 이동. 구 슬라이드 2(부트스트랩 비교) → 슬라이드 3.
+- 사유: 본편에는 레퍼런스 소개보다 우리 시스템의 구조 설계가 먼저 — 조회 계층 공통 전제를 그림으로 고정하고, 부트스트랩 비교(슬라이드 3)가 "인덱싱 경로 선택"임을 구조도에서 미리 보이게.
+- 영향 ID: DP-06, changelog.
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>

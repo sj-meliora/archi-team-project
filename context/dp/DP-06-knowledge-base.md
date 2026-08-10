@@ -32,11 +32,11 @@
 
 > **어느 대안을 고르든 인덱싱·조회 계층은 필요하다.** 형태(raw/증류)가 달라도 "인덱스가 있어야 원하는 지식을 찾는다"는 점은 동일 — 따라서 조회 계층은 대안 간 변별 축이 아니라 **공통 전제**로 깔고, 필드 수렴 패턴을 채택한다.
 
-**채택 패턴 (레퍼런스 아키텍처 = Cerebras Knowledge, A7)**: 모든 소스를 **단일 임베딩 스토어**로 연합 + **하이브리드 검색**(전문검색: 에러 코드·플래그명 정확 일치 / 임베딩: 패러프레이즈) + **RRF 융합 → rerank** + **age decay**(신선한 지식 우선). 우리 도메인(빌드 로그·config diff·quantize 플래그)은 정확 문자열 검색 수요가 커서 하이브리드가 옵션이 아니라 필수. **상세 설계(신호 구성·인덱스 기술 선택)는 `_backlog.md` BL-4** — 본 DP(시작 전략) 확정 후 후속 결정.
+**채택 패턴 (레퍼런스 아키텍처 = Cerebras Knowledge, A7)**: 모든 소스를 **단일 임베딩 스토어**로 연합 + **하이브리드 검색**(전문검색: 에러 코드·플래그명 정확 일치 / 임베딩: 패러프레이즈) + **RRF 융합 → rerank** + **age decay**(신선한 지식 우선). 우리 도메인(빌드 로그·config diff·quantize 플래그)은 정확 문자열 검색 수요가 커서 하이브리드가 옵션이 아니라 필수. **상세 설계(신호 구성·인덱스 기술 선택)는 `_backlog.md` BL-4** — 본 DP(시작 전략) 확정 후 후속 결정. 구조도는 슬라이드 2 참조.
 
 ---
 
-## 슬라이드 요약 (2장 — 16:9)
+## 슬라이드 요약 (본편 3장 + Appendix 1장 — 16:9)
 
 ### 슬라이드 1 — 왜 지식 베이스인가 (필요성)
 
@@ -54,9 +54,58 @@
 
 > 요지: 지식 베이스는 "있으면 좋은 것"이 아니라 **자율 이슈처리의 성립 조건**이다. 그리고 지금 그 지식 베이스는 **비어 있다** — 기존 Confluence·Jira 연동 RAG도, LLM wiki도 없다. 다음 장에서 "어디서부터 세우나"를 결정한다.
 
-### 슬라이드 2 — 부트스트랩 전략: Backfill vs Forward vs Distill-seeded
+### 슬라이드 2 — 공통 조회 계층 구조: 하나의 인덱스, 여러 지식 소스
 
-> 대안별 column = (a) 도안 + (b) 설명 + (c) 별점(행=ASR). 도안 SVG는 미작성(TODO — 선택안 확정 후 `diagrams/`). **3안의 원형 = Cerebras Knowledge**(15K 쿼리/일 운영 실증, A7).
+**메시지**: 조회 계층은 대안 간 변별 축이 아니라 **공통 전제** — LLM Wiki든 기존 Confluence·Jira·채팅이든, 모든 지식 소스는 **하나의 조회 계층(단일 인덱스) 아래에 federation으로 붙는다.** 본 DP(슬라이드 3)는 이 구조에서 "소스를 어떻게 채우나"(부트스트랩)를 결정한다.
+
+```mermaid
+flowchart TB
+    subgraph CONS["소비자 — 실행·제어 평면 (DP-01 · DP-0004)"]
+        ORC["Orchestrator"]
+        AGT["노드 Agent (IR·Opt·Quant·Compile)"]
+    end
+
+    subgraph KAL["Knowledge Access Layer — 공통 조회 계층 (상세 설계: BL-4)"]
+        GATE["C-03 권한 게이트"]
+        HYB["하이브리드 검색 (전문검색 + 임베딩)"]
+        RANK["RRF 융합 → rerank → age decay"]
+        IDX[("단일 인덱스 · 임베딩 스토어")]
+    end
+
+    subgraph DIST["증류 파이프라인 (2·3안 경로)"]
+        SEED["시딩 backfill (3안)"]
+        EVT["이벤트 트리거 축적 (운영)"]
+    end
+
+    WIKI["LLM Wiki — 증류 문서 티어<br/>(증류의 산출이자 조회 소스)"]
+
+    subgraph SRC["기존 지식 소스 (federation)"]
+        CONF["Confluence"]
+        JIRA["Jira"]
+        CHAT["채팅 · 메신저"]
+        LOGS["빌드 로그 · 이슈 이력 (FR-0002)"]
+        TRC["실행 trace (QA-04)"]
+    end
+
+    ORC -->|"질의: 유사 이슈 · config diff · 특이사항"| GATE
+    AGT --> GATE
+    GATE --> HYB --> RANK --> IDX
+
+    SRC --> DIST
+    DIST --> WIKI
+    WIKI -->|"인덱싱"| IDX
+    SRC -.->|"1안: raw 직결 인덱싱"| IDX
+```
+
+**구조 읽기**
+- **소비자**(Orchestrator·노드 Agent)는 **C-03 권한 게이트**를 지나 조회 계층에만 질의 — 소스에 직접 접근하지 않는다(단일 진입점).
+- **조회 계층**은 채택 패턴(§공통 전제) 그대로: 단일 인덱스 + 하이브리드 검색 + RRF·rerank + age decay. 상세는 BL-4.
+- **소스는 federation** — LLM Wiki(증류 문서 티어)와 기존 소스(Confluence·Jira·채팅·빌드 로그·trace)가 같은 인덱스 아래 나란히 붙는다. LLM Wiki는 증류 파이프라인의 **산출이자 소스**(선순환 루프).
+- **인덱싱 경로가 대안을 가른다**: 1안은 기존 소스를 **raw 직결**(점선), 2·3안은 **증류 경유**(실선) — 슬라이드 3의 비교가 곧 이 두 경로의 선택.
+
+### 슬라이드 3 — 부트스트랩 전략: Backfill vs Forward vs Distill-seeded
+
+> 대안별 column = (a) 도안 + (b) 설명 + (c) 별점(행=ASR). 도안 SVG는 미작성(TODO — 선택안 확정 후 `diagrams/`). **3안의 원형 = Cerebras Knowledge**(15K 쿼리/일 운영 실증, A7·Appendix 슬라이드).
 
 | | **1안 · Backfill-first (raw 일괄 인덱싱)** | **2안 · Forward-only (운영 중 증류 축적)** | **3안 · Distill-seeded (증류 시딩 + 축적)** (권고) |
 |---|---|---|---|
@@ -70,6 +119,10 @@
 > ★ 앵커: Correctness = golden 정답률 [93,99]=★★★(QA-07 — 초기/정상 분리는 콜드스타트 구간이 본 DP의 핵심 변별이라서) · Efficiency = 작업당 신규 토큰 ≤4k=★★★(QA-05, 캐시 분리집계) · Scalability = QA-01 등급척도. **3안 초기 ★★★◯** = 증류 시딩 품질 가정(표본 HITL 감사 + QA-07 golden 게이트 통과 PoC 확정 전 `◯`). 3안의 시딩 비용·복잡도는 별점 행(ASR) 밖 — QA-13·A5 참조.
 
 **권고**: **3안 Distill-seeded** — 기존 소스에 건질 지식이 실재하고(채팅·Jira·빌드 이력 有) 시딩 비용을 감당할 수 있으면 3안. 기존 소스가 실질적으로 비었으면 2안이 강제되고, 시딩 비용이 binding이면 1안으로 시작해 증류를 점진 적용(→3안 수렴 경로, NR-2: 조회 계층이 공통이라 전환 비용 제한적). **택일 강행 금지 — 드라이버로 결정** (상세 → Appendix).
+
+### Appendix 슬라이드 — Cerebras Knowledge (Field Reference)
+
+본편에서 빠진 **필드 실증 상세**를 발표 Appendix 1장으로 유지: 파이프라인(소스 → LLM 증류 → 단일 임베딩 스토어 → 하이브리드 검색 → RRF·rerank → age decay → 인용 답변) + 3가지 교훈 매핑(raw를 임베딩하지 않는다 → 3안 원형 / 순수 시맨틱 부족 → 하이브리드 필수 / age decay → R-4 완화). 전문·출처는 A7.
 
 ---
 
