@@ -1,9 +1,9 @@
 # DP-06 Agent 지식 베이스 설계 (Knowledge Base) — RAG vs LLM Wiki
 
-> category: DP | status: 초안 v3 (2026-08-10 발표 용어 정비 — 팀 검토 대기) | source: 신규 발굴 (자율 이슈처리 서사의 지식 공급 공백) + 필드 레퍼런스(Cerebras Knowledge) | updated: 2026-08-10
-> drives: QA-07(Correctness)↑, QA-05(Efficiency), QA-01(Scalability)
+> category: DP | status: 초안 v3.1 (2026-08-10 평가 기준 보강 — 팀 검토 대기) | source: 신규 발굴 (자율 이슈처리 서사의 지식 공급 공백) + 필드 레퍼런스(Cerebras Knowledge) | updated: 2026-08-10
+> drives: QA-07(Correctness)↑, QA-05(Efficiency) | 평가 보강: **KB-DQ**(지식 데이터 품질 — ISO/IEC 25012 앵커: 커버리지·신선도·축적 속도, §지식 품질 평가 기준)
 > realizes: FR-0003(Regression 관리의 지식 축), FR-0004(이슈처리 근거 추적) | constrained-by: C-03(지식 접근도 권한 게이트 통과)
-> **재프레이밍 이력**: v1(2026-08-10) "RAG vs LLM Wiki" 형태 비교 → **v2(같은 날 디스커션)** 인덱싱·조회 계층은 공통 전제임을 확인, 결정 축을 부트스트랩 전략(Backfill/Forward/Distill-seeded)으로 전환 → **v3(같은 날 발표 용어 정비)** 청중이 아는 이름으로 복원: 대안은 **1안 RAG / 2안 LLM 위키** 2개로 단순화하고, v2의 3안(증류 시딩)은 **1안의 강화 tactic**으로, **LLM-as-a-judge**(QA-07 채택 기법)를 **2안의 강화 tactic**으로 재배치. "어디서 시작하나"(콜드스타트) 관점은 비교의 렌즈로 유지. 미결정 트래킹: open-issues OI-13.
+> **재프레이밍 이력**: v1(2026-08-10) "RAG vs LLM Wiki" 형태 비교 → **v2(같은 날 디스커션)** 인덱싱·조회 계층은 공통 전제임을 확인, 결정 축을 부트스트랩 전략(Backfill/Forward/Distill-seeded)으로 전환 → **v3(같은 날 발표 용어 정비)** 청중이 아는 이름으로 복원: 대안은 **1안 RAG / 2안 LLM 위키** 2개로 단순화하고, v2의 3안(증류 시딩)은 **1안의 강화 tactic**으로, **LLM-as-a-judge**(QA-07 채택 기법)를 **2안의 강화 tactic**으로 재배치. "어디서 시작하나"(콜드스타트) 관점은 비교의 렌즈로 유지 → **v3.1(같은 날 평가 기준 보강)** 기존 ASR 중 실제로 물리는 건 QA-07·QA-05뿐임을 확인, **QA-01 행 제거** — 그 관점(축적·확장)은 지식 **데이터** 품질 기준 **KB-DQ**(ISO/IEC 25012 앵커: 커버리지 Completeness·신선도 Currentness·축적 속도)로 이관·신설(§지식 품질 평가 기준). 미결정 트래킹: open-issues OI-13.
 
 ---
 
@@ -24,6 +24,8 @@
 | **grounding / hallucination** | grounding = LLM 답을 실제 근거 데이터에 붙들어 매는 것 / hallucination = 근거 없이 지어내는 것. 사내 SDK·NPU 도메인은 학습 데이터에 없어 grounding 없이는 hallucination이 기본값 |
 | **staleness (낡음)** | 저장된 지식이 갱신을 못 따라가 현실과 어긋난 상태. 위키 문서·임베딩 인덱스 모두에 있다(재인덱싱 랙) — 정도 차이 |
 | **prompt cache 적합성** | 안정된 위키 문서는 반복 조회 시 prompt caching(QA-05 — 캐시 read ~10% 가격) 적중률이 오른다. 질의마다 조합이 바뀌는 raw top-k는 캐시 비친화 |
+| **KB-DQ / ISO·IEC 25012** | KB-DQ=본 DP 전용 **지식 데이터 품질 평가 기준**(커버리지·신선도·축적 속도 — §지식 품질 평가 기준). 앵커 표준 = **ISO/IEC 25012 Data Quality Model**(우리 QA 앵커인 25010과 같은 SQuaRE 패밀리 — 25010은 시스템, 25012는 데이터) |
+| **RAGAS / context recall** | RAG 평가 필드 표준 프레임워크 / context recall=질의에 필요한 근거가 실제로 회수된 비율(커버리지 측정), faithfulness=답이 근거를 이탈하지 않는 정도 |
 | **ASR / driving QA** | ASR=아키텍처 핵심 요구(목록·우선순위 SSoT: [`context/asr.md`](../asr.md)) / driving QA=이 결정이 좌우하는 주 품질속성 |
 | **★ 등급 · S·T·R·N** | ★=그 QA 만족도(등급척도 앵커) · S 민감점 · T 교환점 · R 위험 · N 비위험(ATAM) |
 
@@ -34,6 +36,23 @@
 > **어느 대안을 고르든 인덱싱·조회 계층은 필요하다.** 형태(raw/위키)가 달라도 "인덱스가 있어야 원하는 지식을 찾는다"는 점은 동일 — 따라서 조회 계층은 대안 간 변별 축이 아니라 **공통 전제**로 깔고, 필드 수렴 패턴을 채택한다.
 
 **채택 패턴 (레퍼런스 아키텍처 = Cerebras Knowledge, A7)**: 모든 소스를 **단일 임베딩 스토어**로 연합 + **하이브리드 검색**(전문검색: 에러 코드·플래그명 정확 일치 / 임베딩: 패러프레이즈) + **RRF 융합 → rerank** + **age decay**(신선한 지식 우선). 우리 도메인(빌드 로그·config diff·quantize 플래그)은 정확 문자열 검색 수요가 커서 하이브리드가 옵션이 아니라 필수. **상세 설계(신호 구성·인덱스 기술 선택)는 `_backlog.md` BL-4** — 본 DP 확정 후 후속 결정. 구조도는 슬라이드 2 참조.
+
+---
+
+## 지식 품질 평가 기준 (KB-DQ) — ISO/IEC 25012 앵커
+
+> **왜 별도 기준인가**: 기존 ASR 중 본 DP에 실제로 물릴 수 있는 건 **QA-07(정확성)·QA-05(토큰 효율)** 뿐이다. 커버리지·신선도·축적 속도는 시스템 품질속성이 아니라 **"Agent에게 공급되는 데이터의 품질"** — 시스템 품질은 ISO/IEC 25010(우리 QA 앵커)이 맡지만, **데이터 품질은 같은 SQuaRE 패밀리의 ISO/IEC 25012(Data Quality Model)** 가 표준이다. 25012는 데이터 자체로 평가하는 **고유(inherent) 특성** 5개(Accuracy·**Completeness(완전성)**·Consistency·Credibility·**Currentness(최신성)**)를 정의 — 커버리지·신선도가 정확히 이 자리다. 측정은 RAG 필드 표준 **RAGAS**(context recall/precision·faithfulness)를 쓴다. 25010(시스템)과 25012(데이터)를 나란히 쓰는 것은 SQuaRE 패밀리 내 정합.
+
+| KB-DQ 기준 | ISO/IEC 25012 앵커 | 정의 | 측정 (예시 KPI — PoC로 확정) |
+|---|---|---|---|
+| **KB-DQ-1 커버리지** | **Completeness** (고유) | 질의가 요구하는 지식이 KB에 존재·회수되는 정도 | golden 질의셋 대비 **context recall**(RAGAS) + 미회수(no-evidence)율 |
+| **KB-DQ-2 신선도** | **Currentness** (고유) | 지식이 원본 현실을 반영하는 최신성 | 소스 변경 → 조회 반영 랙 p95 + **stale-hit율**(낡은 근거의 top-k 진입 비율) |
+| **KB-DQ-3 축적 속도** | (25012 직접 특성 아님 — Currentness의 운영 파생) | 새 지식이 조회 가능해지기까지의 속도 = **콜드스타트 탈출 속도** | 이벤트 발생 → 조회 가능 **time-to-knowledge** p95 + 주당 신규 지식 항목 수 |
+| *(재사용)* 정확성 | 25012 **Accuracy**와 접점 — 측정은 **QA-07에 위임** | 회수 근거·생성 답의 옳음 | QA-07 golden 정답률(재정의 금지) + RAGAS **faithfulness**(근거 이탈 없는 생성) |
+| *(재사용)* 토큰 효율 | (25012 밖 — 시스템 측) **QA-05에 위임** | 조회가 소비하는 신규 토큰 | QA-05 신규 토큰 캡 · 캐시 분리집계 |
+
+- **검색 품질(context precision — 잡음 없는 회수)** 은 대안 변별이 아니라 공통 조회 계층의 품질 → **BL-4 평가 지표**로 이관.
+- **위상**: KB-DQ는 현재 **DP-06-로컬 평가 기준**(별점 보조 매트릭스) — QA(전사 품질속성)로의 승격 여부는 팀 디스커션(OI-13). 수치는 전부 예시값, PoC로 확정.
 
 ---
 
@@ -113,12 +132,14 @@ flowchart TB
 |---|---|---|
 | **(a) 도안** | *(TODO: 기존 소스→[증류 시딩]→인덱스→검색 주입)* | *(TODO: 운영 이벤트→증류→judge 검증→위키→조회)* |
 | **(b) 설명** | **구조**: 기존 소스(Confluence·Jira·채팅·빌드 로그)를 인덱싱해 두고, 질의 시점에 검색한 조각을 근거로 주입한다. 쓰기 경로는 자동 인제스천.<br>**＋** 초기 커버리지 즉시 확보(콜드스타트 없음) — 기존 지식에서 시작. 데이터 증가를 인덱싱이 자동 흡수(조합 폭발에 강함).<br>**－** 소스 품질이 낮은 걸 **알면서** 밀어넣으면(raw 직결) **garbage-in** — 부실 Jira·노이즈 채팅이 오염 근거로 grounding을 타고 오진을 만든다. raw 조각 주입이라 조회 토큰↑·캐시 비친화.<br>**🛠 강화 tactic — 증류 시딩**: raw 대신 **LLM이 증류한 구조화 레코드(질문·요약·해결책·관련 시스템)를 인덱싱** — Cerebras 실증(A7). 오염·토큰 문제를 원천에서 완화 → 초기 Correctness ★★☆→★★★◯. 비용: 시딩 LLM 비용(QA-13). | **구조**: 이슈 close·config 변경 이벤트마다 Agent가 배운 것을 **위키 문서로 정리·갱신**(postmortem·모델별 특이사항·회귀 패턴)하고, 판단 시 그 문서를 읽는다. 사람 감사(HITL audit) 가능.<br>**＋** 정제 지식이라 판단 품질↑, 요약 조회라 토큰↓, 안정 문서 = prompt cache 친화(QA-05 정합).<br>**－** **콜드스타트**: 시작 시점에 위키가 비어 있어 초기 분석 정확도가 낮고 → 신뢰 형성 실패 → 채택 부진 → 축적 정체의 악순환. 틀린 내용이 **그럴듯하게 고착**(위키 오염)될 위험. 축적 속도가 이슈 처리량에 종속.<br>**🛠 강화 tactic — LLM-as-a-judge**: 위키 **등재·갱신 전에 별도 judge가 검증** — QA-07의 golden 채점 하네스와 공유(신뢰 조건: judge↔인간 일치도 **κ≥0.8 선검증**, QA-07 등급 척도와 동일). 오염(R-3) 방어 → 정상 상태 ★★★의 신뢰 조건 충족. *단 콜드스타트는 judge로 닫히지 않는다(잔존 약점).* 비용: 판정 토큰(QA-13). |
-| **(c) QA-07 Correctness — 초기(콜드스타트)** | ★★☆ → **★★★◯** (증류 시딩) | ★☆☆ (tactic으로 안 닫힘) |
-| **(c) QA-07 Correctness — 정상 상태** | ★★☆ → **★★★** (증류 시딩) | **★★★◯** (judge κ 검증 조건) |
-| **(c) QA-05 Efficiency (조회 토큰)** | ★★☆ (시딩 시 증류 레코드 조회로 부분 개선) | ★★★ |
-| **(c) QA-01 Scalability (축적 확장)** | ★★★ | ★★☆ |
+| **(c) [ASR] QA-07 Correctness — 초기(콜드스타트)** | ★★☆ → **★★★◯** (증류 시딩) | ★☆☆ (tactic으로 안 닫힘) |
+| **(c) [ASR] QA-07 Correctness — 정상 상태** | ★★☆ → **★★★** (증류 시딩) | **★★★◯** (judge κ 검증 조건) |
+| **(c) [ASR] QA-05 Efficiency (조회 토큰)** | ★★☆ (시딩 시 증류 레코드 조회로 부분 개선) | ★★★ |
+| **(c′) [KB-DQ-1] 커버리지 (25012 Completeness)** | ★★★ (기존 소스 전체) | ★☆☆ (문서화된 것만 — 성장형) |
+| **(c′) [KB-DQ-2] 신선도 (25012 Currentness)** | ★★★ (원본 자동 추종 — 재인덱싱 랙만) | ★★☆ (재증류 지연 — age decay·이벤트 트리거로 완화) |
+| **(c′) [KB-DQ-3] 축적 속도 (time-to-knowledge)** | ★★★ (자동 인제스천 — 즉시) | ★★☆ (이슈 처리량 + judge 판정 지연 종속) |
 
-> ★ 앵커: Correctness = golden 정답률 [93,99]=★★★(QA-07 — 초기/정상 분리는 콜드스타트가 핵심 변별이라서) · Efficiency = 작업당 신규 토큰 ≤4k=★★★(QA-05, 캐시 분리집계) · Scalability = QA-01 등급척도. **`→`** = 강화 tactic 적용 시 별 변화. **◯** = 조건부 — 1안 초기 ★★★◯는 시딩 증류 품질 가정(HITL 표본 감사 PoC 전), 2안 정상 ★★★◯는 judge κ≥0.8 선검증 조건(QA-07과 동일). 강화 tactic 비용은 비-ASR(QA-13) → 교환점 TP-2로 관리.
+> ★ 앵커 — **[ASR] 행**: Correctness = golden 정답률 [93,99]=★★★(QA-07 — 초기/정상 분리는 콜드스타트가 핵심 변별이라서) · Efficiency = 작업당 신규 토큰 ≤4k=★★★(QA-05, 캐시 분리집계). **[KB-DQ] 행**: §지식 품질 평가 기준(ISO/IEC 25012 앵커 — 커버리지=context recall·신선도=반영 랙/stale-hit·축적 속도=time-to-knowledge). *기존 QA-01(Scalability) 행은 v3.1에서 제거 — 그 관점은 KB-DQ-1·3이 데이터 품질 차원에서 대체.* **`→`** = 강화 tactic 적용 시 별 변화. **◯** = 조건부 — 1안 초기 ★★★◯는 시딩 증류 품질 가정(HITL 표본 감사 PoC 전), 2안 정상 ★★★◯는 judge κ≥0.8 선검증 조건(QA-07과 동일). 강화 tactic 비용은 비-ASR(QA-13) → 교환점 TP-2로 관리.
 
 **권고**: 드라이버로 택일 — **Q1** 기존 소스에 건질 지식이 실재하는가? 없으면(진짜 0) → **2안 강제**(축적뿐, 콜드스타트는 HITL 비중으로 버팀). **Q2** (있다면) 초기부터 신뢰 형성(콜드스타트 회피)이 binding인가? → binding이면 **1안 RAG + 증류 시딩**(권고 — 우리 상황: 지식이 채팅·Jira에 실재 + 자율 이슈처리 신뢰를 초기에 세워야 함), 아니면 **2안 LLM 위키 + judge**도 유효(정상 상태 품질·토큰 효율 우위). 장기 수렴 가능성은 A4 참조. (상세 → Appendix.)
 
@@ -143,15 +164,25 @@ flowchart TB
 >   - **아니다 → 2안 LLM 위키 + judge**도 유효 — 정상 상태 품질·토큰 효율 우위.
 
 ### A2. 후보 대안 (전문)
-**1안. RAG (기존 지식 검색)** — 구조: 기존 소스를 인덱싱, 질의 시 검색 주입. 기본형 쓰기 경로는 raw 자동 인제스천. tactic: Retrieval grounding, 자동 인덱싱 + **강화: 증류 시딩**(raw 대신 증류 레코드 인덱싱 — Cerebras thread distillation, A7). 장점 [Scalability] 인덱싱이 증가 흡수·즉시 커버리지(콜드스타트 없음). 단점 [Correctness] raw 직결 시 garbage-in + 조각 단편성(인과 절단) → 증류 시딩으로 완화 / [Efficiency] raw top-k 토큰↑·캐시 비친화 → 시딩 시 부분 개선.
+**1안. RAG (기존 지식 검색)** — 구조: 기존 소스를 인덱싱, 질의 시 검색 주입. 기본형 쓰기 경로는 raw 자동 인제스천. tactic: Retrieval grounding, 자동 인덱싱 + **강화: 증류 시딩**(raw 대신 증류 레코드 인덱싱 — Cerebras thread distillation, A7). 장점 [KB-DQ 커버리지·축적 속도·신선도] 기존 소스 전체 즉시 커버(콜드스타트 없음)·자동 인제스천·원본 자동 추종. 단점 [Correctness] raw 직결 시 garbage-in + 조각 단편성(인과 절단) → 증류 시딩으로 완화 / [Efficiency] raw top-k 토큰↑·캐시 비친화 → 시딩 시 부분 개선.
 
-**2안. LLM 위키 (Agent가 지식을 문서로 축적)** — 구조: 운영 이벤트마다 증류해 위키 문서로 축적, 판단 시 문서 조회, HITL audit + **강화: LLM-as-a-judge**(등재·갱신 전 judge 검증 — QA-07 golden 채점 하네스 공유, κ≥0.8 선검증 조건). 장점 [Correctness 정상] 정제 지식(judge로 신뢰 조건 충족) / [Efficiency] 요약 조회+캐시 친화. 단점 [Correctness 초기] 콜드스타트(judge로 안 닫힘 — 잔존) / [Scalability] 축적이 이슈 처리량에 종속.
+**2안. LLM 위키 (Agent가 지식을 문서로 축적)** — 구조: 운영 이벤트마다 증류해 위키 문서로 축적, 판단 시 문서 조회, HITL audit + **강화: LLM-as-a-judge**(등재·갱신 전 judge 검증 — QA-07 golden 채점 하네스 공유, κ≥0.8 선검증 조건). 장점 [Correctness 정상] 정제 지식(judge로 신뢰 조건 충족) / [Efficiency] 요약 조회+캐시 친화. 단점 [Correctness 초기] 콜드스타트(judge로 안 닫힘 — 잔존) / [KB-DQ 커버리지·축적 속도] 문서화된 것만 조회 가능(성장형)·축적이 이슈 처리량+judge 지연에 종속.
 
-### A3. 대안 × ASR 통합 매트릭스 (★ + S/T/R/N)
-| 대안 | QA-07 초기 | QA-07 정상 | QA-05 Efficiency | QA-01 Scalability |
-|---|:---:|:---:|:---:|:---:|
-| 1안 RAG (기본 → +증류 시딩) | ★★☆ → **★★★◯** (S,T,R) | ★★☆ → **★★★** (R) | ★★☆ (T) | ★★★ (N) |
-| 2안 LLM 위키 (기본 → +judge) | ★☆☆ (S,R — 잔존) | **★★★◯** (S,R→N) | ★★★ (S,T) | ★★☆ (R) |
+### A3. 대안 × 평가 기준 통합 매트릭스 (★ + S/T/R/N)
+
+**[ASR] 기존 품질속성** (QA-07·QA-05만 실제로 물림 — QA-01 행은 v3.1 제거, KB-DQ로 이관):
+
+| 대안 | QA-07 초기 | QA-07 정상 | QA-05 Efficiency |
+|---|:---:|:---:|:---:|
+| 1안 RAG (기본 → +증류 시딩) | ★★☆ → **★★★◯** (S,T,R) | ★★☆ → **★★★** (R) | ★★☆ (T) |
+| 2안 LLM 위키 (기본 → +judge) | ★☆☆ (S,R — 잔존) | **★★★◯** (S,R→N) | ★★★ (S,T) |
+
+**[KB-DQ] 지식 데이터 품질** (ISO/IEC 25012 앵커 — §지식 품질 평가 기준):
+
+| 대안 | KB-DQ-1 커버리지 (Completeness) | KB-DQ-2 신선도 (Currentness) | KB-DQ-3 축적 속도 (time-to-knowledge) |
+|---|:---:|:---:|:---:|
+| 1안 RAG (기본 → +증류 시딩) | ★★★ (N) | ★★★ (N — 시딩 시 증류 랙 소폭) | ★★★ (N) |
+| 2안 LLM 위키 (기본 → +judge) | ★☆☆ (S,R — 성장형) | ★★☆ (S,T — age decay 완화) | ★★☆ (T — judge 지연 가산) |
 
 > `→` = 강화 tactic 적용 시 별 변화. 선택안 확정 시 해당 행이 세트 Traceability Matrix로 graduate. 강화 tactic 비용(QA-13)은 비-ASR이라 매트릭스 밖 — TP-2로 관리. S=민감점·T=교환점·R=위험·N=비위험.
 
@@ -183,4 +214,6 @@ flowchart TB
 - 장문 컨텍스트 중간 정보 회수율 저하(A1 "다 넣기" 반박): [Lost in the Middle (TACL 2024)](https://arxiv.org/abs/2307.03172)
 - 안정 문서 prompt cache 경제성(2안 Efficiency 앵커): [Anthropic — prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) (cache read = 정상가 ~10%, QA-05와 동일 출처)
 - Agent 경험의 구조화 기억·회고 증류(위키 축적 원형): [Generative Agents — memory stream & reflection (Park et al. 2023)](https://arxiv.org/abs/2304.03442)
-- 별점 수치는 PoC로 확정(레퍼런스 수치 복제 금지). QA-07/05/01 등급척도 = `context/qa/QA-07·QA-05·QA-01`.
+- **KB-DQ 앵커 표준 — ISO/IEC 25012 (Data Quality Model)**: SQuaRE 패밀리(25000)의 데이터 품질 모델 — 고유 특성 Accuracy·**Completeness**·Consistency·Credibility·**Currentness**(커버리지=Completeness·신선도=Currentness의 앵커). 우리 QA 앵커(25010 시스템 품질)와 같은 패밀리라 정합. [iso25000.com — ISO/IEC 25012](https://iso25000.com/index.php/en/iso-25000-standards/iso-25012/136-iso-iec-25012) · [ISO 원문](https://www.iso.org/standard/35736.html)
+- **KB-DQ 측정 프레임워크 — RAGAS**: RAG 평가 필드 표준 — **context recall**(커버리지 측정)·context precision(조회 계층 품질, BL-4)·**faithfulness**(근거 이탈 없는 생성 — QA-07 보조). [RAGAS metrics](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/) · [Confident AI — RAG 평가 지표 해설](https://www.confident-ai.com/blog/rag-evaluation-metrics-answer-relevancy-faithfulness-and-more)
+- 별점 수치는 PoC로 확정(레퍼런스 수치 복제 금지). ASR 등급척도 = `context/qa/QA-07·QA-05`, KB-DQ 척도 = §지식 품질 평가 기준(예시 KPI).

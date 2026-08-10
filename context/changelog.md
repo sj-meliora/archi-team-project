@@ -134,6 +134,11 @@
 - 권고 갱신: 드라이버 Q1(기존 소스 지식 실재)·Q2(초기 신뢰 형성 binding) → 우리 상황은 **1안 RAG + 증류 시딩** 우세.
 - 영향 ID: DP-06(v3), INDEX, open-issues(OI-13 갱신), changelog.
 
+## 2026-08-10 — DP-06 v3.1: 지식 데이터 품질 기준 KB-DQ 신설 (ISO/IEC 25012 앵커)
+- 변경: 기존 ASR 중 실제로 물리는 건 QA-07·QA-05뿐임을 확인 — **매트릭스에서 QA-01 행 제거**, 그 관점(축적·확장)을 **KB-DQ**(DP-06-로컬 지식 데이터 품질 기준)로 이관·신설: **KB-DQ-1 커버리지(25012 Completeness) · KB-DQ-2 신선도(25012 Currentness) · KB-DQ-3 축적 속도(Currentness 운영 파생, time-to-knowledge)**. 측정 = RAG 필드 표준 RAGAS(context recall·faithfulness) + stale-hit율·반영 랙. A3 매트릭스를 [ASR]+[KB-DQ] 2단으로 분리, 정확성·토큰은 QA-07/05에 위임(재정의 금지), context precision은 BL-4로 이관.
+- 사유: 팀 피드백 — 커버리지·축적 속도·신선도는 시스템 품질속성이 아니라 "Agent에게 공급되는 데이터의 품질" → 표준 탐색 결과 우리 QA 앵커(ISO/IEC 25010)와 같은 SQuaRE 패밀리의 **ISO/IEC 25012 Data Quality Model**이 정확히 이 자리(고유 특성 Completeness·Currentness).
+- 영향 ID: DP-06(v3.1), open-issues(OI-13 ⑥ 추가 — KB-DQ QA 승격 여부), changelog.
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>
