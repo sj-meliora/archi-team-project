@@ -117,6 +117,12 @@
 - drives: QA-07↑·QA-05·QA-01 (ASR 3종). 하이브리드(Wiki 1차+RAG fallback)는 승격 후보로 디스커션 회부. DP-06부터 신규 DP는 2자리 발번(DP-02는 드랍 결번).
 - 영향 ID: DP-06(신규), INDEX, open-issues(OI-13 신설), changelog.
 
+## 2026-08-10 — DP-06 v2 재프레이밍: 형태 비교 → 부트스트랩 전략 (디스커션 반영)
+- 변경: DP-06 결정 축 **"RAG vs LLM Wiki(형태)" → "Backfill-first vs Forward-only vs Distill-seeded(시작 전략)"** 재프레이밍. 인덱싱·조회 계층은 공통 전제(채택 패턴)로 분리, 조회 계층 상세 설계는 `_backlog` **BL-4** 신설.
+- 사유: 팀 디스커션 — ① 어느 형태든 인덱스가 있어야 지식을 찾으므로 조회 계층은 변별 축이 아니라 공통 인프라 ② 우리 현실은 물릴 지식이 0(기존 Confluence·Jira 연동 RAG·LLM wiki 부재)이라 진짜 결정은 "어디서 시작하나" ③ 필드 실증(**Cerebras Knowledge**: thread distillation·하이브리드 검색+RRF·age decay, 15K 쿼리/일)이 3안(증류 시딩) 원형을 제공. v1 RAG/Wiki 분석은 1안/2안 근거로 승계.
+- drives 불변(QA-07↑·QA-05·QA-01). 매트릭스에 QA-07 초기/정상 분리(콜드스타트가 핵심 변별). 권고 = 3안 Distill-seeded(드라이버 2단 질문으로 택일).
+- 영향 ID: DP-06(v2), _backlog(BL-4 신설), INDEX, open-issues(OI-13 갱신), changelog.
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>
