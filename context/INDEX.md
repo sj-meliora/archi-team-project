@@ -53,6 +53,6 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 - DP-0003 Agent 외부 시스템 안정성 보장
 - DP-0004 Workflow 실행 구조
 - DP-0005 E2E 개발시간 최적화
-- **DP-06 Agent 지식 베이스 구축 전략 (Bootstrap: Backfill vs Forward vs Distill-seeded)** — 신설(2026-08-10)·v2 재프레이밍(같은 날 디스커션 — 조회 계층은 공통 전제, 결정 축=시작 전략, 레퍼런스=Cerebras Knowledge). 자율 이슈처리의 지식 공급 계층 (OI-13, BL-4)
+- **DP-06 Agent 지식 베이스 (RAG vs LLM 위키 + 강화 tactic: 증류 시딩·LLM-as-a-judge)** — 신설(2026-08-10)·v2 디스커션(조회 계층=공통 전제, 레퍼런스=Cerebras Knowledge)·v3 발표 용어 정비(대안 2개 단순화). 자율 이슈처리의 지식 공급 계층 (OI-13, BL-4)
 - _backlog.md (신규 design approach 후보)
 - *2026-06-27: 구 DP-0001·DP-0002 삭제. DP-0002 → DP-01 승계, 구 DP-0001(배치/풀) 결정은 재귀속 보류(OI-12). DP는 2자리 전환 중(DP-0003/0004/0005 추후). DP-06부터 신규는 2자리로 발번(DP-02는 드랍으로 결번).*

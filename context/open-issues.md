@@ -84,8 +84,8 @@
 - **후보 행선지(미결정)**: (a) **DP-0004**(Workflow 실행 구조)가 scale-out(A5/A8 ephemeral)으로 동적 풀을 흡수 / (b) 신규 DP로 분리 / (c) 비-ASR이면 드랍. **DP 디스커션에서 결정.**
 - **남은 작업**: 행선지 확정 시 위 인용처의 `구 DP-0001` 참조를 새 owner로 redirect + `_backlog.md` BL-3 갱신.
 
-## [ ] OI-13 DP-06 지식 베이스 — 부트스트랩 전략(Backfill vs Forward vs Distill-seeded) 미확정
-- **맥락(2026-08-10)**: DP-06(Agent 지식 베이스) 신설 — 자율 이슈처리(불량 분석·회귀)의 전제인 지식 공급 계층이 어떤 DP에도 없던 공백을 닫음. 슬라이드 2장(필요성 / 부트스트랩 전략 비교) 구성.
-- **재프레이밍(2026-08-10 디스커션, v1→v2)**: 초판 "RAG vs LLM Wiki" 형태 비교 → ① 인덱싱·조회 계층은 공통 필수 인프라(변별 축 아님, 채택 패턴 = Cerebras Knowledge 레퍼런스) ② 우리 현실은 "물릴 지식 자체가 0"(기존 Confluence·Jira 연동 RAG도 LLM wiki도 없음)이라 결정 축을 **시작 전략**으로 전환. v1의 RAG/Wiki 분석은 1안/2안 근거로 승계. 조회 계층 상세는 `_backlog` BL-4.
-- **미확정**: ① 1안(Backfill-first) vs 2안(Forward-only) vs 3안(Distill-seeded — 권고) 선택 — 드라이버 Q1(기존 소스에 건질 지식 실재 여부)·Q2(시딩 비용 감당 여부)를 팀/PM이 판정, DP 디스커션 회부. ② 3안 초기 Correctness `★★★◯` 해제(시딩 증류 품질 — HITL 표본 감사 + QA-07 golden 게이트 PoC). ③ 도안 SVG 미작성(선택안 확정 후 `diagrams/` 승격). ④ BL-4(조회 계층 상세 설계) 승격 여부.
-- **남은 작업**: 선택안 확정 시 — module-view Repository 레이어에 `Knowledge Base`(단일 조회 계층 + 증류 파이프라인) 반영, QA-07/05/01 `related-dp`에 DP-06 역방향 링크 추가, eval/검증 서브시스템 DP(OI-7)와 R-3(증류 오염) 방어선 정합 확인.
+## [ ] OI-13 DP-06 지식 베이스 — RAG vs LLM 위키 택일 미확정
+- **맥락(2026-08-10)**: DP-06(Agent 지식 베이스) 신설 — 자율 이슈처리(불량 분석·회귀)의 전제인 지식 공급 계층이 어떤 DP에도 없던 공백을 닫음. 슬라이드 본편 3장(필요성 / 공통 조회 계층 구조 / 대안 비교) + Appendix 1장(Cerebras) 구성.
+- **경위(같은 날 v1→v2→v3)**: v1 "RAG vs LLM Wiki" 형태 비교 → v2 디스커션: 인덱싱·조회 계층은 공통 전제(채택 패턴 = Cerebras Knowledge), 결정 축을 부트스트랩 전략으로 전환 → **v3 발표 용어 정비: 대안을 청중이 아는 이름 2개(1안 RAG / 2안 LLM 위키)로 단순화**, v2의 3안(증류 시딩)은 1안 강화 tactic으로, LLM-as-a-judge(QA-07 기법 재사용)를 2안 강화 tactic으로 재배치. 조회 계층 상세는 `_backlog` BL-4.
+- **미확정**: ① 1안(RAG+증류 시딩 — 권고) vs 2안(LLM 위키+judge) 택일 — 드라이버 Q1(기존 소스에 건질 지식 실재 여부)·Q2(초기 신뢰 형성 binding 여부)를 팀/PM이 판정, DP 디스커션 회부. ② `◯` 해제 — 1안 초기 ★★★◯(시딩 증류 품질 HITL 표본 감사 PoC), 2안 정상 ★★★◯(judge κ≥0.8 선검증, QA-07 조건 공유). ③ 도안 SVG 미작성(선택안 확정 후 `diagrams/` 승격). ④ BL-4(조회 계층 상세 설계) 승격 여부. ⑤ A4 수렴 노트(1안 강화형 → 2안 수렴 경로)의 정식 대안 승격 여부.
+- **남은 작업**: 선택안 확정 시 — module-view Repository 레이어에 `Knowledge Base`(단일 조회 계층 + 증류·검증 파이프라인) 반영, QA-07/05/01 `related-dp`에 DP-06 역방향 링크 추가, eval/검증 서브시스템 DP(OI-7)와 judge 하네스 공유(2안 tactic·R-3 방어) 정합 확인.
