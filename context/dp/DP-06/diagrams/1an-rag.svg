@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" font-family="'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6E74"/></marker>
+    <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4A9ED6"/></marker>
+    <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7B6FD0"/></marker>
+    <marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C07A2D"/></marker>
+  </defs>
+  <rect width="880" height="480" fill="#FFFFFF"/>
+  <text x="24" y="30" font-size="18" font-weight="700" fill="#4A9ED6">1안 · RAG — 기존 지식 공간을 인덱싱해, 질의 시 검색해 근거로 주입</text>
+
+  <!-- Agent -->
+  <rect x="24" y="100" width="180" height="120" rx="8" fill="#F1F5F5" stroke="#5B6E74" stroke-width="1.5"/>
+  <text x="114" y="128" font-size="16" font-weight="700" fill="#1B2A30" text-anchor="middle">노드 Agent</text>
+  <text x="114" y="150" font-size="12" fill="#5B6E74" text-anchor="middle">불량 분석 · 회귀 판단</text>
+  <text x="114" y="174" font-size="12" font-style="italic" fill="#5B6E74" text-anchor="middle">“모델 A quantize 실패,</text>
+  <text x="114" y="192" font-size="12" font-style="italic" fill="#5B6E74" text-anchor="middle">유사 사례는?”</text>
+  <circle cx="34" cy="242" r="10" fill="#4A9ED6"/><text x="34" y="246" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="50" y="246" font-size="12" fill="#1B2A30">반환된 근거로 분석 · 해결</text>
+
+  <!-- KAL container -->
+  <rect x="280" y="56" width="360" height="212" rx="10" fill="#F6FAF9" stroke="#2FA98C" stroke-width="1.5"/>
+  <text x="296" y="78" font-size="12.5" font-weight="700" fill="#2FA98C">공통 조회 계층 (Knowledge Access Layer)</text>
+  <rect x="296" y="92" width="92" height="46" rx="6" fill="#FBF7EE" stroke="#C07A2D"/>
+  <text x="342" y="111" font-size="12.5" font-weight="700" fill="#C07A2D" text-anchor="middle">C-03</text>
+  <text x="342" y="127" font-size="11" fill="#5B6E74" text-anchor="middle">권한 게이트</text>
+  <rect x="404" y="92" width="220" height="46" rx="6" fill="#FFFFFF" stroke="#C9D4D7"/>
+  <text x="514" y="110" font-size="13" font-weight="700" fill="#1B2A30" text-anchor="middle">하이브리드 검색</text>
+  <text x="514" y="127" font-size="10.5" fill="#5B6E74" text-anchor="middle">임베딩(유사) + 전문검색(에러코드·플래그명)</text>
+  <rect x="404" y="146" width="220" height="30" rx="6" fill="#FFFFFF" stroke="#C9D4D7"/>
+  <text x="514" y="165" font-size="11.5" fill="#1B2A30" text-anchor="middle">RRF 융합 → rerank → age decay</text>
+  <!-- index cylinder -->
+  <rect x="405" y="196" width="200" height="44" fill="#EDF2F2" stroke="#5B6E74"/>
+  <ellipse cx="505" cy="240" rx="100" ry="10" fill="#EDF2F2" stroke="#5B6E74"/>
+  <ellipse cx="505" cy="196" rx="100" ry="10" fill="#E3EBEB" stroke="#5B6E74"/>
+  <text x="505" y="226" font-size="12.5" font-weight="700" fill="#1B2A30" text-anchor="middle">단일 인덱스 · 임베딩 스토어</text>
+  <!-- internal arrows -->
+  <line x1="388" y1="115" x2="400" y2="115" stroke="#5B6E74" stroke-width="1.5" marker-end="url(#arrG)"/>
+  <line x1="514" y1="138" x2="514" y2="143" stroke="#5B6E74" stroke-width="1.5" marker-end="url(#arrG)"/>
+  <line x1="505" y1="176" x2="505" y2="183" stroke="#5B6E74" stroke-width="1.5" marker-end="url(#arrG)"/>
+  <circle cx="658" cy="161" r="10" fill="#4A9ED6"/><text x="658" y="165" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="674" y="165" font-size="11.5" fill="#4A9ED6">검색 · 융합</text>
+
+  <!-- query arrows -->
+  <line x1="204" y1="120" x2="292" y2="112" stroke="#4A9ED6" stroke-width="2" marker-end="url(#arrB)"/>
+  <circle cx="240" cy="98" r="10" fill="#4A9ED6"/><text x="240" y="102" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="256" y="102" font-size="11.5" fill="#4A9ED6">질의</text>
+  <line x1="280" y1="208" x2="208" y2="196" stroke="#4A9ED6" stroke-width="2" marker-end="url(#arrB)"/>
+  <circle cx="236" cy="226" r="10" fill="#4A9ED6"/><text x="236" y="230" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="252" y="230" font-size="11.5" fill="#4A9ED6">top-k 근거 반환</text>
+
+  <!-- seeding tactic -->
+  <rect x="690" y="210" width="166" height="80" rx="8" fill="#F0EEFA" stroke="#7B6FD0" stroke-width="1.5"/>
+  <text x="773" y="234" font-size="14" font-weight="700" fill="#7B6FD0" text-anchor="middle">증류 시딩</text>
+  <text x="773" y="252" font-size="10.5" fill="#7B6FD0" text-anchor="middle">강화 tactic (Cerebras 원형)</text>
+  <text x="773" y="270" font-size="10.5" fill="#5B6E74" text-anchor="middle">질문·요약·해결책으로 정제</text>
+  <line x1="690" y1="240" x2="612" y2="226" stroke="#7B6FD0" stroke-width="2" marker-end="url(#arrP)"/>
+  <text x="694" y="204" font-size="11" fill="#7B6FD0">⓪ 사전: 증류 레코드 인덱싱</text>
+
+  <!-- sources -->
+  <rect x="24" y="380" width="190" height="72" rx="8" fill="#EDF2F2" stroke="#5B6E74"/>
+  <text x="119" y="408" font-size="14" font-weight="700" fill="#1B2A30" text-anchor="middle">Confluence</text>
+  <text x="119" y="428" font-size="11" fill="#5B6E74" text-anchor="middle">설계 · 운영 문서</text>
+  <rect x="238" y="380" width="190" height="72" rx="8" fill="#EDF2F2" stroke="#5B6E74"/>
+  <text x="333" y="408" font-size="14" font-weight="700" fill="#1B2A30" text-anchor="middle">Jira</text>
+  <text x="333" y="428" font-size="11" fill="#5B6E74" text-anchor="middle">이슈 티켓 (부실 위험)</text>
+  <rect x="452" y="380" width="190" height="72" rx="8" fill="#EDF2F2" stroke="#5B6E74"/>
+  <text x="547" y="408" font-size="14" font-weight="700" fill="#1B2A30" text-anchor="middle">Messenger · 채팅</text>
+  <text x="547" y="428" font-size="11" fill="#5B6E74" text-anchor="middle">휘발성 실전 지식</text>
+  <rect x="666" y="380" width="190" height="72" rx="8" fill="#EDF2F2" stroke="#5B6E74"/>
+  <text x="761" y="408" font-size="14" font-weight="700" fill="#1B2A30" text-anchor="middle">빌드 로그 · 이슈 이력</text>
+  <text x="761" y="428" font-size="11" fill="#5B6E74" text-anchor="middle">FR-0002 · 실행 trace(QA-04)</text>
+
+  <!-- ingestion fan-in -->
+  <line x1="119" y1="380" x2="722" y2="294" stroke="#7B6FD0" stroke-width="1.3" marker-end="url(#arrP)"/>
+  <line x1="333" y1="380" x2="748" y2="294" stroke="#7B6FD0" stroke-width="1.3" marker-end="url(#arrP)"/>
+  <line x1="547" y1="380" x2="774" y2="294" stroke="#7B6FD0" stroke-width="1.3" marker-end="url(#arrP)"/>
+  <line x1="761" y1="380" x2="800" y2="294" stroke="#7B6FD0" stroke-width="1.3" marker-end="url(#arrP)"/>
+  <!-- raw direct (default) -->
+  <line x1="300" y1="376" x2="466" y2="252" stroke="#C07A2D" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arrW)"/>
+  <text x="220" y="316" font-size="11" fill="#C07A2D">기본: raw 직결 — garbage-in 위험</text>
+
+  <text x="24" y="470" font-size="11.5" fill="#5B6E74">Agent는 소스에 직접 접근하지 않는다 — 조회는 항상 권한 게이트 · 조회 계층을 경유한다</text>
+</svg>
