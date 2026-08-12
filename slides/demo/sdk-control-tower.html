@@ -439,6 +439,25 @@
   .impact-box.high-risk { border-color: var(--critical); background: var(--critical-soft); }
   .impact-box .impact-note { color: var(--ink-secondary); }
   .editor-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* ---------- infra screen ---------- */
+  .orch-pair { display: flex; flex-direction: column; gap: 10px; }
+  .orch-card { border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; display: flex; align-items: center; gap: 10px; }
+  .orch-card .hb-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .orch-card[data-role="active"] .hb-dot { background: var(--good); box-shadow: 0 0 0 3px var(--good-soft); }
+  .orch-card[data-role="standby"] .hb-dot { background: var(--muted); }
+  .orch-card .orch-body { flex: 1; min-width: 0; }
+  .orch-card .orch-title { font-size: 12.5px; font-weight: 700; }
+  .orch-card .orch-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .instance-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; margin-bottom: 10px; }
+  .instance-row:last-child { margin-bottom: 0; }
+  .instance-row .i-label { width: 104px; flex-shrink: 0; color: var(--ink-secondary); }
+  .instance-row .i-count { width: 24px; flex-shrink: 0; font-family: var(--font-mono); font-weight: 700; text-align: right; }
+  .token-hero { font-size: 25px; font-weight: 760; font-family: var(--font-mono); }
+  .token-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .token-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; font-size: 12px; }
+  .token-rows .row { display: flex; justify-content: space-between; color: var(--ink-secondary); }
+  .token-rows .row span:last-child { font-family: var(--font-mono); color: var(--ink); font-weight: 650; }
 </style>
 
 <div class="shell">
@@ -458,6 +477,10 @@
   <button type="button" class="nav-item" data-target="screenEditor">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
     <span class="nav-text"><span class="nav-label">워크플로우 편집</span><span class="nav-sub">SDK·플랫폼 개발자</span></span>
+  </button>
+  <button type="button" class="nav-item" data-target="screenInfra">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+    <span class="nav-text"><span class="nav-label">인프라 현황</span><span class="nav-sub">플랫폼 개발자</span></span>
   </button>
   <div class="nav-role">ST-0001~0003 이해관계자별 화면<br/>(context/stakeholders.md)</div>
 </nav>
@@ -680,6 +703,79 @@
   </div>
 
   <footer class="foot">기반 컨텍스트: FR-0003(SDK Config 변경 추적) · QA-12(Change Impact Scope ≤2개 컴포넌트) — 수치는 모두 예시값</footer>
+</div>
+</section>
+
+<section class="screen" id="screenInfra" data-screen="infra" hidden>
+<div class="app">
+  <div>
+    <p class="eyebrow">플랫폼 개발자 · ST-0003</p>
+    <div class="title-row">
+      <div>
+        <h1>인프라 현황</h1>
+        <p class="subtitle">워크플로우가 실제로 도는 서버·VM과 그 위의 Claude 인스턴스 현황입니다. 노드는 DP-0004(A5/A8) 기준 호출마다 뜨는 ephemeral 컨테이너입니다.</p>
+      </div>
+      <div class="header-meta">
+        <span class="clock mono">스냅샷 · 데모 고정 데이터</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-strip" id="infraKpiStrip"></div>
+
+  <div class="main-grid">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>컴퓨트 노드</h2>
+        <span class="hint">DP-0004 A5/A8 · ephemeral 컨테이너(K8s Job)</span>
+      </div>
+      <div class="toolbar" style="box-shadow:none;border:none;padding:0 0 12px;margin-bottom:2px">
+        <span class="label">상태 필터</span>
+        <button class="chip-btn infra-filter active" data-status="all" type="button">전체</button>
+        <button class="chip-btn infra-filter" data-status="running" type="button">가동중</button>
+        <button class="chip-btn infra-filter" data-status="fault" type="button">장애</button>
+        <button class="chip-btn infra-filter" data-status="hitl" type="button">HITL 대기</button>
+        <button class="chip-btn infra-filter" data-status="idle" type="button">유휴</button>
+      </div>
+      <div class="pm-grid" id="infraGrid"></div>
+    </div>
+
+    <div class="control-col">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>오케스트레이터</h2>
+          <span class="panel-tag">DP-01 3안</span>
+        </div>
+        <div class="orch-pair" id="orchPair"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Claude 인스턴스</h2>
+          <span class="panel-tag">FR-0004</span>
+        </div>
+        <div id="instanceBreakdown"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>토큰 사용</h2>
+          <span class="panel-tag">QA-05/13</span>
+        </div>
+        <div id="tokenStats"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>인프라 알림</h2>
+          <span class="panel-tag">alerting</span>
+        </div>
+        <div class="log-list" id="infraLog"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">기반 컨텍스트: DP-0004(A5/A8 ephemeral) · DP-01(오케스트레이터 Active-Passive) · FR-0004 · ST-0003 — 수치는 모두 예시 스냅샷</footer>
 </div>
 </section>
 </div>
@@ -1329,6 +1425,13 @@
       renderPM();
       return;
     }
+    var infraChip = e.target.closest && e.target.closest(".infra-filter");
+    if (infraChip) {
+      infraFilter = infraChip.getAttribute("data-status");
+      document.querySelectorAll(".infra-filter").forEach(function (b) { b.classList.toggle("active", b === infraChip); });
+      renderInfraGrid();
+      return;
+    }
     var chip = e.target.closest && e.target.closest(".chip-btn");
     if (chip) {
       $("copilotInput").value = chip.textContent;
@@ -1608,13 +1711,135 @@
     }, 1200 + Math.random() * 500);
   });
 
+  /* ================= Infra screen (인프라 현황) ================= */
+  var INFRA_NODES = [
+    { id: "node-ir-a1", stage: 0, run: "RUN-2204", status: "running", load: 62, uptime: "18분" },
+    { id: "node-opt-b2", stage: 1, run: "RUN-2202", status: "running", load: 78, uptime: "9분" },
+    { id: "node-opt-c7", stage: 1, run: "RUN-2206", status: "fault", load: 0, uptime: "2분", note: "OOM(메모리 한도 초과) · 컨테이너 재시작 대기" },
+    { id: "node-quant-a3", stage: 2, run: "RUN-2203", status: "running", load: 91, uptime: "6분" },
+    { id: "node-quant-b1", stage: 2, run: "RUN-2205", status: "idle", load: 4, uptime: "41분", note: "scale-to-zero 대기" },
+    { id: "node-compile-a2", stage: 3, run: "RUN-2201", status: "hitl", load: 12, uptime: "3분", note: "배포 승인 대기 · 사람 승인 필요" },
+    { id: "node-compile-b5", stage: 3, run: "RUN-2202", status: "running", load: 54, uptime: "1분" }
+  ];
+  var INFRA_LOG = [
+    { t: "-2분", sev: "critical", msg: "node-opt-c7 OOM으로 장애 · 컨테이너 재시작 대기" },
+    { t: "-3분", sev: "warn", msg: "node-compile-a2 배포 승인 대기 진입(HITL)" },
+    { t: "-9분", sev: "good", msg: "node-opt-b2 기동 완료 · RUN-2202 그래프 최적화 착수" },
+    { t: "-41분", sev: "muted", msg: "node-quant-b1 유휴 전환 · scale-to-zero 대기" }
+  ];
+  var infraFilter = "all";
+
+  function infraStatusMeta(s) {
+    if (s === "running") return { s: "good", label: "가동중" };
+    if (s === "fault") return { s: "critical", label: "장애" };
+    if (s === "hitl") return { s: "warn", label: "HITL 대기" };
+    return { s: "muted", label: "유휴" };
+  }
+
+  function renderInfraCard(n) {
+    var sm = infraStatusMeta(n.status);
+    var noteHtml = n.note
+      ? '<div class="pm-issue-row"><span class="chip" data-s="' + sm.s + '"><span class="dot"></span>' + sm.label + '</span><span class="pm-issue-title">' + n.note + "</span></div>"
+      : '<div class="pm-issue-row"><span class="chip" data-s="good"><span class="dot"></span>정상</span><span class="pm-issue-title">이상 없음</span></div>';
+    return (
+      '<div class="pm-card">' +
+      '<div class="pm-card-head"><div><span class="run-id mono">' + n.id + '</span><span class="pm-owner">' + STAGES[n.stage] + " worker · " + n.run + '</span></div>' +
+      '<span class="chip" data-s="' + sm.s + '"><span class="dot"></span>' + sm.label + "</span></div>" +
+      noteHtml +
+      '<div class="pm-progress"><div class="pm-progress-top"><span>부하</span><span class="mono">' + n.load + '%</span></div><div class="gauge-track"><div class="gauge-fill" style="width:' + n.load + '%"></div></div></div>' +
+      '<div class="pm-updated">가동 ' + n.uptime + " · ephemeral(A5/A8)</div>" +
+      "</div>"
+    );
+  }
+
+  function renderInfraGrid() {
+    var shown = INFRA_NODES.filter(function (n) { return infraFilter === "all" || n.status === infraFilter; });
+    $("infraGrid").innerHTML = shown.length ? shown.map(renderInfraCard).join("") : '<div class="empty-state">해당 상태의 노드가 없습니다.</div>';
+  }
+
+  function renderOrchPair() {
+    $("orchPair").innerHTML =
+      '<div class="orch-card" data-role="active"><span class="hb-dot"></span><div class="orch-body"><div class="orch-title">orch-a1 · Active</div><div class="orch-sub">지휘 중 · heartbeat 2초 간격 정상 · VIP 10.0.4.10</div></div></div>' +
+      '<div class="orch-card" data-role="standby"><span class="hb-dot"></span><div class="orch-body"><div class="orch-title">orch-b1 · Standby</div><div class="orch-sub">부하 없음 · 상태 외부화 resync 정상 · 마지막 failover 없음</div></div></div>';
+  }
+
+  function infraRunningCount() {
+    return INFRA_NODES.filter(function (n) { return n.status === "running"; }).length;
+  }
+
+  function renderInstanceBreakdown() {
+    var running = infraRunningCount();
+    var total = 1 + running;
+    function row(label, count) {
+      var pct = total ? Math.round((count / total) * 100) : 0;
+      return '<div class="instance-row"><span class="i-label">' + label + '</span><div class="gauge-track" style="flex:1"><div class="gauge-fill" style="width:' + pct + '%"></div></div><span class="i-count">' + count + "</span></div>";
+    }
+    $("instanceBreakdown").innerHTML =
+      row("오케스트레이터", 1) + row("워커 에이전트", running) +
+      '<div class="empty-mini" style="margin-top:2px">장애·유휴·HITL 대기 노드는 LLM 세션 없음(체크아웃 종료)</div>';
+  }
+
+  function tokenTotals() {
+    var growth = state.running ? state.tick * 0.011 : 0;
+    var total = 18.42 + growth;
+    var orch = 3.10 + growth * 0.18;
+    return { total: total, orch: orch, worker: total - orch, cost: 219 + growth * 11.4 };
+  }
+
+  function renderInfraKpis() {
+    var running = infraRunningCount();
+    var fault = INFRA_NODES.filter(function (n) { return n.status === "fault"; }).length;
+    var hitl = INFRA_NODES.filter(function (n) { return n.status === "hitl"; }).length;
+    var idle = INFRA_NODES.filter(function (n) { return n.status === "idle"; }).length;
+    var tok = tokenTotals();
+    $("infraKpiStrip").innerHTML =
+      '<div class="kpi"><span class="k-label">오케스트레이터 · DP-01</span><div class="k-value">Active<span class="k-unit">1</span></div><span class="k-sub">Standby 1 · heartbeat 정상</span></div>' +
+      '<div class="kpi"><span class="k-label">컴퓨트 노드 · ' + INFRA_NODES.length + '개</span><div class="k-value" style="font-size:15px;gap:6px;flex-wrap:wrap">' +
+        '<span class="chip" data-s="good"><span class="dot"></span>가동 ' + running + '</span>' +
+        '<span class="chip" data-s="critical"><span class="dot"></span>장애 ' + fault + '</span>' +
+        '<span class="chip" data-s="warn"><span class="dot"></span>HITL ' + hitl + '</span>' +
+      '</div><span class="k-sub">유휴 ' + idle + ' · DP-0004 A5/A8 ephemeral</span></div>' +
+      '<div class="kpi"><span class="k-label">Claude 인스턴스 · FR-0004</span><div class="k-value">' + (1 + running) + '<span class="k-unit">개 활성</span></div><span class="k-sub">오케스트레이터 1 · 워커 ' + running + '</span></div>' +
+      '<div class="kpi"><span class="k-label">총 토큰 사용 · QA-05/13</span><div class="k-value">' + tok.total.toFixed(2) + '<span class="k-unit">M</span></div><span class="k-sub">이번 세션 누적 · ≈42K tok/분</span></div>' +
+      '<div class="kpi"><span class="k-label">예상 비용</span><div class="k-value">$' + tok.cost.toFixed(0) + '<span class="k-unit">(예시)</span></div><span class="k-sub">결정당 비용 trace 100% 기록(QA-04 공급)</span></div>';
+  }
+
+  function renderTokenStats() {
+    var tok = tokenTotals();
+    $("tokenStats").innerHTML =
+      '<div class="token-hero">' + tok.total.toFixed(2) + 'M</div><div class="token-sub">이번 세션 누적 토큰 · ≈42K tok/분</div>' +
+      '<div class="token-rows">' +
+      '<div class="row"><span>오케스트레이터</span><span>' + tok.orch.toFixed(2) + 'M</span></div>' +
+      '<div class="row"><span>워커 에이전트</span><span>' + tok.worker.toFixed(2) + 'M</span></div>' +
+      '<div class="row"><span>예상 비용(예시)</span><span>$' + tok.cost.toFixed(0) + '</span></div>' +
+      "</div>";
+  }
+
+  function renderInfraLog() {
+    $("infraLog").innerHTML = INFRA_LOG.map(function (e) {
+      return '<div class="log-item" data-s="' + e.sev + '"><span class="bar"></span><span class="txt"><span class="t">' + e.t + '</span><br/><span class="m">' + e.msg + "</span></span></div>";
+    }).join("");
+  }
+
+  function renderInfra() {
+    renderInfraKpis();
+    renderInfraGrid();
+    renderOrchPair();
+    renderInstanceBreakdown();
+    renderTokenStats();
+    renderInfraLog();
+  }
+
   renderPM();
   renderEditor();
+  renderInfra();
 
   setInterval(function () {
     state.tick += 1;
     advanceRuns();
     render();
+    renderInfraKpis();
+    renderTokenStats();
   }, TICK_MS);
 
   render();
