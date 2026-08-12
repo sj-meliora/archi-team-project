@@ -596,18 +596,28 @@
   </div>
 
   <div class="main-grid">
-    <div class="panel">
-      <div class="panel-head">
-        <h2>파이프라인 보드</h2>
-        <span class="hint">FR-0001 워크플로우 실행 인프라</span>
-      </div>
-      <div class="board-scroll">
-        <div class="board" id="board">
-          <div class="board-row head">
-            <span>RUN ID</span><span>모델 · 세대</span><span>단계 진행</span><span>상태</span><span>경과</span><span>Trace</span>
-          </div>
-          <div class="empty-state" id="boardEmpty">‘실행 시작’을 눌러 파이프라인 데모를 시작하세요.</div>
+    <div class="control-col">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>파이프라인 보드</h2>
+          <span class="hint">FR-0001 워크플로우 실행 인프라</span>
         </div>
+        <div class="board-scroll">
+          <div class="board" id="board">
+            <div class="board-row head">
+              <span>RUN ID</span><span>모델 · 세대</span><span>단계 진행</span><span>상태</span><span>경과</span><span>Trace</span>
+            </div>
+            <div class="empty-state" id="boardEmpty">‘실행 시작’을 눌러 파이프라인 데모를 시작하세요.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="tracePanel">
+        <div class="panel-head">
+          <h2>Trace 드릴다운</h2>
+          <span class="hint" id="traceHint">파이프라인 보드에서 실행을 선택하면 span 단위로 재구성됩니다</span>
+        </div>
+        <div id="traceBody"><div class="trace-empty">선택된 실행이 없습니다.</div></div>
       </div>
     </div>
 
@@ -668,14 +678,6 @@
         <div class="log-list" id="logList"><div class="empty-mini">이벤트 없음</div></div>
       </div>
     </div>
-  </div>
-
-  <div class="panel" id="tracePanel">
-    <div class="panel-head">
-      <h2>Trace 드릴다운</h2>
-      <span class="hint" id="traceHint">파이프라인 보드에서 실행을 선택하면 span 단위로 재구성됩니다</span>
-    </div>
-    <div id="traceBody"><div class="trace-empty">선택된 실행이 없습니다.</div></div>
   </div>
 
   <footer class="foot">기반 컨텍스트: OV-0001 · QA-01 · QA-03 · QA-04 · FR-0001 · C-03 — 수치는 모두 예시값이며 합격 기준은 실측으로 확정</footer>
