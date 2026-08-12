@@ -1,0 +1,871 @@
+<title>SDK 파이프라인 관제탑</title>
+<style>
+  :root {
+    --bg: #f4f6f7;
+    --surface: #ffffff;
+    --surface-2: #eef1f3;
+    --border: #dfe4e8;
+    --border-strong: #c7ced4;
+    --ink: #0d1216;
+    --ink-secondary: #49535c;
+    --muted: #7c8890;
+    --accent: #0f6e82;
+    --accent-strong: #0a505f;
+    --accent-soft: #e1f2f4;
+    --good: #0ca30c;
+    --good-soft: #e6f7e1;
+    --warning: #fab219;
+    --warning-soft: #fff3dc;
+    --serious: #ec835a;
+    --serious-soft: #fde7dd;
+    --critical: #d03b3b;
+    --critical-soft: #fbe4e4;
+    --shadow: 0 1px 2px rgba(13,18,22,0.06), 0 10px 28px -14px rgba(13,18,22,0.16);
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --font-mono: ui-monospace, "SFMono-Regular", "Roboto Mono", Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b0e12; --surface: #131a20; --surface-2: #1a232b;
+      --border: #232e37; --border-strong: #30404c;
+      --ink: #f1f4f6; --ink-secondary: #b9c3ca; --muted: #8a97a1;
+      --accent: #3dd6d6; --accent-strong: #7ff0f0; --accent-soft: rgba(61,214,214,0.14);
+      --good: #22c55e; --good-soft: rgba(34,197,94,0.16);
+      --warning: #fab219; --warning-soft: rgba(250,178,25,0.16);
+      --serious: #ec835a; --serious-soft: rgba(236,131,90,0.16);
+      --critical: #f0605f; --critical-soft: rgba(240,96,95,0.18);
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0e12; --surface: #131a20; --surface-2: #1a232b;
+    --border: #232e37; --border-strong: #30404c;
+    --ink: #f1f4f6; --ink-secondary: #b9c3ca; --muted: #8a97a1;
+    --accent: #3dd6d6; --accent-strong: #7ff0f0; --accent-soft: rgba(61,214,214,0.14);
+    --good: #22c55e; --good-soft: rgba(34,197,94,0.16);
+    --warning: #fab219; --warning-soft: rgba(250,178,25,0.16);
+    --serious: #ec835a; --serious-soft: rgba(236,131,90,0.16);
+    --critical: #f0605f; --critical-soft: rgba(240,96,95,0.18);
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 28px -14px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  button { font-family: inherit; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  .app {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 28px clamp(16px, 3vw, 40px) 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* ---------- header ---------- */
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin: 0 0 6px;
+  }
+  :root[data-theme="dark"] .eyebrow, @media (prefers-color-scheme: dark) { }
+  .eyebrow { color: var(--accent); }
+  .title-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+  h1 {
+    margin: 0;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .subtitle { margin: 6px 0 0; color: var(--ink-secondary); font-size: 13.5px; max-width: 62ch; }
+  .header-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .clock {
+    font-size: 13px; color: var(--ink-secondary);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 12px;
+  }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12.5px; font-weight: 650;
+    padding: 7px 13px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--border);
+  }
+  .status-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .status-pill[data-run="running"] .dot { background: var(--good); box-shadow: 0 0 0 3px var(--good-soft); }
+  .status-pill[data-run="stopped"] .dot { background: var(--critical); box-shadow: 0 0 0 3px var(--critical-soft); }
+  .status-pill[data-run="idle"] .dot { background: var(--muted); }
+
+  /* ---------- toolbar ---------- */
+  .toolbar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px;
+    box-shadow: var(--shadow);
+  }
+  .toolbar .label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-right: 4px;
+  }
+  .btn {
+    appearance: none; border: 1px solid var(--border-strong);
+    background: var(--surface); color: var(--ink);
+    padding: 9px 14px; border-radius: 9px;
+    font-size: 13px; font-weight: 620; cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+  }
+  .btn:hover:not(:disabled) { border-color: var(--accent); }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-strong); border-color: var(--accent-strong); }
+  .btn-warn { border-color: var(--warning); color: var(--ink); }
+  .btn-serious { border-color: var(--serious); color: var(--ink); }
+  .btn-critical { background: var(--critical); border-color: var(--critical); color: #fff; font-weight: 700; }
+  .btn-critical:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn-ghost { background: transparent; }
+  .spacer { flex: 1; }
+
+  /* ---------- kpi strip ---------- */
+  .kpi-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  @media (max-width: 1080px) { .kpi-strip { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 15px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 4px; min-height: 108px;
+  }
+  .kpi .k-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .kpi .k-value { font-size: 25px; font-weight: 760; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 6px; }
+  .kpi .k-unit { font-size: 13px; font-weight: 600; color: var(--ink-secondary); }
+  .kpi .k-sub { font-size: 12px; color: var(--muted); margin-top: auto; }
+  .grade-chip {
+    font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+    background: var(--accent-soft); color: var(--accent-strong);
+  }
+  :root[data-theme="dark"] .grade-chip { color: var(--accent); }
+  .stage-dist { display: flex; gap: 2px; height: 6px; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .stage-dist span { flex: 1; background: var(--surface-2); }
+  .stage-dist span.on { background: var(--accent); }
+
+  /* ---------- panels ---------- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: var(--shadow); padding: 16px 17px;
+  }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .panel-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
+  .panel-head .hint { font-size: 12px; color: var(--muted); }
+  .panel-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em;
+    color: var(--muted); font-family: var(--font-mono);
+  }
+
+  .main-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .main-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- pipeline board ---------- */
+  .board-scroll { overflow-x: auto; }
+  .board { min-width: 640px; display: flex; flex-direction: column; }
+  .board-row {
+    display: grid;
+    grid-template-columns: 92px 1fr 210px 128px 74px 84px;
+    gap: 12px; align-items: center;
+    padding: 10px 4px; border-bottom: 1px solid var(--border);
+  }
+  .board-row.head { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border-strong); }
+  .board-row:last-child { border-bottom: none; }
+  .run-id { font-family: var(--font-mono); font-weight: 700; font-size: 12.5px; }
+  .run-model { font-size: 13px; }
+  .run-model .gen { color: var(--muted); font-size: 12px; }
+  .stage-track { display: flex; flex-direction: column; gap: 4px; }
+  .stage-track .segs { display: flex; gap: 3px; height: 6px; }
+  .stage-track .segs i { flex: 1; border-radius: 3px; background: var(--surface-2); position: relative; overflow: hidden; }
+  .stage-track .segs i.done { background: var(--accent); }
+  .stage-track .segs i.now::after {
+    content: ""; position: absolute; inset: 0 auto 0 0; width: var(--fill, 0%);
+    background: var(--accent); border-radius: 3px; transition: width 0.5s ease;
+  }
+  .stage-track .caption { font-size: 11.5px; color: var(--muted); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); font-size: 11.5px; font-weight: 650; white-space: nowrap; }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .chip[data-s="good"] { background: var(--good-soft); } .chip[data-s="good"] .dot { background: var(--good); }
+  .chip[data-s="warn"] { background: var(--warning-soft); } .chip[data-s="warn"] .dot { background: var(--warning); }
+  .chip[data-s="serious"] { background: var(--serious-soft); } .chip[data-s="serious"] .dot { background: var(--serious); }
+  .chip[data-s="critical"] { background: var(--critical-soft); } .chip[data-s="critical"] .dot { background: var(--critical); }
+  .chip[data-s="muted"] { background: var(--surface-2); } .chip[data-s="muted"] .dot { background: var(--muted); }
+  .run-elapsed { font-family: var(--font-mono); font-size: 12px; color: var(--ink-secondary); }
+  .link-btn {
+    background: none; border: 1px solid var(--border-strong); color: var(--accent-strong);
+    font-size: 12px; font-weight: 650; padding: 5px 9px; border-radius: 7px; cursor: pointer;
+  }
+  :root[data-theme="dark"] .link-btn { color: var(--accent); }
+  .link-btn:hover { border-color: var(--accent); }
+  .link-btn.active { background: var(--accent-soft); border-color: var(--accent); }
+  .empty-state { padding: 34px 10px; text-align: center; color: var(--muted); font-size: 13.5px; }
+
+  /* ---------- control column ---------- */
+  .control-col { display: flex; flex-direction: column; gap: 14px; }
+  .estop-card { border: 1px solid var(--critical); background: var(--critical-soft); }
+  :root[data-theme="dark"] .estop-card { background: rgba(240,96,95,0.08); }
+  .estop-body { display: flex; align-items: center; gap: 14px; }
+  .ring { position: relative; width: 58px; height: 58px; border-radius: 50%; background: conic-gradient(var(--critical) calc(var(--p, 0) * 1%), var(--surface-2) 0); flex-shrink: 0; }
+  .ring::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: var(--surface); }
+  .ring .ring-txt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 700; z-index: 1; }
+  .estop-lines { flex: 1; display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; }
+  .estop-lines .row { display: flex; justify-content: space-between; gap: 8px; }
+  .estop-lines .lbl { color: var(--ink-secondary); }
+  .estop-lines .val { font-family: var(--font-mono); font-weight: 700; }
+
+  .checklist { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
+  .check-item { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--ink-secondary); }
+  .check-item .box { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid var(--border-strong); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; }
+  .check-item.on .box { background: var(--good); border-color: var(--good); }
+  .check-item.on .box::after { content: "✓"; color: #fff; font-size: 10px; font-weight: 900; }
+  .check-item.on { color: var(--ink); }
+  .check-item .cap { color: var(--muted); font-size: 11px; }
+
+  .hitl-item { border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; display: flex; flex-direction: column; gap: 7px; margin-bottom: 8px; }
+  .hitl-item:last-child { margin-bottom: 0; }
+  .hitl-item .top { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; }
+  .hitl-item .id { font-family: var(--font-mono); font-weight: 700; }
+  .hitl-actions { display: flex; gap: 6px; }
+  .hitl-actions button { flex: 1; padding: 6px 8px; font-size: 12px; border-radius: 7px; border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; font-weight: 650; }
+  .hitl-actions .approve:hover { border-color: var(--good); color: var(--good); }
+  .hitl-actions .reject:hover { border-color: var(--critical); color: var(--critical); }
+  .empty-mini { font-size: 12px; color: var(--muted); padding: 6px 2px; }
+
+  .gauge-row { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
+  .gauge-row:last-child { margin-bottom: 0; }
+  .gauge-row .g-top { display: flex; justify-content: space-between; font-size: 12px; }
+  .gauge-row .g-top .g-name { color: var(--ink-secondary); }
+  .gauge-row .g-top .g-val { font-family: var(--font-mono); font-weight: 650; }
+  .gauge-track { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .gauge-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+
+  .log-list { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; padding-right: 2px; }
+  .log-item { display: flex; gap: 8px; font-size: 12px; }
+  .log-item .bar { width: 3px; border-radius: 2px; flex-shrink: 0; background: var(--muted); }
+  .log-item[data-s="good"] .bar { background: var(--good); }
+  .log-item[data-s="warn"] .bar { background: var(--warning); }
+  .log-item[data-s="serious"] .bar { background: var(--serious); }
+  .log-item[data-s="critical"] .bar { background: var(--critical); }
+  .log-item .txt { flex: 1; }
+  .log-item .t { font-family: var(--font-mono); color: var(--muted); font-size: 11px; }
+  .log-item .m { color: var(--ink); }
+
+  /* ---------- trace panel ---------- */
+  .trace-head-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tstat { display: flex; flex-direction: column; gap: 2px; }
+  .tstat .tv { font-size: 19px; font-weight: 750; font-family: var(--font-mono); display: flex; align-items: center; gap: 7px; }
+  .tstat .tl { font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .waterfall { display: flex; flex-direction: column; gap: 9px; }
+  .span-row { display: grid; grid-template-columns: 220px 1fr 90px; gap: 10px; align-items: center; }
+  .span-name { font-size: 12.5px; }
+  .span-name .type { display: block; font-size: 10px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em; }
+  .span-track { position: relative; height: 16px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .span-bar { position: absolute; top: 0; bottom: 0; background: var(--accent); border-radius: 4px; }
+  .span-bar.trunc { background: repeating-linear-gradient(135deg, var(--critical), var(--critical) 4px, transparent 4px, transparent 8px); opacity: 0.9; }
+  .span-dur { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-secondary); text-align: right; }
+  .trunc-flag { color: var(--critical); font-weight: 700; font-size: 10.5px; }
+  .trace-empty { padding: 40px 10px; text-align: center; color: var(--muted); font-size: 13.5px; }
+
+  footer.foot { text-align: center; font-size: 11px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+  footer.foot a { color: inherit; }
+</style>
+
+<div class="app">
+  <div>
+    <p class="eyebrow">Agentic AI · On-device AI SDK 개발 자동화</p>
+    <div class="title-row">
+      <div>
+        <h1>SDK 파이프라인 관제탑</h1>
+        <p class="subtitle">IR 변환 → 그래프 최적화 → 양자화 → 컴파일을 사람 개입 없이 수행하는 Agent를, 사람이 언제든 보고(Observability) 멈출 수 있게(Controllability) 만드는 관제 화면 데모.</p>
+      </div>
+      <div class="header-meta">
+        <span class="clock mono" id="clock">가동 00:00</span>
+        <span class="status-pill" id="statusPill" data-run="idle"><span class="dot"></span><span id="statusPillTxt">대기 중</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span class="label">데모 컨트롤</span>
+    <button class="btn btn-primary" id="btnStart">실행 시작</button>
+    <button class="btn btn-warn" id="btnAnomaly">이상 상황 주입</button>
+    <button class="btn btn-serious" id="btnUnauth">권한외 시도 주입</button>
+    <div class="spacer"></div>
+    <button class="btn btn-critical" id="btnStop">긴급 정지</button>
+    <button class="btn btn-ghost" id="btnReset">초기화</button>
+  </div>
+
+  <div class="kpi-strip">
+    <div class="kpi">
+      <span class="k-label">동시 실행 조합 · QA-01</span>
+      <div class="k-value"><span id="kpiRuns">—</span><span class="k-unit">건 진행 중</span></div>
+      <div class="stage-dist" id="stageDist"><span></span><span></span><span></span><span></span></div>
+      <span class="k-sub">전체 대기열 1,680+ 조합 (모델 140+ × 세대 3 × 4단계)</span>
+    </div>
+    <div class="kpi">
+      <span class="k-label">Trace 완전성(일반) · QA-04</span>
+      <div class="k-value"><span id="kpiTrace">100.0</span><span class="k-unit">%</span><span class="grade-chip" id="kpiTraceGrade">★★★</span></div>
+      <span class="k-sub">안전관련 액션 100% · event-history 100% (게이트 불변)</span>
+    </div>
+    <div class="kpi">
+      <span class="k-label">결정당 비용 · QA-05/13</span>
+      <div class="k-value"><span id="kpiCost">$0.0182</span></div>
+      <span class="k-sub">토큰 사용량 trace 기록 100%</span>
+    </div>
+    <div class="kpi">
+      <span class="k-label">MTTD(이상 탐지) · QA-04</span>
+      <div class="k-value"><span id="kpiMttd">—</span></div>
+      <span class="k-sub" id="kpiMttdSub">목표 ≤5분 · 이상 주입 시 측정 시작</span>
+    </div>
+    <div class="kpi">
+      <span class="k-label">제어 응답 · QA-03</span>
+      <div class="k-value"><span id="kpiCtrl">—</span></div>
+      <span class="k-sub" id="kpiCtrlSub">목표 ack ≤5초 · 정지+롤백 ≤30초</span>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>파이프라인 보드</h2>
+        <span class="hint">FR-0001 워크플로우 실행 인프라</span>
+      </div>
+      <div class="board-scroll">
+        <div class="board" id="board">
+          <div class="board-row head">
+            <span>RUN ID</span><span>모델 · 세대</span><span>단계 진행</span><span>상태</span><span>경과</span><span>Trace</span>
+          </div>
+          <div class="empty-state" id="boardEmpty">‘실행 시작’을 눌러 파이프라인 데모를 시작하세요.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-col">
+      <div class="panel estop-card">
+        <div class="panel-head">
+          <h2>긴급 정지</h2>
+          <span class="panel-tag">QA-03 주 KPI</span>
+        </div>
+        <div class="estop-body">
+          <div class="ring" id="estopRing"><span class="ring-txt" id="estopRingTxt">0%</span></div>
+          <div class="estop-lines">
+            <div class="row"><span class="lbl">중단 ack</span><span class="val" id="ackVal">—</span></div>
+            <div class="row"><span class="lbl">Graceful stop + 롤백</span><span class="val" id="rollbackVal">—</span></div>
+            <div class="row"><span class="lbl">등급</span><span class="val" id="estopGrade">—</span></div>
+          </div>
+        </div>
+        <div class="checklist" id="estopChecklist">
+          <div class="check-item" id="chkAck"><span class="box"></span><span>중단 ack ≤ 5초</span></div>
+          <div class="check-item" id="chkHitl"><span class="box"></span><span>HITL 통과율 100% · 우회 0건 <span class="cap">(우회 API 자체를 미노출 — 부재는 설계로 보장, 실측 시연은 별개)</span></span></div>
+          <div class="check-item" id="chkRunaway"><span class="box"></span><span>Runaway cap 작동 100%</span></div>
+          <div class="check-item" id="chkAdmit"><span class="box"></span><span>권한외 hard-invalid 차단(②-1)</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>HITL 승인 대기열</h2>
+          <span class="panel-tag">고위험 액션</span>
+        </div>
+        <div id="hitlList"><div class="empty-mini">대기 중인 승인 요청 없음</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Runaway Cap</h2>
+          <span class="panel-tag">QA-03</span>
+        </div>
+        <div class="gauge-row">
+          <div class="g-top"><span class="g-name">Max iteration</span><span class="g-val" id="gIter">0 / 500</span></div>
+          <div class="gauge-track"><div class="gauge-fill" id="gIterFill" style="width:0%"></div></div>
+        </div>
+        <div class="gauge-row">
+          <div class="g-top"><span class="g-name">Token budget</span><span class="g-val" id="gTok">0 / 2.0M</span></div>
+          <div class="gauge-track"><div class="gauge-fill" id="gTokFill" style="width:0%"></div></div>
+        </div>
+        <div class="gauge-row">
+          <div class="g-top"><span class="g-name">Wall-clock</span><span class="g-val" id="gWall">00:00 / 15:00</span></div>
+          <div class="gauge-track"><div class="gauge-fill" id="gWallFill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>이벤트 로그</h2>
+          <span class="panel-tag">alerting</span>
+        </div>
+        <div class="log-list" id="logList"><div class="empty-mini">이벤트 없음</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="tracePanel">
+    <div class="panel-head">
+      <h2>Trace 드릴다운</h2>
+      <span class="hint" id="traceHint">파이프라인 보드에서 실행을 선택하면 span 단위로 재구성됩니다</span>
+    </div>
+    <div id="traceBody"><div class="trace-empty">선택된 실행이 없습니다.</div></div>
+  </div>
+
+  <footer class="foot">기반 컨텍스트: OV-0001 · QA-01 · QA-03 · QA-04 · FR-0001 · C-03 — 수치는 모두 예시값이며 합격 기준은 실측으로 확정</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var MODELS = [
+    { name: "ResNet-Q", gen: "gen3" },
+    { name: "BERT-Edge", gen: "gen2" },
+    { name: "YOLO-Nano", gen: "gen4" },
+    { name: "Whisper-Tiny", gen: "gen2" },
+    { name: "MobileSAM", gen: "gen1" },
+    { name: "Compact-LM-1B", gen: "gen3" }
+  ];
+  var STAGES = ["IR 변환", "그래프 최적화", "양자화", "컴파일"];
+  var SPAN_TEMPLATE = [
+    { type: "prompt", label: "Prompt 캡처", dur: 40 },
+    { type: "context", label: "입력 Context 로드", dur: 130 },
+    { type: "tool", label: "Tool 호출 · registry.lookup", dur: 85 },
+    { type: "tool", label: "Tool 호출 · optimizer.run", dur: 640 },
+    { type: "model", label: "Model 호출 · quantize-policy v3 (2,140 tok)", dur: 310 },
+    { type: "tool", label: "Tool 호출 · compiler.emit", dur: 210 }
+  ];
+  var TICK_MS = 700;
+  var TICK_S = TICK_MS / 1000;
+
+  var state = {
+    running: false,
+    tick: 0,
+    runs: [],
+    hitl: [],
+    log: [],
+    selectedRun: null,
+    estop: { active: false, ackDone: false, rollbackDone: false, ackSeconds: null, rollbackSeconds: null, gate: { ack: false, hitl: false, runaway: false, admit: false } },
+    mttd: { active: false, startedAt: null, resultSeconds: null },
+    nextId: 1
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function fmtTime(totalSeconds) {
+    var m = Math.floor(totalSeconds / 60);
+    var s = Math.floor(totalSeconds % 60);
+    return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+  function pushLog(sev, msg) {
+    state.log.unshift({ t: fmtTime(state.tick * TICK_S), sev: sev, msg: msg });
+    if (state.log.length > 30) state.log.pop();
+  }
+  function traceGrade(pct) {
+    if (pct >= 98) return "★★★";
+    if (pct >= 97) return "★★☆";
+    if (pct >= 95) return "★☆☆";
+    return "불합격";
+  }
+  function stopGrade(seconds) {
+    if (seconds <= 15) return "★★★";
+    if (seconds <= 30) return "★★☆";
+    return "★☆☆ (hard-kill 폴백)";
+  }
+
+  function makeRun() {
+    var m = MODELS[(state.nextId - 1) % MODELS.length];
+    var run = {
+      id: "RUN-" + (2200 + state.nextId),
+      model: m.name,
+      gen: m.gen,
+      stage: 0,
+      progress: Math.floor(Math.random() * 15),
+      status: "running", // running | anomaly | pending-approval | done | rejected | stopped
+      startTick: state.tick,
+      hasTruncatedSpan: false
+    };
+    state.nextId++;
+    return run;
+  }
+
+  function startDemo() {
+    if (state.running) return;
+    state.running = true;
+    state.runs = MODELS.map(function () { return makeRun(); });
+    state.hitl = [];
+    state.selectedRun = null;
+    state.log = [];
+    pushLog("good", "파이프라인 실행 시작 · " + state.runs.length + "건 동시 진입");
+    $("btnStart").disabled = true;
+    render();
+  }
+
+  function resetDemo() {
+    state.running = false;
+    state.tick = 0;
+    state.runs = [];
+    state.hitl = [];
+    state.log = [];
+    state.selectedRun = null;
+    state.nextId = 1;
+    state.estop = { active: false, ackDone: false, rollbackDone: false, ackSeconds: null, rollbackSeconds: null, gate: { ack: false, hitl: false, runaway: false, admit: false } };
+    state.mttd = { active: false, startedAt: null, resultSeconds: null };
+    $("btnStart").disabled = false;
+    render();
+  }
+
+  function advanceRuns() {
+    if (!state.running || state.estop.active) return;
+    state.runs.forEach(function (r) {
+      if (r.status !== "running" && r.status !== "anomaly") return;
+      r.progress += 8 + Math.random() * 14;
+      if (r.progress >= 100) {
+        r.progress = 0;
+        r.stage += 1;
+        if (r.stage >= STAGES.length) {
+          r.status = "pending-approval";
+          state.hitl.push(r.id);
+          pushLog("warn", r.id + " 배포 승인 대기 · HITL 게이트 진입");
+        }
+      }
+    });
+  }
+
+  function injectAnomaly() {
+    var candidates = state.runs.filter(function (r) { return r.status === "running"; });
+    if (!candidates.length) { pushLog("warn", "이상 주입 대상 없음 — 실행 중인 run이 없습니다"); render(); return; }
+    var r = candidates[Math.floor(Math.random() * candidates.length)];
+    r.status = "anomaly";
+    state.mttd.active = true;
+    state.mttd.startedAt = performance.now();
+    pushLog("critical", r.id + " 이상 징후 포착 — trace span 잘림(truncation) 의심");
+    render();
+    setTimeout(function () {
+      r.hasTruncatedSpan = true;
+      r.status = "running";
+      var elapsed = (performance.now() - state.mttd.startedAt) / 1000;
+      state.mttd.active = false;
+      state.mttd.resultSeconds = elapsed;
+      pushLog("good", r.id + " 이상 탐지 완료 · MTTD " + elapsed.toFixed(1) + "초 (데모 압축, 실측 환산 목표 ≤5분)");
+      render();
+    }, 2300 + Math.random() * 700);
+  }
+
+  function injectUnauthorized() {
+    var running = state.runs.filter(function (r) { return r.status === "running" || r.status === "anomaly"; });
+    var target = running.length ? running[Math.floor(Math.random() * running.length)] : null;
+    var label = target ? target.id : "합성 시도";
+    pushLog("serious", label + " hard-invalid 시도 감지 — 미허용 도구 호출(allowlist 외)");
+    render();
+    setTimeout(function () {
+      state.estop.gate.admit = true;
+      pushLog("good", "admission 게이트 실행 전 차단 완료 · " + (280 + Math.floor(Math.random() * 400)) + "ms (②-1)");
+      render();
+    }, 500 + Math.random() * 400);
+  }
+
+  function emergencyStop() {
+    if (!state.running || state.estop.active) return;
+    state.estop.active = true;
+    $("btnStart").disabled = true;
+    pushLog("critical", "긴급 정지 명령 발행");
+    render();
+
+    var ackMs = 350 + Math.random() * 250;
+    setTimeout(function () {
+      state.estop.ackDone = true;
+      state.estop.ackSeconds = ackMs / 1000;
+      state.estop.gate.ack = ackMs / 1000 <= 5;
+      pushLog("good", "중단 ack 접수 · " + (ackMs / 1000).toFixed(2) + "초");
+      render();
+    }, ackMs);
+
+    var rollbackTotalMs = 11500 + Math.random() * 900;
+    var rollStart = performance.now();
+    var ringTimer = setInterval(function () {
+      var elapsed = performance.now() - rollStart;
+      var pct = Math.min(100, (elapsed / rollbackTotalMs) * 100);
+      var ring = $("estopRing");
+      if (ring) { ring.style.setProperty("--p", pct.toFixed(1)); $("estopRingTxt").textContent = Math.round(pct) + "%"; }
+      if (pct >= 100) {
+        clearInterval(ringTimer);
+        var totalS = rollbackTotalMs / 1000;
+        state.estop.rollbackDone = true;
+        state.estop.rollbackSeconds = totalS;
+        state.estop.gate.hitl = true;
+        state.estop.gate.runaway = true;
+        state.runs.forEach(function (r) {
+          if (r.status === "running" || r.status === "anomaly" || r.status === "pending-approval") {
+            r.status = "stopped";
+          }
+        });
+        state.hitl = [];
+        pushLog("good", "안전 정지 + 롤백 완료 · " + totalS.toFixed(1) + "초 (" + stopGrade(totalS) + ")");
+        $("statusPillTxt").textContent = "정지됨";
+        $("statusPill").setAttribute("data-run", "stopped");
+        render();
+      }
+    }, 120);
+  }
+
+  function approveHitl(id) {
+    var r = state.runs.filter(function (x) { return x.id === id; })[0];
+    if (!r) return;
+    r.status = "done";
+    state.hitl = state.hitl.filter(function (x) { return x !== id; });
+    pushLog("good", id + " 배포 승인 완료");
+    render();
+  }
+  function rejectHitl(id) {
+    var r = state.runs.filter(function (x) { return x.id === id; })[0];
+    if (!r) return;
+    r.status = "rejected";
+    state.hitl = state.hitl.filter(function (x) { return x !== id; });
+    pushLog("warn", id + " 배포 반려 · 롤백 처리");
+    render();
+  }
+
+  function statusMeta(r) {
+    switch (r.status) {
+      case "running": return { s: "good", txt: STAGES[r.stage] + " · " + Math.round(r.progress) + "%" };
+      case "anomaly": return { s: "critical", txt: "이상 징후 감지" };
+      case "pending-approval": return { s: "warn", txt: "HITL 승인 대기" };
+      case "done": return { s: "good", txt: "배포 완료" };
+      case "rejected": return { s: "serious", txt: "반려 · 롤백" };
+      case "stopped": return { s: "muted", txt: "정지됨" };
+      default: return { s: "muted", txt: r.status };
+    }
+  }
+
+  function renderBoard() {
+    var board = $("board");
+    var rows = board.querySelectorAll(".board-row:not(.head)");
+    rows.forEach(function (n) { n.remove(); });
+    var empty = $("boardEmpty");
+    if (!state.runs.length) { if (empty) empty.style.display = ""; return; }
+    if (empty) empty.style.display = "none";
+
+    state.runs.forEach(function (r) {
+      var meta = statusMeta(r);
+      var row = document.createElement("div");
+      row.className = "board-row";
+      var elapsed = fmtTime((state.tick - r.startTick) * TICK_S);
+      var doneStage = (r.status === "done" || r.status === "rejected" || r.status === "stopped") ? STAGES.length : r.stage;
+
+      var segsHtml = "";
+      for (var i = 0; i < STAGES.length; i++) {
+        if (i < doneStage) segsHtml += '<i class="done"></i>';
+        else if (i === doneStage && (r.status === "running" || r.status === "anomaly")) segsHtml += '<i class="now" style="--fill:' + Math.round(r.progress) + '%"></i>';
+        else segsHtml += "<i></i>";
+      }
+
+      row.innerHTML =
+        '<span class="run-id mono">' + r.id + "</span>" +
+        '<span class="run-model">' + r.model + ' <span class="gen">· ' + r.gen + "</span></span>" +
+        '<span class="stage-track"><span class="segs">' + segsHtml + '</span><span class="caption">' + (doneStage >= STAGES.length ? "파이프라인 완료" : STAGES[r.stage]) + "</span></span>" +
+        '<span class="chip" data-s="' + meta.s + '"><span class="dot"></span>' + meta.txt + "</span>" +
+        '<span class="run-elapsed mono">' + elapsed + "</span>" +
+        '<button class="link-btn' + (state.selectedRun === r.id ? " active" : "") + '" data-run="' + r.id + '">Trace 보기</button>';
+      board.appendChild(row);
+    });
+  }
+
+  function renderKpis() {
+    var activeRuns = state.runs.filter(function (r) { return r.status === "running" || r.status === "anomaly" || r.status === "pending-approval"; }).length;
+    $("kpiRuns").textContent = state.runs.length ? activeRuns : "—";
+
+    var dist = $("stageDist").children;
+    for (var i = 0; i < 4; i++) {
+      var count = state.runs.filter(function (r) { return (r.status === "running" || r.status === "anomaly") && r.stage === i; }).length;
+      dist[i].className = count > 0 ? "on" : "";
+    }
+
+    var totalSpans = state.runs.length * SPAN_TEMPLATE.length;
+    var truncated = state.runs.filter(function (r) { return r.hasTruncatedSpan; }).length;
+    var pct = totalSpans ? ((totalSpans - truncated) / totalSpans) * 100 : 100;
+    $("kpiTrace").textContent = pct.toFixed(1);
+    $("kpiTraceGrade").textContent = traceGrade(pct);
+
+    var cost = 0.0182 + (Math.sin(state.tick / 3) * 0.0009);
+    $("kpiCost").textContent = "$" + cost.toFixed(4);
+
+    if (state.mttd.active) {
+      var live = (performance.now() - state.mttd.startedAt) / 1000;
+      $("kpiMttd").textContent = live.toFixed(1) + "초";
+      $("kpiMttdSub").textContent = "탐지 진행 중 (데모 압축)";
+    } else if (state.mttd.resultSeconds != null) {
+      $("kpiMttd").textContent = state.mttd.resultSeconds.toFixed(1) + "초";
+      $("kpiMttdSub").textContent = "탐지 완료 · 실측 환산 목표 ≤5분";
+    } else {
+      $("kpiMttd").textContent = "—";
+      $("kpiMttdSub").textContent = "목표 ≤5분 · 이상 주입 시 측정 시작";
+    }
+
+    if (state.estop.rollbackDone) {
+      $("kpiCtrl").textContent = state.estop.ackSeconds.toFixed(1) + "s / " + state.estop.rollbackSeconds.toFixed(1) + "s";
+      $("kpiCtrlSub").textContent = "ack/정지+롤백 · " + stopGrade(state.estop.rollbackSeconds);
+    } else {
+      $("kpiCtrl").textContent = "—";
+      $("kpiCtrlSub").textContent = "목표 ack ≤5초 · 정지+롤백 ≤30초";
+    }
+  }
+
+  function renderControl() {
+    var ring = $("estopRing");
+    if (!state.estop.active) { ring.style.setProperty("--p", 0); $("estopRingTxt").textContent = "대기"; }
+    $("ackVal").textContent = state.estop.ackSeconds != null ? state.estop.ackSeconds.toFixed(2) + "초" : "—";
+    $("rollbackVal").textContent = state.estop.rollbackSeconds != null ? state.estop.rollbackSeconds.toFixed(1) + "초" : "—";
+    $("estopGrade").textContent = state.estop.rollbackSeconds != null ? stopGrade(state.estop.rollbackSeconds) : "—";
+
+    ["ack", "hitl", "runaway", "admit"].forEach(function (k) {
+      var el = $("chk" + k.charAt(0).toUpperCase() + k.slice(1));
+      if (state.estop.gate[k]) el.classList.add("on"); else el.classList.remove("on");
+    });
+
+    var hitlList = $("hitlList");
+    hitlList.innerHTML = "";
+    if (!state.hitl.length) {
+      hitlList.innerHTML = '<div class="empty-mini">대기 중인 승인 요청 없음</div>';
+    } else {
+      state.hitl.forEach(function (id) {
+        var r = state.runs.filter(function (x) { return x.id === id; })[0];
+        if (!r) return;
+        var item = document.createElement("div");
+        item.className = "hitl-item";
+        item.innerHTML =
+          '<div class="top"><span class="id mono">' + id + '</span><span class="chip" data-s="warn"><span class="dot"></span>배포 승인 대기</span></div>' +
+          '<div style="font-size:12px;color:var(--ink-secondary)">' + r.model + " · " + r.gen + " · 컴파일 완료</div>" +
+          '<div class="hitl-actions"><button class="approve" data-approve="' + id + '">승인</button><button class="reject" data-reject="' + id + '">반려</button></div>';
+        hitlList.appendChild(item);
+      });
+    }
+
+    var iterPct = state.running ? Math.min(100, (state.tick * 1.8)) : 0;
+    var tokPct = state.running ? Math.min(100, state.tick * 1.3) : 0;
+    var wallPct = state.running ? Math.min(100, state.tick * 0.9) : 0;
+    $("gIter").textContent = Math.round(iterPct * 5) + " / 500";
+    $("gIterFill").style.width = iterPct + "%";
+    $("gTok").textContent = (iterPct * 0.02).toFixed(2) + "M / 2.0M";
+    $("gTokFill").style.width = tokPct + "%";
+    $("gWall").textContent = fmtTime(state.tick * TICK_S) + " / 15:00";
+    $("gWallFill").style.width = wallPct + "%";
+
+    var logList = $("logList");
+    logList.innerHTML = "";
+    if (!state.log.length) {
+      logList.innerHTML = '<div class="empty-mini">이벤트 없음</div>';
+    } else {
+      state.log.forEach(function (e) {
+        var item = document.createElement("div");
+        item.className = "log-item";
+        item.setAttribute("data-s", e.sev);
+        item.innerHTML = '<span class="bar"></span><span class="txt"><span class="t">' + e.t + "</span><br/><span class=\"m\">" + e.msg + "</span></span>";
+        logList.appendChild(item);
+      });
+    }
+  }
+
+  function renderTrace() {
+    var body = $("traceBody");
+    var hint = $("traceHint");
+    if (!state.selectedRun) {
+      body.innerHTML = '<div class="trace-empty">파이프라인 보드에서 실행을 선택하면 span 단위로 재구성됩니다.</div>';
+      hint.textContent = "파이프라인 보드에서 실행을 선택하면 span 단위로 재구성됩니다";
+      return;
+    }
+    var r = state.runs.filter(function (x) { return x.id === state.selectedRun; })[0];
+    if (!r) { state.selectedRun = null; renderTrace(); return; }
+
+    var spans = SPAN_TEMPLATE.map(function (s, i) { return { type: s.type, label: s.label, dur: s.dur, truncated: r.hasTruncatedSpan && i === 4 }; });
+    var total = spans.reduce(function (a, s) { return a + s.dur; }, 0);
+    var completeCount = spans.filter(function (s) { return !s.truncated; }).length;
+    var pct = (completeCount / spans.length) * 100;
+
+    var offset = 0;
+    var rowsHtml = spans.map(function (s) {
+      var left = (offset / total) * 100;
+      var width = (s.dur / total) * 100;
+      offset += s.dur;
+      return (
+        '<div class="span-row">' +
+        '<span class="span-name"><span class="type">' + s.type + "</span>" + s.label + "</span>" +
+        '<span class="span-track"><span class="span-bar' + (s.truncated ? " trunc" : "") + '" style="left:' + left.toFixed(1) + "%;width:" + width.toFixed(1) + '%"></span></span>' +
+        '<span class="span-dur mono">' + (s.truncated ? '<span class="trunc-flag">잘림</span> ' : "") + s.dur + "ms</span>" +
+        "</div>"
+      );
+    }).join("");
+
+    hint.textContent = r.id + " (" + r.model + " · " + r.gen + ") 의 agent loop span 재구성";
+    body.innerHTML =
+      '<div class="trace-head-stats">' +
+      '<div class="tstat"><span class="tv">' + pct.toFixed(1) + "% <span class=\"grade-chip\">" + traceGrade(pct) + "</span></span><span class=\"tl\">일반 액션 trace 완전성</span></div>" +
+      '<div class="tstat"><span class="tv">100%</span><span class="tl">안전 액션 완전성(게이트)</span></div>' +
+      '<div class="tstat"><span class="tv">100%</span><span class="tl">event-history 완전성</span></div>' +
+      '<div class="tstat"><span class="tv">' + total.toLocaleString() + 'ms</span><span class="tl">결정 재구성 소요(span 합)</span></div>' +
+      "</div>" +
+      '<div class="waterfall">' + rowsHtml + "</div>";
+  }
+
+  function render() {
+    $("clock").textContent = "가동 " + fmtTime(state.tick * TICK_S);
+    if (state.estop.active) {
+      $("statusPillTxt").textContent = state.estop.rollbackDone ? "정지됨" : "정지 진행 중";
+      $("statusPill").setAttribute("data-run", "stopped");
+    } else {
+      $("statusPillTxt").textContent = state.running ? "실행 중" : "대기 중";
+      $("statusPill").setAttribute("data-run", state.running ? "running" : "idle");
+    }
+    $("btnAnomaly").disabled = !state.running || state.estop.active;
+    $("btnUnauth").disabled = !state.running || state.estop.active;
+    $("btnStop").disabled = !state.running || state.estop.active;
+
+    renderBoard();
+    renderKpis();
+    renderControl();
+    renderTrace();
+  }
+
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.matches("[data-run]") && t.classList.contains("link-btn")) {
+      var id = t.getAttribute("data-run");
+      state.selectedRun = state.selectedRun === id ? null : id;
+      render();
+    } else if (t.matches("[data-approve]")) {
+      approveHitl(t.getAttribute("data-approve"));
+    } else if (t.matches("[data-reject]")) {
+      rejectHitl(t.getAttribute("data-reject"));
+    }
+  });
+
+  $("btnStart").addEventListener("click", startDemo);
+  $("btnAnomaly").addEventListener("click", injectAnomaly);
+  $("btnUnauth").addEventListener("click", injectUnauthorized);
+  $("btnStop").addEventListener("click", emergencyStop);
+  $("btnReset").addEventListener("click", resetDemo);
+
+  setInterval(function () {
+    state.tick += 1;
+    advanceRuns();
+    render();
+  }, TICK_MS);
+
+  render();
+})();
+</script>
