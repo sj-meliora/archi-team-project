@@ -458,6 +458,25 @@
   .token-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; font-size: 12px; }
   .token-rows .row { display: flex; justify-content: space-between; color: var(--ink-secondary); }
   .token-rows .row span:last-child { font-family: var(--font-mono); color: var(--ink); font-weight: 650; }
+  .status-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-secondary); margin-bottom: 12px; }
+  .status-legend .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+  .status-legend .legend-item .dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .server-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 12px; }
+  .server-card { border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; display: flex; flex-direction: column; gap: 10px; background: var(--surface-2); }
+  .server-head { display: flex; flex-direction: column; gap: 2px; }
+  .server-hw { font-size: 11px; color: var(--muted); }
+  .slot-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .slot-chip { width: 26px; height: 26px; border-radius: 6px; border: none; padding: 0; cursor: pointer; transition: transform 0.12s ease; }
+  .slot-chip:hover { transform: scale(1.12); }
+  .slot-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .slot-chip.selected { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .slot-chip.good { background: var(--good); }
+  .slot-chip.critical { background: var(--critical); }
+  .slot-chip.warn { background: var(--warning); }
+  .slot-chip.muted { background: var(--muted); }
+  .slot-chip.empty { background: transparent; border: 1.5px dashed var(--border-strong); cursor: default; }
+  .slot-chip.empty:hover { transform: none; }
+  .server-foot { display: flex; align-items: center; gap: 10px; font-size: 11.5px; color: var(--ink-secondary); }
 </style>
 
 <div class="shell">
@@ -726,18 +745,17 @@
   <div class="main-grid">
     <div class="panel">
       <div class="panel-head">
-        <h2>컴퓨트 노드</h2>
-        <span class="hint">DP-0004 A5/A8 · ephemeral 컨테이너(K8s Job)</span>
+        <h2>서버 현황</h2>
+        <span class="hint">DP-0004 A5/A8 · ephemeral 컨테이너(K8s Job)가 뜨는 물리 노드</span>
       </div>
-      <div class="toolbar" style="box-shadow:none;border:none;padding:0 0 12px;margin-bottom:2px">
-        <span class="label">상태 필터</span>
-        <button class="chip-btn infra-filter active" data-status="all" type="button">전체</button>
-        <button class="chip-btn infra-filter" data-status="running" type="button">가동중</button>
-        <button class="chip-btn infra-filter" data-status="fault" type="button">장애</button>
-        <button class="chip-btn infra-filter" data-status="hitl" type="button">HITL 대기</button>
-        <button class="chip-btn infra-filter" data-status="idle" type="button">유휴</button>
+      <div class="status-legend">
+        <span class="legend-item"><span class="dot" style="background:var(--good)"></span>가동중</span>
+        <span class="legend-item"><span class="dot" style="background:var(--critical)"></span>장애</span>
+        <span class="legend-item"><span class="dot" style="background:var(--warning)"></span>HITL 대기</span>
+        <span class="legend-item"><span class="dot" style="background:var(--muted)"></span>유휴</span>
+        <span class="legend-item"><span class="dot" style="background:transparent;border:1.5px dashed var(--border-strong)"></span>빈 슬롯</span>
       </div>
-      <div class="pm-grid" id="infraGrid"></div>
+      <div class="server-grid" id="serverGrid"></div>
     </div>
 
     <div class="control-col">
@@ -773,6 +791,14 @@
         <div class="log-list" id="infraLog"></div>
       </div>
     </div>
+  </div>
+
+  <div class="panel" id="nodeDetailPanel">
+    <div class="panel-head">
+      <h2>노드 상세</h2>
+      <span class="hint" id="nodeDetailHint">서버 위 VM/컨테이너를 클릭하면 상세 정보가 표시됩니다</span>
+    </div>
+    <div id="nodeDetailBody"><div class="trace-empty">선택된 노드가 없습니다.</div></div>
   </div>
 
   <footer class="foot">기반 컨텍스트: DP-0004(A5/A8 ephemeral) · DP-01(오케스트레이터 Active-Passive) · FR-0004 · ST-0003 — 수치는 모두 예시 스냅샷</footer>
@@ -1425,11 +1451,11 @@
       renderPM();
       return;
     }
-    var infraChip = e.target.closest && e.target.closest(".infra-filter");
-    if (infraChip) {
-      infraFilter = infraChip.getAttribute("data-status");
-      document.querySelectorAll(".infra-filter").forEach(function (b) { b.classList.toggle("active", b === infraChip); });
-      renderInfraGrid();
+    var slotChip = e.target.closest && e.target.closest(".slot-chip[data-node]");
+    if (slotChip) {
+      selectedNodeId = slotChip.getAttribute("data-node");
+      renderServerGrid();
+      renderNodeDetail();
       return;
     }
     var chip = e.target.closest && e.target.closest(".chip-btn");
@@ -1727,7 +1753,18 @@
     { t: "-9분", sev: "good", msg: "node-opt-b2 기동 완료 · RUN-2202 그래프 최적화 착수" },
     { t: "-41분", sev: "muted", msg: "node-quant-b1 유휴 전환 · scale-to-zero 대기" }
   ];
-  var infraFilter = "all";
+  var SERVERS = [
+    { id: "srv-01", hw: "NPU 노드 · 4× NPU-A2", capacity: 4, nodeIds: ["node-ir-a1", "node-opt-b2"] },
+    { id: "srv-02", hw: "NPU 노드 · 4× NPU-A2", capacity: 4, nodeIds: ["node-opt-c7", "node-quant-a3"] },
+    { id: "srv-03", hw: "NPU 노드 · 2× NPU-B1", capacity: 2, nodeIds: ["node-quant-b1"] },
+    { id: "srv-04", hw: "범용 컴퓨트 · 32 vCPU", capacity: 3, nodeIds: ["node-compile-a2"] },
+    { id: "srv-05", hw: "범용 컴퓨트 · 32 vCPU", capacity: 3, nodeIds: ["node-compile-b5"] }
+  ];
+  var selectedNodeId = null;
+
+  function findInfraNode(id) {
+    return INFRA_NODES.filter(function (n) { return n.id === id; })[0];
+  }
 
   function infraStatusMeta(s) {
     if (s === "running") return { s: "good", label: "가동중" };
@@ -1752,9 +1789,45 @@
     );
   }
 
-  function renderInfraGrid() {
-    var shown = INFRA_NODES.filter(function (n) { return infraFilter === "all" || n.status === infraFilter; });
-    $("infraGrid").innerHTML = shown.length ? shown.map(renderInfraCard).join("") : '<div class="empty-state">해당 상태의 노드가 없습니다.</div>';
+  function renderServerCard(srv) {
+    var slots = "";
+    for (var i = 0; i < srv.capacity; i++) {
+      if (i < srv.nodeIds.length) {
+        var n = findInfraNode(srv.nodeIds[i]);
+        var sm = infraStatusMeta(n.status);
+        slots += '<button type="button" class="slot-chip ' + sm.s + (selectedNodeId === n.id ? " selected" : "") + '" data-node="' + n.id + '" title="' + n.id + " · " + sm.label + '" aria-label="' + n.id + " · " + sm.label + '"></button>';
+      } else {
+        slots += '<span class="slot-chip empty" title="빈 슬롯"></span>';
+      }
+    }
+    var used = srv.nodeIds.length;
+    var pct = Math.round((used / srv.capacity) * 100);
+    return (
+      '<div class="server-card">' +
+      '<div class="server-head"><span class="run-id mono">' + srv.id + '</span><span class="server-hw">' + srv.hw + "</span></div>" +
+      '<div class="slot-grid">' + slots + "</div>" +
+      '<div class="server-foot"><span class="mono">' + used + " / " + srv.capacity + '</span><div class="gauge-track" style="flex:1"><div class="gauge-fill" style="width:' + pct + '%"></div></div></div>' +
+      "</div>"
+    );
+  }
+
+  function renderServerGrid() {
+    $("serverGrid").innerHTML = SERVERS.map(renderServerCard).join("");
+  }
+
+  function renderNodeDetail() {
+    var body = $("nodeDetailBody");
+    var hint = $("nodeDetailHint");
+    if (!selectedNodeId) {
+      body.innerHTML = '<div class="trace-empty">서버 위 VM/컨테이너를 클릭하면 상세 정보가 표시됩니다.</div>';
+      hint.textContent = "서버 위 VM/컨테이너를 클릭하면 상세 정보가 표시됩니다";
+      return;
+    }
+    var n = findInfraNode(selectedNodeId);
+    if (!n) { selectedNodeId = null; renderNodeDetail(); return; }
+    var srv = SERVERS.filter(function (s) { return s.nodeIds.indexOf(n.id) > -1; })[0];
+    hint.textContent = n.id + (srv ? " · " + srv.id + " 위 실행 중" : "");
+    body.innerHTML = renderInfraCard(n);
   }
 
   function renderOrchPair() {
@@ -1823,7 +1896,8 @@
 
   function renderInfra() {
     renderInfraKpis();
-    renderInfraGrid();
+    renderServerGrid();
+    renderNodeDetail();
     renderOrchPair();
     renderInstanceBreakdown();
     renderTokenStats();
