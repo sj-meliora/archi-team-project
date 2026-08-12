@@ -177,16 +177,16 @@
     color: var(--muted); font-family: var(--font-mono);
   }
 
-  .main-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  .main-grid { display: grid; grid-template-columns: minmax(0, 1fr) 316px; gap: 16px; align-items: start; }
   @media (max-width: 980px) { .main-grid { grid-template-columns: 1fr; } }
 
   /* ---------- pipeline board ---------- */
   .board-scroll { overflow-x: auto; }
-  .board { min-width: 640px; display: flex; flex-direction: column; }
+  .board { min-width: 544px; display: flex; flex-direction: column; }
   .board-row {
     display: grid;
-    grid-template-columns: 92px 1fr 210px 128px 74px 84px;
-    gap: 12px; align-items: center;
+    grid-template-columns: 80px 1fr 170px 108px 60px 70px;
+    gap: 10px; align-items: center;
     padding: 10px 4px; border-bottom: 1px solid var(--border);
   }
   .board-row.head { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border-strong); }
@@ -359,7 +359,7 @@
   /* ---------- app shell / sidebar ---------- */
   .shell { display: flex; align-items: flex-start; min-height: 100vh; }
   .sidebar {
-    flex-shrink: 0; width: 216px; height: 100vh; position: sticky; top: 0; align-self: flex-start;
+    flex-shrink: 0; width: 196px; height: 100vh; position: sticky; top: 0; align-self: flex-start;
     background: var(--surface); border-right: 1px solid var(--border);
     display: flex; flex-direction: column; gap: 2px; padding: 16px 10px; overflow-y: auto;
   }
@@ -967,7 +967,7 @@
         '<span class="stage-track"><span class="segs">' + segsHtml + '</span><span class="caption">' + (doneStage >= STAGES.length ? "파이프라인 완료" : STAGES[r.stage]) + "</span></span>" +
         '<span class="chip" data-s="' + meta.s + '"><span class="dot"></span>' + meta.txt + "</span>" +
         '<span class="run-elapsed mono">' + elapsed + "</span>" +
-        '<button class="link-btn' + (state.selectedRun === r.id ? " active" : "") + '" data-run="' + r.id + '">Trace 보기</button>';
+        '<button class="link-btn' + (state.selectedRun === r.id ? " active" : "") + '" data-run="' + r.id + '">보기</button>';
       board.appendChild(row);
     });
   }
