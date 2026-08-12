@@ -355,8 +355,115 @@
     .copilot-panel { right: 12px; bottom: 12px; width: calc(100vw - 24px); }
     .copilot-fab { right: 12px; bottom: 12px; }
   }
+
+  /* ---------- app shell / sidebar ---------- */
+  .shell { display: flex; align-items: flex-start; min-height: 100vh; }
+  .sidebar {
+    flex-shrink: 0; width: 216px; height: 100vh; position: sticky; top: 0; align-self: flex-start;
+    background: var(--surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 2px; padding: 16px 10px; overflow-y: auto;
+  }
+  .sidebar-brand { padding: 2px 8px 14px; }
+  .sidebar-brand strong { display: block; font-size: 13px; }
+  .sidebar-brand span { font-size: 10.5px; color: var(--muted); }
+  .nav-item {
+    display: flex; align-items: flex-start; gap: 10px; width: 100%;
+    padding: 10px; border-radius: 10px; border: none; background: none; cursor: pointer;
+    text-align: left; color: var(--ink-secondary);
+  }
+  .nav-item:hover { background: var(--surface-2); color: var(--ink); }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent-strong); }
+  :root[data-theme="dark"] .nav-item.active { color: var(--accent); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .nav-item.active { color: var(--accent); } }
+  .nav-item svg { flex-shrink: 0; margin-top: 1px; }
+  .nav-item .nav-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .nav-item .nav-label { font-size: 12.5px; font-weight: 650; }
+  .nav-item .nav-sub { font-size: 10.5px; color: var(--muted); }
+  .nav-role { margin-top: auto; padding: 12px 8px 2px; font-size: 10px; line-height: 1.6; color: var(--muted); border-top: 1px solid var(--border); }
+  .content { flex: 1; min-width: 0; }
+  .screen[hidden] { display: none; }
+  @media (max-width: 760px) {
+    .shell { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; flex-direction: row; align-items: center; overflow-x: auto; padding: 8px 10px; border-right: none; border-bottom: 1px solid var(--border); }
+    .sidebar-brand, .nav-role { display: none; }
+    .nav-item { flex-direction: row; white-space: nowrap; width: auto; }
+  }
+
+  /* ---------- PM screen ---------- */
+  .pm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .pm-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding: 15px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .pm-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .pm-owner { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .pm-progress-top { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-secondary); margin-bottom: 3px; }
+  .pm-issues { display: flex; flex-direction: column; gap: 6px; }
+  .pm-issue-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .pm-issue-title { color: var(--ink-secondary); }
+  .pm-updated { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+  .chip-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+
+  /* ---------- editor screen ---------- */
+  .editor-select {
+    border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 10px; font-size: 12.5px;
+    font-family: inherit; background: var(--surface); color: var(--ink);
+  }
+  .node-flow { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 4px 2px; }
+  .node-box {
+    flex: 1; min-width: 152px; background: var(--surface); border: 1.5px solid var(--border-strong); border-radius: 12px;
+    padding: 12px 14px; cursor: pointer; text-align: left; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 4px; position: relative; font-family: inherit;
+  }
+  .node-box:hover { border-color: var(--accent); }
+  .node-box.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .node-box .node-index { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .node-box .node-name { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+  .node-box .node-impact { font-size: 11px; color: var(--muted); }
+  .node-box .dirty-dot { position: absolute; top: 10px; right: 10px; width: 7px; height: 7px; border-radius: 50%; background: var(--warning); }
+  .node-arrow { flex-shrink: 0; color: var(--muted); font-size: 15px; }
+  .param-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+  .field-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .field-row label { font-size: 12.5px; color: var(--ink-secondary); }
+  .field-row select, .field-row input[type="number"] {
+    border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 9px; font-size: 12.5px;
+    font-family: inherit; background: var(--surface); color: var(--ink); min-width: 130px;
+  }
+  .field-row select:focus, .field-row input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .switch { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .switch .track { position: absolute; inset: 0; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 999px; transition: background 0.15s ease; pointer-events: none; }
+  .switch .track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,0.25); transition: transform 0.15s ease; }
+  .switch input:checked + .track { background: var(--accent); border-color: var(--accent); }
+  .switch input:checked + .track::after { transform: translateX(16px); background: #fff; }
+  .impact-box { border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; font-size: 12.5px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .impact-box .impact-top { font-weight: 700; }
+  .impact-box.ok { border-color: var(--good); background: var(--good-soft); }
+  .impact-box.high-risk { border-color: var(--critical); background: var(--critical-soft); }
+  .impact-box .impact-note { color: var(--ink-secondary); }
+  .editor-actions { display: flex; gap: 8px; justify-content: flex-end; }
 </style>
 
+<div class="shell">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <strong>Agentic DevOps</strong>
+    <span>17조 데모 콘솔</span>
+  </div>
+  <button type="button" class="nav-item active" data-target="screenControl">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    <span class="nav-text"><span class="nav-label">관제탑</span><span class="nav-sub">SDK 개발자</span></span>
+  </button>
+  <button type="button" class="nav-item" data-target="screenPM">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="nav-text"><span class="nav-label">프로젝트 현황</span><span class="nav-sub">모델 PM</span></span>
+  </button>
+  <button type="button" class="nav-item" data-target="screenEditor">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+    <span class="nav-text"><span class="nav-label">워크플로우 편집</span><span class="nav-sub">SDK·플랫폼 개발자</span></span>
+  </button>
+  <div class="nav-role">ST-0001~0003 이해관계자별 화면<br/>(context/stakeholders.md)</div>
+</nav>
+
+<div class="content">
+<section class="screen" id="screenControl" data-screen="control">
 <div class="app">
   <div>
     <p class="eyebrow">Agentic AI · On-device AI SDK 개발 자동화</p>
@@ -495,6 +602,87 @@
   </div>
 
   <footer class="foot">기반 컨텍스트: OV-0001 · QA-01 · QA-03 · QA-04 · FR-0001 · C-03 — 수치는 모두 예시값이며 합격 기준은 실측으로 확정</footer>
+</div>
+</section>
+
+<section class="screen" id="screenPM" data-screen="pm" hidden>
+<div class="app">
+  <div>
+    <p class="eyebrow">모델 PM · ST-0001</p>
+    <div class="title-row">
+      <div>
+        <h1>프로젝트 현황</h1>
+        <p class="subtitle">모델별 개발 진척과 이슈를 한눈에 봅니다. Jira 수동 업데이트 대신 실행 로그에서 자동 집계한 스냅샷입니다.</p>
+      </div>
+      <div class="header-meta">
+        <span class="clock mono">스냅샷 · 데모 고정 데이터</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-strip" id="pmKpiStrip"></div>
+
+  <div class="toolbar">
+    <span class="label">상태 필터</span>
+    <button class="chip-btn pm-filter active" data-health="all" type="button">전체</button>
+    <button class="chip-btn pm-filter" data-health="healthy" type="button">정상</button>
+    <button class="chip-btn pm-filter" data-health="watch" type="button">주의</button>
+    <button class="chip-btn pm-filter" data-health="issue" type="button">이슈</button>
+  </div>
+
+  <div class="pm-grid" id="pmGrid"></div>
+
+  <footer class="foot">기반 컨텍스트: OV-0001(Pain Point: Jira 수동 업데이트) · ST-0001 · QA-01 — 수치는 모두 예시 스냅샷</footer>
+</div>
+</section>
+
+<section class="screen" id="screenEditor" data-screen="editor" hidden>
+<div class="app">
+  <div>
+    <p class="eyebrow">SDK 개발자 · 플랫폼 개발자 · ST-0002 / ST-0003</p>
+    <div class="title-row">
+      <div>
+        <h1>워크플로우 편집기</h1>
+        <p class="subtitle">모델별 파이프라인 설정을 편집합니다. 저장 전 영향 범위를 자동 분석해 하위 재검증 필요 여부를 보여줍니다.</p>
+      </div>
+      <div class="header-meta">
+        <span class="label" style="margin-right:6px">모델</span>
+        <select id="editorModelSelect" class="editor-select"></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="node-flow" id="nodeFlow"></div>
+
+  <div class="main-grid">
+    <div class="panel">
+      <div class="panel-head">
+        <h2 id="paramPanelTitle">단계 설정</h2>
+        <span class="panel-tag" id="paramPanelTag">STAGE</span>
+      </div>
+      <div class="param-form" id="paramForm"></div>
+      <div class="impact-box" id="impactBox"></div>
+      <div class="editor-actions">
+        <button class="btn btn-ghost" id="btnRevert" type="button">되돌리기</button>
+        <button class="btn btn-primary" id="btnSave" type="button">저장</button>
+      </div>
+    </div>
+
+    <div class="control-col">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>변경 이력</h2>
+          <span class="panel-tag">FR-0003</span>
+        </div>
+        <div class="log-list" id="historyList"><div class="empty-mini">아직 저장된 변경이 없습니다.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">기반 컨텍스트: FR-0003(SDK Config 변경 추적) · QA-12(Change Impact Scope ≤2개 컴포넌트) — 수치는 모두 예시값</footer>
+</div>
+</section>
+</div>
 </div>
 
 <button class="copilot-fab" id="copilotFab" type="button" aria-expanded="false" aria-controls="copilotPanel" aria-label="관제 코파일럿 열기">
@@ -1134,6 +1322,13 @@
   });
 
   document.addEventListener("click", function (e) {
+    var pmChip = e.target.closest && e.target.closest(".pm-filter");
+    if (pmChip) {
+      pmFilter = pmChip.getAttribute("data-health");
+      document.querySelectorAll(".pm-filter").forEach(function (b) { b.classList.toggle("active", b === pmChip); });
+      renderPM();
+      return;
+    }
     var chip = e.target.closest && e.target.closest(".chip-btn");
     if (chip) {
       $("copilotInput").value = chip.textContent;
@@ -1144,6 +1339,277 @@
 
   renderCopilotSuggestions();
   addMessage("bot", copilotGreeting());
+
+  /* ================= screen navigation ================= */
+  function switchScreen(id) {
+    document.querySelectorAll(".screen").forEach(function (s) { s.hidden = s.id !== id; });
+    document.querySelectorAll(".nav-item").forEach(function (n) { n.classList.toggle("active", n.getAttribute("data-target") === id); });
+  }
+  document.querySelectorAll(".nav-item").forEach(function (n) {
+    n.addEventListener("click", function () { switchScreen(n.getAttribute("data-target")); });
+  });
+
+  /* ================= PM screen (프로젝트 현황) ================= */
+  var PM_MODELS = [
+    { id: "ResNet-Q", owner: "Compiler팀", stage: 3, health: "healthy", progress: 92, gen: "3/3", updated: "5분 전", issues: [] },
+    { id: "BERT-Edge", owner: "Optimizer팀", stage: 1, health: "watch", progress: 61, gen: "2/3", updated: "12분 전", issues: [{ sev: "minor", title: "메모리 사용량 임계치 근접(85%)" }] },
+    { id: "YOLO-Nano", owner: "Quantizer팀", stage: 2, health: "issue", progress: 45, gen: "4/4", updated: "2분 전", issues: [{ sev: "major", title: "정확도 저하 3.2%p(양자화 후)" }, { sev: "minor", title: "빌드 캐시 미스율 증가" }] },
+    { id: "Whisper-Tiny", owner: "IR팀", stage: 0, health: "healthy", progress: 18, gen: "2/2", updated: "31분 전", issues: [] },
+    { id: "MobileSAM", owner: "Compiler팀", stage: 3, health: "healthy", progress: 100, gen: "1/1", updated: "2시간 전", issues: [] },
+    { id: "Compact-LM-1B", owner: "Optimizer팀", stage: 1, health: "issue", progress: 38, gen: "3/3", updated: "1분 전", issues: [{ sev: "critical", title: "컴파일 타임아웃 반복 실패 · 3회 연속" }] }
+  ];
+  var pmFilter = "all";
+
+  function healthMeta(h) {
+    if (h === "healthy") return { s: "good", label: "정상" };
+    if (h === "watch") return { s: "warn", label: "주의" };
+    return { s: "critical", label: "이슈" };
+  }
+  function sevMeta(sev) {
+    if (sev === "critical") return { s: "critical", label: "심각" };
+    if (sev === "major") return { s: "serious", label: "주요" };
+    return { s: "warn", label: "경미" };
+  }
+
+  function renderPmCard(m) {
+    var hm = healthMeta(m.health);
+    var doneStage = m.progress >= 100 ? STAGES.length : m.stage;
+    var segsHtml = "";
+    for (var i = 0; i < STAGES.length; i++) {
+      if (i < doneStage) segsHtml += '<i class="done"></i>';
+      else if (i === doneStage) segsHtml += '<i class="now" style="--fill:55%"></i>';
+      else segsHtml += "<i></i>";
+    }
+    var issuesHtml = m.issues.length
+      ? m.issues.map(function (iss) {
+          var sm = sevMeta(iss.sev);
+          return '<div class="pm-issue-row"><span class="chip" data-s="' + sm.s + '"><span class="dot"></span>' + sm.label + '</span><span class="pm-issue-title">' + iss.title + "</span></div>";
+        }).join("")
+      : '<div class="pm-issue-row"><span class="chip" data-s="good"><span class="dot"></span>정상</span><span class="pm-issue-title">열린 이슈 없음</span></div>';
+
+    return (
+      '<div class="pm-card">' +
+      '<div class="pm-card-head"><div><span class="run-id mono">' + m.id + '</span><span class="pm-owner">' + m.owner + " · gen " + m.gen + '</span></div>' +
+      '<span class="chip" data-s="' + hm.s + '"><span class="dot"></span>' + hm.label + "</span></div>" +
+      '<div class="stage-track"><span class="segs">' + segsHtml + '</span><span class="caption">' + (doneStage >= STAGES.length ? "파이프라인 완료" : STAGES[m.stage] + " 진행 중") + "</span></div>" +
+      '<div class="pm-progress"><div class="pm-progress-top"><span>진척률</span><span class="mono">' + m.progress + '%</span></div><div class="gauge-track"><div class="gauge-fill" style="width:' + m.progress + '%"></div></div></div>' +
+      '<div class="pm-issues">' + issuesHtml + "</div>" +
+      '<div class="pm-updated">마지막 업데이트 · ' + m.updated + "</div>" +
+      "</div>"
+    );
+  }
+
+  function renderPM() {
+    var healthy = PM_MODELS.filter(function (m) { return m.health === "healthy"; }).length;
+    var watch = PM_MODELS.filter(function (m) { return m.health === "watch"; }).length;
+    var issue = PM_MODELS.filter(function (m) { return m.health === "issue"; }).length;
+    var avgProgress = Math.round(PM_MODELS.reduce(function (a, m) { return a + m.progress; }, 0) / PM_MODELS.length);
+    var allIssues = PM_MODELS.reduce(function (a, m) { return a.concat(m.issues); }, []);
+    var critCount = allIssues.filter(function (i) { return i.sev === "critical"; }).length;
+    var majCount = allIssues.filter(function (i) { return i.sev === "major"; }).length;
+    var minCount = allIssues.filter(function (i) { return i.sev === "minor"; }).length;
+
+    $("pmKpiStrip").innerHTML =
+      '<div class="kpi"><span class="k-label">전체 모델 · ST-0001</span><div class="k-value">' + PM_MODELS.length + '<span class="k-unit">종</span></div><span class="k-sub">전체 대기열 1,680+ 조합과 연동</span></div>' +
+      '<div class="kpi"><span class="k-label">상태 분포</span><div class="k-value" style="font-size:15px;gap:6px;flex-wrap:wrap">' +
+        '<span class="chip" data-s="good"><span class="dot"></span>정상 ' + healthy + '</span>' +
+        '<span class="chip" data-s="warn"><span class="dot"></span>주의 ' + watch + '</span>' +
+        '<span class="chip" data-s="critical"><span class="dot"></span>이슈 ' + issue + '</span>' +
+      '</div><span class="k-sub">health = 실행 로그 자동 판정(예시)</span></div>' +
+      '<div class="kpi"><span class="k-label">평균 진척률</span><div class="k-value">' + avgProgress + '<span class="k-unit">%</span></div><span class="k-sub">6개 모델 파이프라인 평균</span></div>' +
+      '<div class="kpi"><span class="k-label">열린 이슈</span><div class="k-value">' + allIssues.length + '<span class="k-unit">건</span></div><span class="k-sub">심각 ' + critCount + ' · 주요 ' + majCount + ' · 경미 ' + minCount + '</span></div>';
+
+    var grid = $("pmGrid");
+    var shown = PM_MODELS.filter(function (m) { return pmFilter === "all" || m.health === pmFilter; });
+    grid.innerHTML = shown.length ? shown.map(renderPmCard).join("") : '<div class="empty-state">해당 상태의 모델이 없습니다.</div>';
+  }
+
+  /* ================= Editor screen (워크플로우 편집기) ================= */
+  var STAGE_KEYS = ["ir", "opt", "quant", "compile"];
+  var STAGE_IMPACT = [3, 2, 1, 0];
+  var STAGE_FIELDS = [
+    { fields: [
+        { key: "sourceFw", label: "소스 프레임워크", type: "select", options: ["PyTorch", "TensorFlow", "ONNX"] },
+        { key: "irVersion", label: "대상 IR 버전", type: "select", options: ["IR v3", "IR v4", "IR v5"] },
+        { key: "strict", label: "엄격 검증(strict mode)", type: "toggle" }
+      ] },
+    { fields: [
+        { key: "optLevel", label: "최적화 레벨", type: "select", options: ["O0", "O1", "O2", "O3"] },
+        { key: "fusion", label: "연산자 퓨전", type: "toggle" },
+        { key: "targetNpu", label: "대상 NPU 아키텍처", type: "select", options: ["NPU-Gen2", "NPU-Gen3", "NPU-Gen4"] }
+      ] },
+    { fields: [
+        { key: "precision", label: "정밀도(precision)", type: "select", options: ["FP16", "INT8", "INT4"] },
+        { key: "calibSize", label: "캘리브레이션 데이터 수", type: "number" },
+        { key: "perChannel", label: "채널별(per-channel) 양자화", type: "toggle" }
+      ] },
+    { fields: [
+        { key: "targetChip", label: "타겟 칩", type: "select", options: ["NPU-A1", "NPU-A2", "NPU-B1"] },
+        { key: "timeout", label: "최적화 타임아웃(초)", type: "number" },
+        { key: "retries", label: "재시도 횟수", type: "number" }
+      ] }
+  ];
+
+  function defaultConfig() {
+    return {
+      ir: { sourceFw: "PyTorch", irVersion: "IR v4", strict: true },
+      opt: { optLevel: "O2", fusion: true, targetNpu: "NPU-Gen3" },
+      quant: { precision: "INT8", calibSize: 512, perChannel: true },
+      compile: { targetChip: "NPU-A2", timeout: 300, retries: 2 }
+    };
+  }
+
+  var editorState = { model: MODELS[0].name, configs: {}, savedConfigs: {}, selectedStage: "ir", history: [] };
+
+  function ensureModelConfig(model) {
+    if (!editorState.configs[model]) {
+      editorState.configs[model] = defaultConfig();
+      editorState.savedConfigs[model] = JSON.parse(JSON.stringify(editorState.configs[model]));
+    }
+  }
+  function stageDirty(model, stageKey) {
+    return JSON.stringify(editorState.configs[model][stageKey]) !== JSON.stringify(editorState.savedConfigs[model][stageKey]);
+  }
+
+  function renderEditorModelSelect() {
+    var sel = $("editorModelSelect");
+    sel.innerHTML = MODELS.map(function (m) { return '<option value="' + m.name + '">' + m.name + "</option>"; }).join("");
+    sel.value = editorState.model;
+  }
+
+  function renderNodeFlow() {
+    ensureModelConfig(editorState.model);
+    var html = "";
+    STAGE_KEYS.forEach(function (key, i) {
+      if (i > 0) html += '<span class="node-arrow">→</span>';
+      var dirty = stageDirty(editorState.model, key);
+      html +=
+        '<button type="button" class="node-box' + (editorState.selectedStage === key ? " selected" : "") + '" data-stage="' + key + '">' +
+        (dirty ? '<span class="dirty-dot" title="저장되지 않은 변경"></span>' : "") +
+        '<span class="node-index">STAGE ' + (i + 1) + " / " + STAGE_KEYS.length + '</span>' +
+        '<span class="node-name">' + STAGES[i] + '</span>' +
+        '<span class="node-impact">영향 범위 ' + STAGE_IMPACT[i] + '개 컴포넌트</span>' +
+        "</button>";
+    });
+    $("nodeFlow").innerHTML = html;
+  }
+
+  function fieldControlHtml(model, stageKey, field) {
+    var cfg = editorState.configs[model][stageKey];
+    var val = cfg[field.key];
+    if (field.type === "select") {
+      var opts = field.options.map(function (o) { return '<option value="' + o + '"' + (o === val ? " selected" : "") + ">" + o + "</option>"; }).join("");
+      return '<select data-field="' + field.key + '">' + opts + "</select>";
+    }
+    if (field.type === "number") return '<input type="number" data-field="' + field.key + '" value="' + val + '" />';
+    return '<label class="switch"><input type="checkbox" data-field="' + field.key + '"' + (val ? " checked" : "") + '/><span class="track"></span></label>';
+  }
+
+  function renderParamFields() {
+    var stageKey = editorState.selectedStage;
+    var stageIdx = STAGE_KEYS.indexOf(stageKey);
+    var stageDef = STAGE_FIELDS[stageIdx];
+    $("paramPanelTitle").textContent = STAGES[stageIdx] + " 설정";
+    $("paramPanelTag").textContent = "STAGE " + (stageIdx + 1) + " / " + STAGE_KEYS.length + " · " + editorState.model;
+    $("paramForm").innerHTML = stageDef.fields.map(function (f) {
+      return '<div class="field-row"><label>' + f.label + "</label>" + fieldControlHtml(editorState.model, stageKey, f) + "</div>";
+    }).join("");
+  }
+
+  function renderImpactBox() {
+    var stageKey = editorState.selectedStage;
+    var stageIdx = STAGE_KEYS.indexOf(stageKey);
+    var dirty = stageDirty(editorState.model, stageKey);
+    var impact = STAGE_IMPACT[stageIdx];
+    var box = $("impactBox");
+    if (!dirty) {
+      box.className = "impact-box";
+      box.innerHTML = '<span class="impact-top">영향 범위 분석 대기 중</span><span class="impact-note">이 단계 값을 바꾸면 하위 몇 개 컴포넌트가 재검증 대상인지 자동으로 계산합니다(FR-0003).</span>';
+      return;
+    }
+    var level = impact <= 2 ? "ok" : "high-risk";
+    box.className = "impact-box " + level;
+    var verdict = impact === 0 ? "하위 영향 없음 — 재검증 불요" : impact <= 2 ? "QA-12 기준(≤2개 컴포넌트) 이내" : "QA-12 기준(≤2개 컴포넌트) 초과 — 하위 재검증 필요";
+    var downstream = STAGE_KEYS.slice(stageIdx + 1).map(function (k, j) { return STAGES[stageIdx + 1 + j]; }).join(", ");
+    box.innerHTML = '<span class="impact-top">영향 범위 ' + impact + '개 컴포넌트</span><span class="impact-note">' + verdict + (downstream ? " · 대상: " + downstream : "") + "</span>";
+  }
+
+  function renderEditorHistory() {
+    var list = $("historyList");
+    if (!editorState.history.length) { list.innerHTML = '<div class="empty-mini">아직 저장된 변경이 없습니다.</div>'; return; }
+    list.innerHTML = editorState.history.map(function (h) {
+      return '<div class="log-item" data-s="' + h.sev + '"><span class="bar"></span><span class="txt"><span class="t">' + h.time + '</span><br/><span class="m">' + h.msg + "</span></span></div>";
+    }).join("");
+  }
+
+  function renderEditor() {
+    ensureModelConfig(editorState.model);
+    renderEditorModelSelect();
+    renderNodeFlow();
+    renderParamFields();
+    renderImpactBox();
+    renderEditorHistory();
+  }
+
+  function handleFieldChange(e) {
+    var t = e.target;
+    var fieldKey = t.getAttribute && t.getAttribute("data-field");
+    if (!fieldKey) return;
+    var cfg = editorState.configs[editorState.model][editorState.selectedStage];
+    if (t.type === "checkbox") cfg[fieldKey] = t.checked;
+    else if (t.type === "number") cfg[fieldKey] = t.value === "" ? cfg[fieldKey] : Number(t.value);
+    else cfg[fieldKey] = t.value;
+    renderNodeFlow();
+    renderImpactBox();
+  }
+  document.addEventListener("input", handleFieldChange);
+  document.addEventListener("change", handleFieldChange);
+
+  document.addEventListener("click", function (e) {
+    var node = e.target.closest && e.target.closest(".node-box");
+    if (node) {
+      editorState.selectedStage = node.getAttribute("data-stage");
+      renderNodeFlow();
+      renderParamFields();
+      renderImpactBox();
+    }
+  });
+
+  $("editorModelSelect").addEventListener("change", function (ev) {
+    editorState.model = ev.target.value;
+    renderEditor();
+  });
+
+  $("btnRevert").addEventListener("click", function () {
+    editorState.configs[editorState.model] = JSON.parse(JSON.stringify(editorState.savedConfigs[editorState.model]));
+    renderNodeFlow();
+    renderParamFields();
+    renderImpactBox();
+  });
+
+  $("btnSave").addEventListener("click", function () {
+    var model = editorState.model;
+    var stageKey = editorState.selectedStage;
+    if (!stageDirty(model, stageKey)) return;
+    var stageIdx = STAGE_KEYS.indexOf(stageKey);
+    var impact = STAGE_IMPACT[stageIdx];
+    var highRisk = impact > 2;
+    editorState.savedConfigs[model][stageKey] = JSON.parse(JSON.stringify(editorState.configs[model][stageKey]));
+    var entry = { time: fmtTime(state.tick * TICK_S), sev: "warn", msg: model + " · " + STAGES[stageIdx] + " 설정 저장 · 영향 범위 " + impact + "개 컴포넌트 · 회귀 테스트 실행 중…" };
+    editorState.history.unshift(entry);
+    renderEditorHistory();
+    renderNodeFlow();
+    renderImpactBox();
+    setTimeout(function () {
+      entry.sev = highRisk ? "critical" : "good";
+      entry.msg = model + " · " + STAGES[stageIdx] + " 설정 저장 · 영향 범위 " + impact + "개 컴포넌트 · " +
+        (highRisk ? "회귀 테스트 결과 재검증 필요(하위 " + impact + "개 컴포넌트 대기)" : "회귀 테스트 통과(자동 스모크 " + (impact + 1) + "/" + (impact + 1) + ")");
+      renderEditorHistory();
+    }, 1200 + Math.random() * 500);
+  });
+
+  renderPM();
+  renderEditor();
 
   setInterval(function () {
     state.tick += 1;
