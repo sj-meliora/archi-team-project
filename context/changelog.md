@@ -163,6 +163,11 @@
 - 사유: 팀 요청 — 현재 repo에 잡힌 QA 기준의 장단점 비교를 PR에 반영. 발표 본편(슬라이드 4)은 핵심 행 유지, 전수 판정은 Appendix로.
 - 영향 ID: DP-06(v4.1 — A3′·헤더·슬라이드 4 앵커), changelog.
 
+## 2026-08-13 — DP-06 v4.2: 2안 조회 경로 2단화 — 다이제스트 push + 선택 pull
+- 변경: 2안 런타임 note의 수신을 "작업 시작 시 pull(전량 주입)"에서 **2단 조회**로 정정 — ⑴ **다이제스트 push**: 하네스가 scope 매칭 note의 한 줄 목차(id·claim 요지·TTL 잔여·citations, 상한 N건)만 자동 주입(존재 알림 — unknown unknowns 해소) ⑵ **선택 pull**: 전문은 Agent가 get_note(id)로 필요분만 조회, 능동 검색은 query_notes(조회 계층 질의와 동일 패턴 — note를 federation 소스로 일반화). 명시 get_note만 citations 집계 → 승격 신호 품질 조건. ATAM SP-6(다이제스트 증류 품질 → 선택 조회 누락률) 신설. 반영 위치: 용어·슬라이드 3/4·A2·A4·A3′(QA-05 근거)·`2an-canonical-runtime.svg`(② 라벨).
+- 사유: 팀 리뷰 — 전량 주입은 새 Agent가 원치 않는 정보의 컨텍스트 적재(QA-05 캡 잠식·lost-in-the-middle 재발·관련성 판단 주체 전도). 완전 무주입도 기각(존재를 몰라 조회 시도 자체가 없음) — "존재는 알리고 내용은 청하게".
+- 영향 ID: DP-06(v4.2), diagrams/2an-canonical-runtime.svg, changelog.
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>
