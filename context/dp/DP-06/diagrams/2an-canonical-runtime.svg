@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" font-family="'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="c2arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6E74"/></marker>
+    <marker id="c2arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C07A2D"/></marker>
+    <marker id="c2arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4A9ED6"/></marker>
+    <marker id="c2arrT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2FA98C"/></marker>
+  </defs>
+  <rect width="880" height="480" fill="#FFFFFF"/>
+  <text x="24" y="30" font-size="18" font-weight="700" fill="#2FA98C">2안 · 엄격 정본 + 런타임 공유 — 위키는 순도, 최신 정보는 런타임</text>
+
+  <!-- Agents -->
+  <rect x="24" y="90" width="150" height="72" rx="8" fill="#F1F5F5" stroke="#5B6E74" stroke-width="1.5"/>
+  <text x="99" y="118" font-size="14" font-weight="700" fill="#1B2A30" text-anchor="middle">Agent A</text>
+  <text x="99" y="140" font-size="10.5" fill="#5B6E74" text-anchor="middle">quantize 불량 분석 중</text>
+
+  <rect x="24" y="300" width="150" height="72" rx="8" fill="#F1F5F5" stroke="#5B6E74" stroke-width="1.5"/>
+  <text x="99" y="328" font-size="14" font-weight="700" fill="#1B2A30" text-anchor="middle">Agent B</text>
+  <text x="99" y="350" font-size="10.5" fill="#5B6E74" text-anchor="middle">같은 모델 회귀 검증 중</text>
+
+  <!-- runtime sharing layer -->
+  <rect x="238" y="252" width="330" height="168" rx="8" fill="#F6FAF9" stroke="#4A9ED6" stroke-width="1.8"/>
+  <text x="403" y="278" font-size="14" font-weight="700" fill="#1B2A30" text-anchor="middle">런타임 공유 계층 (Blackboard)</text>
+  <text x="256" y="302" font-size="11" fill="#1B2A30">· 게이트 없음 — 발견 · 현황 · 임시 해결책 즉시 게시</text>
+  <text x="256" y="322" font-size="11" fill="#1B2A30">· 다른 Agent가 구독 · 조회 (최신 정보 실시간 공유)</text>
+  <text x="256" y="342" font-size="11" fill="#1B2A30">· TTL 자동 만료 — 오염의 영구화 방지</text>
+  <text x="256" y="362" font-size="11" fill="#1B2A30">· provenance 표식 — 미검증 근거 표시,</text>
+  <text x="268" y="380" font-size="11" fill="#1B2A30">비가역 액션 금지 (C-03 연계)</text>
+  <text x="256" y="404" font-size="10.5" fill="#4A9ED6">비영속 — 미승격분은 TTL 만료로 소멸 (유실 위험)</text>
+
+  <!-- publish / subscribe arrows -->
+  <line x1="174" y1="140" x2="256" y2="256" stroke="#4A9ED6" stroke-width="2" marker-end="url(#c2arrB)"/>
+  <text x="150" y="196" font-size="10.5" font-weight="700" fill="#4A9ED6">① 즉시 게시</text>
+  <line x1="238" y1="330" x2="178" y2="330" stroke="#4A9ED6" stroke-width="2" marker-end="url(#c2arrB)"/>
+  <text x="182" y="320" font-size="10.5" font-weight="700" fill="#4A9ED6">② 구독</text>
+
+  <!-- promotion queue -->
+  <path d="M 470,252 L 470,196" fill="none" stroke="#C07A2D" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#c2arrA)"/>
+  <text x="482" y="230" font-size="10.5" font-weight="700" fill="#C07A2D">③ 승격 큐 → 증류</text>
+  <text x="482" y="245" font-size="10" fill="#C07A2D">가치 항목만 정본 후보로</text>
+
+  <!-- human gate -->
+  <rect x="364" y="100" width="212" height="96" rx="8" fill="#FBF7EE" stroke="#C07A2D" stroke-width="1.5"/>
+  <text x="470" y="126" font-size="13.5" font-weight="700" fill="#1B2A30" text-anchor="middle">사람 PR 게이트 (전량)</text>
+  <text x="470" y="146" font-size="11" fill="#5B6E74" text-anchor="middle">시니어 · 아키텍트 승인 필수</text>
+  <text x="470" y="164" font-size="11" fill="#5B6E74" text-anchor="middle">위키로 가는 유일한 경로</text>
+  <text x="470" y="184" font-size="10.5" fill="#C07A2D" text-anchor="middle">완화 게이트 없음</text>
+
+  <!-- bottleneck risk -->
+  <text x="590" y="220" font-size="11" font-weight="700" fill="#C07A2D">⚠ 병목 — 축적이 시니어 리뷰</text>
+  <text x="590" y="236" font-size="11" fill="#C07A2D">대역폭에 종속, 큐 적체 시</text>
+  <text x="590" y="252" font-size="11" fill="#C07A2D">TTL 만료로 지식 유실</text>
+
+  <!-- canonical wiki -->
+  <line x1="576" y1="148" x2="676" y2="148" stroke="#C07A2D" stroke-width="2" marker-end="url(#c2arrA)"/>
+  <rect x="696" y="78" width="160" height="140" rx="6" fill="#FFFFFF" stroke="#C9D4D7"/>
+  <rect x="688" y="70" width="160" height="140" rx="6" fill="#E9F6F1" stroke="#2FA98C" stroke-width="1.5"/>
+  <text x="768" y="96" font-size="13.5" font-weight="700" fill="#1B2A30" text-anchor="middle">정본 위키</text>
+  <text x="768" y="118" font-size="10.5" fill="#1B2A30" text-anchor="middle">설계 · 정책 · 표준 · 계약</text>
+  <text x="768" y="134" font-size="10.5" fill="#1B2A30" text-anchor="middle">+ 검증 통과한 운영 지식</text>
+  <text x="768" y="158" font-size="10.5" font-weight="700" fill="#2FA98C" text-anchor="middle">등재분 100% 사람 검증</text>
+  <text x="768" y="174" font-size="10.5" fill="#5B6E74" text-anchor="middle">순도 최상 (KB-DQ-4 ★★★)</text>
+  <text x="768" y="196" font-size="10" fill="#5B6E74" text-anchor="middle">git 이력 — 감사 가능</text>
+
+  <!-- retrieval strip -->
+  <rect x="238" y="434" width="618" height="34" rx="8" fill="#E3EBEB" stroke="#C9D4D7"/>
+  <text x="547" y="456" font-size="11.5" fill="#1B2A30" text-anchor="middle">조회는 정본 + 런타임 이중 (공통 조회 계층 · BL-4) — 근거에 출처 표식: 정본 근거 vs 미검증 런타임 근거</text>
+
+</svg>

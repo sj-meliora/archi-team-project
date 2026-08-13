@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" font-family="'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="t1arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6E74"/></marker>
+    <marker id="t1arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C07A2D"/></marker>
+    <marker id="t1arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7B6FD0"/></marker>
+    <marker id="t1arrT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2FA98C"/></marker>
+  </defs>
+  <rect width="880" height="480" fill="#FFFFFF"/>
+  <text x="24" y="30" font-size="18" font-weight="700" fill="#2FA98C">1안 · 지식 등급별 차등 게이팅 — 하나의 위키, 두 개의 게이트</text>
+
+  <!-- Agent (writer) -->
+  <rect x="24" y="150" width="160" height="110" rx="8" fill="#F1F5F5" stroke="#5B6E74" stroke-width="1.5"/>
+  <text x="104" y="178" font-size="15" font-weight="700" fill="#1B2A30" text-anchor="middle">Agent</text>
+  <text x="104" y="200" font-size="11.5" fill="#5B6E74" text-anchor="middle">이슈 close · config 변경</text>
+  <text x="104" y="218" font-size="11.5" fill="#5B6E74" text-anchor="middle">경험을 증류해</text>
+  <text x="104" y="236" font-size="11.5" fill="#5B6E74" text-anchor="middle">위키 갱신 PR 생성</text>
+
+  <!-- classification -->
+  <line x1="184" y1="205" x2="228" y2="205" stroke="#5B6E74" stroke-width="2" marker-end="url(#t1arrG)"/>
+  <rect x="232" y="160" width="140" height="90" rx="8" fill="#EDF2F2" stroke="#5B6E74" stroke-width="1.5"/>
+  <text x="302" y="188" font-size="13" font-weight="700" fill="#1B2A30" text-anchor="middle">① 등급 분류</text>
+  <text x="302" y="208" font-size="10.5" fill="#5B6E74" text-anchor="middle">경로 · frontmatter로</text>
+  <text x="302" y="224" font-size="10.5" fill="#5B6E74" text-anchor="middle">정본/운영 명시</text>
+
+  <!-- misclassification risk -->
+  <text x="232" y="278" font-size="11" font-weight="700" fill="#C07A2D">⚠ 오분류 위험 — 정본 성격이 운영 경로로 새면</text>
+  <text x="232" y="294" font-size="11" fill="#C07A2D">judge만 거쳐 등재 → 경계 규율 + HITL 표본 감사로 방어</text>
+
+  <!-- human gate (top) -->
+  <line x1="372" y1="185" x2="424" y2="120" stroke="#C07A2D" stroke-width="2" marker-end="url(#t1arrA)"/>
+  <rect x="428" y="66" width="212" height="96" rx="8" fill="#FBF7EE" stroke="#C07A2D" stroke-width="1.5"/>
+  <text x="534" y="92" font-size="13.5" font-weight="700" fill="#1B2A30" text-anchor="middle">②-a 사람 PR 게이트</text>
+  <text x="534" y="112" font-size="11" fill="#5B6E74" text-anchor="middle">시니어 · 아키텍트 승인 필수</text>
+  <text x="534" y="130" font-size="11" fill="#5B6E74" text-anchor="middle">CODEOWNERS 경로 매핑</text>
+  <text x="534" y="150" font-size="10.5" fill="#C07A2D" text-anchor="middle">정합성 엄격 지식 전용</text>
+
+  <!-- judge gate (bottom) -->
+  <line x1="372" y1="225" x2="424" y2="290" stroke="#7B6FD0" stroke-width="2" marker-end="url(#t1arrP)"/>
+  <rect x="428" y="248" width="212" height="96" rx="8" fill="#F0EEFA" stroke="#7B6FD0" stroke-width="1.5"/>
+  <text x="534" y="274" font-size="13.5" font-weight="700" fill="#1B2A30" text-anchor="middle">②-b LLM-as-a-judge</text>
+  <text x="534" y="294" font-size="11" fill="#5B6E74" text-anchor="middle">검증 통과 시 auto-merge</text>
+  <text x="534" y="312" font-size="11" fill="#5B6E74" text-anchor="middle">κ≥0.8 선검증 (QA-07 하네스)</text>
+  <text x="534" y="332" font-size="10.5" fill="#7B6FD0" text-anchor="middle">불합격 → 반려 · 사람 에스컬레이션</text>
+
+  <!-- wiki normative tier -->
+  <line x1="640" y1="114" x2="684" y2="114" stroke="#C07A2D" stroke-width="2" marker-end="url(#t1arrA)"/>
+  <rect x="688" y="66" width="168" height="96" rx="6" fill="#E9F6F1" stroke="#2FA98C" stroke-width="1.5"/>
+  <text x="772" y="90" font-size="13" font-weight="700" fill="#1B2A30" text-anchor="middle">정본 티어</text>
+  <text x="772" y="110" font-size="10.5" fill="#1B2A30" text-anchor="middle">설계 결정 · 정책 · 표준</text>
+  <text x="772" y="126" font-size="10.5" fill="#1B2A30" text-anchor="middle">인터페이스 계약 · 보안 규칙</text>
+  <text x="772" y="148" font-size="10" fill="#5B6E74" text-anchor="middle">틀리면 전 Agent가 같이 틀림</text>
+
+  <!-- wiki operational tier -->
+  <line x1="640" y1="296" x2="684" y2="296" stroke="#7B6FD0" stroke-width="2" marker-end="url(#t1arrP)"/>
+  <rect x="688" y="248" width="168" height="96" rx="6" fill="#F6FAF9" stroke="#2FA98C" stroke-width="1.2" stroke-dasharray="none"/>
+  <text x="772" y="272" font-size="13" font-weight="700" fill="#1B2A30" text-anchor="middle">운영 티어</text>
+  <text x="772" y="292" font-size="10.5" fill="#1B2A30" text-anchor="middle">팁 · 트러블슈팅 노하우</text>
+  <text x="772" y="308" font-size="10.5" fill="#1B2A30" text-anchor="middle">모델별 특이사항 · 현황</text>
+  <text x="772" y="330" font-size="10" fill="#5B6E74" text-anchor="middle">틀려도 피해는 국소적</text>
+
+  <!-- wiki bracket label -->
+  <text x="772" y="52" font-size="12" font-weight="700" fill="#2FA98C" text-anchor="middle">LLM 위키 (git 관리 md · 단일)</text>
+
+  <!-- promotion path -->
+  <path d="M 772,248 L 772,196 L 640,150" fill="none" stroke="#2FA98C" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#t1arrT)"/>
+  <text x="700" y="192" font-size="10.5" font-weight="700" fill="#2FA98C">③ 승격 — 반복 인용 · 검증 누적 시</text>
+  <text x="700" y="207" font-size="10" fill="#2FA98C">사람 게이트 경유 정본 승격</text>
+
+  <!-- one-way reference note -->
+  <text x="688" y="366" font-size="10" fill="#5B6E74">참조는 운영→정본 단방향 (정본은 운영을 인용 안 함)</text>
+
+  <!-- bottom strip: retrieval -->
+  <rect x="24" y="398" width="832" height="58" rx="8" fill="#E3EBEB" stroke="#C9D4D7"/>
+  <text x="440" y="422" font-size="12.5" font-weight="700" fill="#1B2A30" text-anchor="middle">두 티어 모두 공통 조회 계층(단일 인덱스 · BL-4)으로 인덱싱 — 단일 위키 = 조회 · prompt cache 단순 (QA-05 친화)</text>
+  <text x="440" y="442" font-size="11" fill="#5B6E74" text-anchor="middle">운영 지식도 영속 등재 — 축적 속도가 사람 대역폭에 비종속 (KB-DQ-1 · KB-DQ-3 ★★★)</text>
+</svg>

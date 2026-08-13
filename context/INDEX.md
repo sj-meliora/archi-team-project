@@ -53,6 +53,6 @@ overview → stakeholders → requirements(FR/NFR/C) → qa(QA → QAS) → dp(�
 - DP-0003 Agent 외부 시스템 안정성 보장
 - DP-0004 Workflow 실행 구조
 - DP-0005 E2E 개발시간 최적화
-- **DP-06 자율 Agent를 위한 지식베이스 설계 (RAG vs LLM 위키 + 강화 tactic: 증류 시딩·LLM-as-a-judge)** — 신설(2026-08-10)·v2 디스커션(조회 계층=공통 전제, 레퍼런스=Cerebras Knowledge)·v3 발표 용어 정비·v3.1 KB-DQ(ISO/IEC 25012)·v3.2 명명("실행을 넘어 참여로" — AI-DLC 논지). (OI-13, BL-4)
+- **DP-06 자율 Agent를 위한 지식베이스 설계 (LLM 위키 거버넌스: 1안 차등 게이팅 vs 2안 정본+런타임 공유)** — 신설(2026-08-10)·v2 디스커션(조회 계층=공통 전제, 레퍼런스=Cerebras Knowledge)·v3 발표 용어 정비·v3.1 KB-DQ(ISO/IEC 25012)·v3.2 명명("실행을 넘어 참여로" — AI-DLC 논지)·**v4 거버넌스 재프레이밍(2026-08-13)**: LLM 위키 기반 채택(IMS·Confluence·Slack 증류 md 구축), 결정 축 = 갱신 게이팅 — 정본은 사람(시니어·아키텍트) PR 게이트 공통, 대안 = 운영 지식 judge auto-merge(1안) vs 런타임 공유 계층(2안). KB-DQ-4 Consistency 신설. (OI-13, BL-4)
 - _backlog.md (신규 design approach 후보)
 - *2026-06-27: 구 DP-0001·DP-0002 삭제. DP-0002 → DP-01 승계, 구 DP-0001(배치/풀) 결정은 재귀속 보류(OI-12). DP는 2자리 전환 중(DP-0003/0004/0005 추후). DP-06부터 신규는 2자리로 발번(DP-02는 드랍으로 결번).*
