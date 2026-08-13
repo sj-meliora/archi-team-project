@@ -111,6 +111,44 @@
 - round-NN append-only 스냅샷·`dp2-drop-rationale`·각 변경이력의 과거 DP-0001/0002 서술은 당시 기준 보존.
 - 영향 ID: DP-0001·DP-0002(삭제), DP-01, QA-01/02/03/05/09/13, QAS-01/02/03/05/09/13, C-03, FR-0001·FR-0004, module-view, asr, INDEX, CLAUDE, _backlog, dp4/*, open-issues(OI-2·OI-7·OI-12), discussion(dp·qa 스펙), changelog.
 
+## 2026-08-10 — DP-06 Agent 지식 베이스 신설 (RAG vs LLM Wiki, OI-13 신설)
+- 변경: 신규 **`dp/DP-06-knowledge-base.md`** — 자율 이슈처리(불량 분석·회귀)의 전제인 **지식 공급 계층** DP 신설. 슬라이드 2장 구성(1장 필요성 3축: 자율 이슈처리 전제·LLM 파라미터 지식 한계·컨텍스트/토큰 한계 / 2장 RAG vs LLM Wiki ★비교).
+- 사유: DP-01(제어평면)·DP-0004(실행구조)는 "어떻게 실행되나"만 다루고 "무엇을 알고 판단하나"는 어떤 DP도 미결정 — 발표 서사 핵심(자율 이슈처리)의 공백.
+- drives: QA-07↑·QA-05·QA-01 (ASR 3종). 하이브리드(Wiki 1차+RAG fallback)는 승격 후보로 디스커션 회부. DP-06부터 신규 DP는 2자리 발번(DP-02는 드랍 결번).
+- 영향 ID: DP-06(신규), INDEX, open-issues(OI-13 신설), changelog.
+
+## 2026-08-10 — DP-06 v2 재프레이밍: 형태 비교 → 부트스트랩 전략 (디스커션 반영)
+- 변경: DP-06 결정 축 **"RAG vs LLM Wiki(형태)" → "Backfill-first vs Forward-only vs Distill-seeded(시작 전략)"** 재프레이밍. 인덱싱·조회 계층은 공통 전제(채택 패턴)로 분리, 조회 계층 상세 설계는 `_backlog` **BL-4** 신설.
+- 사유: 팀 디스커션 — ① 어느 형태든 인덱스가 있어야 지식을 찾으므로 조회 계층은 변별 축이 아니라 공통 인프라 ② 우리 현실은 물릴 지식이 0(기존 Confluence·Jira 연동 RAG·LLM wiki 부재)이라 진짜 결정은 "어디서 시작하나" ③ 필드 실증(**Cerebras Knowledge**: thread distillation·하이브리드 검색+RRF·age decay, 15K 쿼리/일)이 3안(증류 시딩) 원형을 제공. v1 RAG/Wiki 분석은 1안/2안 근거로 승계.
+- drives 불변(QA-07↑·QA-05·QA-01). 매트릭스에 QA-07 초기/정상 분리(콜드스타트가 핵심 변별). 권고 = 3안 Distill-seeded(드라이버 2단 질문으로 택일).
+- 영향 ID: DP-06(v2), _backlog(BL-4 신설), INDEX, open-issues(OI-13 갱신), changelog.
+
+## 2026-08-10 — DP-06 슬라이드 재편: 공통 조회 계층 구조도 신설, Cerebras는 Appendix로
+- 변경: 슬라이드 구성 2장 → **본편 3장 + Appendix 1장**. 신설 슬라이드 2 = **공통 조회 계층 구조도**(Mermaid) — 단일 인덱스 아래 LLM Wiki·Confluence·Jira·채팅·빌드 로그·trace가 federation으로 붙는 구조, 1안(raw 직결) vs 2·3안(증류 경유) 인덱싱 경로 시각화. Cerebras Field Reference는 Appendix 슬라이드로 이동. 구 슬라이드 2(부트스트랩 비교) → 슬라이드 3.
+- 사유: 본편에는 레퍼런스 소개보다 우리 시스템의 구조 설계가 먼저 — 조회 계층 공통 전제를 그림으로 고정하고, 부트스트랩 비교(슬라이드 3)가 "인덱싱 경로 선택"임을 구조도에서 미리 보이게.
+- 영향 ID: DP-06, changelog.
+
+## 2026-08-10 — DP-06 v3: 발표 용어 정비 — 대안을 RAG vs LLM 위키 2개로, 3안은 강화 tactic으로
+- 변경: 대안명 **Backfill-first/Forward-only → 1안 RAG / 2안 LLM 위키**(청중이 아는 이름으로), **v2 3안(Distill-seeded) 제거** — 증류 시딩은 **1안 RAG의 강화 tactic**으로, **LLM-as-a-judge**(QA-07 채택 기법·judge 하네스 공유, κ≥0.8 선검증)는 **2안 LLM 위키의 강화 tactic**(위키 등재 전 검증 → 오염 방어)으로 재배치. 매트릭스는 기본→강화 별 변화(`→`) 표기. A4 = 강화 tactic 상세 + 수렴 노트(1안 강화형↔2안 동형, 정식 대안 아님).
+- 사유: 팀 피드백 — 자작 용어(Backfill/Forward/Distill-seeded)는 청중에게 불투명. 콜드스타트 관점은 비교 렌즈로 유지(QA-07 초기/정상 분리 존치).
+- 권고 갱신: 드라이버 Q1(기존 소스 지식 실재)·Q2(초기 신뢰 형성 binding) → 우리 상황은 **1안 RAG + 증류 시딩** 우세.
+- 영향 ID: DP-06(v3), INDEX, open-issues(OI-13 갱신), changelog.
+
+## 2026-08-10 — DP-06 v3.1: 지식 데이터 품질 기준 KB-DQ 신설 (ISO/IEC 25012 앵커)
+- 변경: 기존 ASR 중 실제로 물리는 건 QA-07·QA-05뿐임을 확인 — **매트릭스에서 QA-01 행 제거**, 그 관점(축적·확장)을 **KB-DQ**(DP-06-로컬 지식 데이터 품질 기준)로 이관·신설: **KB-DQ-1 커버리지(25012 Completeness) · KB-DQ-2 신선도(25012 Currentness) · KB-DQ-3 축적 속도(Currentness 운영 파생, time-to-knowledge)**. 측정 = RAG 필드 표준 RAGAS(context recall·faithfulness) + stale-hit율·반영 랙. A3 매트릭스를 [ASR]+[KB-DQ] 2단으로 분리, 정확성·토큰은 QA-07/05에 위임(재정의 금지), context precision은 BL-4로 이관.
+- 사유: 팀 피드백 — 커버리지·축적 속도·신선도는 시스템 품질속성이 아니라 "Agent에게 공급되는 데이터의 품질" → 표준 탐색 결과 우리 QA 앵커(ISO/IEC 25010)와 같은 SQuaRE 패밀리의 **ISO/IEC 25012 Data Quality Model**이 정확히 이 자리(고유 특성 Completeness·Currentness).
+- 영향 ID: DP-06(v3.1), open-issues(OI-13 ⑥ 추가 — KB-DQ QA 승격 여부), changelog.
+
+## 2026-08-10 — DP-06 v3.2: 설계명 확정 "자율 Agent를 위한 지식베이스 설계" + 배경 논지 재작성
+- 변경: 설계명 = **"자율 Agent를 위한 지식베이스 설계"**(팀 결정). 슬라이드 1(배경)을 **"실행을 넘어 참여로"** 논지로 재작성 — Agent가 시키는 일을 실행하는 데 그치지 않고 **이슈 생성→분석→해결까지 능동적으로 개발에 참여**하려면(AI-DLC), 판단마다 적절한 정보를 공급해 줄 지식베이스가 필요하다. 수동(명령이면 충분)↔능동(판단마다 조직 지식 필요) 대비 표 추가, 동작 예시에 이슈 생성·해결 단계 명시, 요지를 "참여하는 Agent는 지식이 있어야 한다"로.
+- 사유: 발표 제목·서사 확정 — 메커니즘(RAG/위키)이 아니라 역할(자율 Agent의 성립 조건)로 명명.
+- 영향 ID: DP-06(v3.2), INDEX, changelog.
+
+## 2026-08-10 — DP-06 대안 구조도 SVG 신설 + 폴더 승격 (본편 4장)
+- 변경: **`dp/DP-06/` 폴더 승격**(DP-01 패턴 — md 이동 + `diagrams/` 신설) + 대안별 구조도 SVG 작성: `1an-rag.svg`(⓪사전 인제스천(raw 직결 vs 증류 시딩)→①질의(C-03 게이트)→②하이브리드 검색→③top-k 반환→④판단 — Confluence·Jira·Messenger·빌드 로그 배선), `2an-llm-wiki.svg`(①증류→②judge 검증→③등재→④⑤조회→⑥선순환 — 기존 지식 공간 연결 없음 ✕ = 콜드스타트 가시화). 슬라이드 구성 본편 3장→**4장**(3장 = 대안 구조도 신설, 구 3장 비교·결정 → 4장).
+- 사유: 팀 피드백 — 대안 카드의 3-박스 미니 플로우로는 Agent↔기존 지식 공간 간 질의·인제스천 흐름이 안 보임 → 번호 매긴 시퀀스가 있는 구조도로.
+- 영향 ID: DP-06(폴더 승격·v3.2), diagrams(신규 2), open-issues(OI-13 ③ 닫힘), changelog.
+
 <!-- 템플릿
 ## YYYY-MM-DD — 한 줄 요약
 - 변경: <기존> → <신규>
